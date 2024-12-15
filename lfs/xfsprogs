@@ -78,7 +78,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 		LOCAL_CONFIGURE_OPTIONS="$(CONFIGURE_OPTIONS)"
 	cd $(DIR_APP) && make install install-dev
 	cd $(DIR_APP) && install -v -m755 -D libhandle/libhandle.la /usr/lib/libhandle.la
-	chmod -v 755 /lib/libhandle.so*
+	#chmod -v 755 /lib/libhandle.so*
 	rm -f /lib/libhandle.{a,la,so}
 	ln -svf ../../lib/libhandle.so.1 /usr/lib/libhandle.so
 	@rm -rf $(DIR_APP)

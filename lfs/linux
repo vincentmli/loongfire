@@ -35,6 +35,12 @@ HEADERS_ARCH  = $(BUILD_PLATFORM)
 KERNEL_ARCH   = $(BUILD_ARCH)
 KERNEL_TARGET = bzImage
 
+ifeq "$(BUILD_ARCH)" "loongarch64"
+	HEADERS_ARCH = loongarch
+	KERNEL_ARCH  = loongarch
+	KERNEL_TARGET = vmlinuz
+endif
+
 ifeq "$(BUILD_ARCH)" "aarch64"
 	HEADERS_ARCH = arm64
 	KERNEL_ARCH  = arm64
@@ -165,7 +171,13 @@ else
 	rm -rf /lib/modules/$(KVER)
 
 	# Build the kernel
-	cd $(DIR_APP) && make $(MAKETUNING) $(KERNEL_TARGET) modules
+	# Loongarch64 make requires no argument to build vmlinuz and EFI under arch/loongarch/boot
+ifeq "$(BUILD_ARCH)" "loongarch64"
+	cd $(DIR_APP) && make $(MAKETUNING)
+	cd $(DIR_APP) && make $(MAKETUNING) modules
+else
+	cd $(DIR_APP) && make V=1 $(MAKETUNING) $(KERNEL_TARGET) modules
+endif
 
 	# Install the kernel
 	cd $(DIR_APP) && cp -v arch/$(KERNEL_ARCH)/boot/$(KERNEL_TARGET) /boot/vmlinuz-$(KVER)

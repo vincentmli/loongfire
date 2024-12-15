@@ -221,7 +221,6 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 		-e 's@\./fixinc\.sh@-c true@' \
 		-e 's/^T_CFLAGS =$$/& -fomit-frame-pointer/'
 
-ifeq "$(TOOLCHAIN)" "1"
 	# Build gmp and mpfr internally in toolchain.
 	cd $(DIR_APP) && tar xfa $(DIR_DL)/gmp-$(GMP_VER).tar.xz
 	cd $(DIR_APP) && mv -v gmp-$(GMP_VER) gmp
@@ -229,6 +228,8 @@ ifeq "$(TOOLCHAIN)" "1"
 	cd $(DIR_APP) && mv -v mpfr-$(MPFR_VER) mpfr
 	cd $(DIR_APP) && tar xfa $(DIR_DL)/mpc-$(MPC_VER).tar.gz
 	cd $(DIR_APP) && mv -v mpc-$(MPC_VER) mpc
+
+ifeq "$(TOOLCHAIN)" "1"
 
 	for file in $$(find $(DIR_APP)/gcc/config -name linux64.h -o -name linux.h \
 			-o -name sysv4.h -o -name linux-eabi.h -o -name linux-elf.h -o -name aarch64-linux.h); do \

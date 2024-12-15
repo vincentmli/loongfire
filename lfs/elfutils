@@ -74,6 +74,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 	cd $(DIR_APP) && ./configure \
 				--prefix=/usr \
+				--disable-demangler \
 				--disable-debuginfod \
 				--disable-libdebuginfod
 	cd $(DIR_APP) && make $(MAKETUNING)

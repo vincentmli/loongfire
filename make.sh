@@ -51,6 +51,7 @@ ARCHES=(
 	aarch64
 	riscv64
 	x86_64
+	loongarch64
 )
 
 HOST_ARCH="${HOSTTYPE}"
@@ -1370,7 +1371,7 @@ build_toolchain() {
 	lfsmake1 ccache
 	lfsmake1 tcl
 	lfsmake1 expect
-	lfsmake1 dejagnu
+	#lfsmake1 dejagnu
 	lfsmake1 pkg-config
 	lfsmake1 ncurses
 	lfsmake1 bash
@@ -1475,7 +1476,7 @@ build_system() {
 	lfsmake2 configroot
 	lfsmake2 initscripts
 	lfsmake2 backup
-	lfsmake2 rust
+	#lfsmake2 rust
 	lfsmake2 openssl
 	lfsmake2 popt
 	lfsmake2 libedit
@@ -1545,108 +1546,108 @@ build_system() {
 	lfsmake2 linux-atm
 	lfsmake2 libqmi
 	lfsmake2 c-ares
-	lfsmake2 rust-dissimilar
-	lfsmake2 rust-cfg-if
-	lfsmake2 rust-libc
-	lfsmake2 rust-getrandom
-	lfsmake2 rust-typenum
-	lfsmake2 rust-version-check
-	lfsmake2 rust-generic-array
-	lfsmake2 rust-crypto-common
-	lfsmake2 rust-cipher
-	lfsmake2 rust-hex
-	lfsmake2 rust-unicode-xid
-	lfsmake2 rust-proc-macro2
-	lfsmake2 rust-quote
-	lfsmake2 rust-syn
-	lfsmake2 rust-home
-	lfsmake2 rust-lazy-static
-	lfsmake2 rust-memchr
-	lfsmake2 rust-aho-corasick
-	lfsmake2 rust-regex-syntax
-	lfsmake2 rust-regex
-	lfsmake2 rust-ucd-trie
-	lfsmake2 rust-pest
-	lfsmake2 rust-semver-parser
-	lfsmake2 rust-semver
-	lfsmake2 rust-same-file
-	lfsmake2 rust-walkdir
-	lfsmake2 rust-dirs
-	lfsmake2 rust-toolchain_find
-	lfsmake2 rust-serde
-	lfsmake2 rust-itoa
-	lfsmake2 rust-ryu
-	lfsmake2 rust-serde_json
-	lfsmake2 rust-synstructure
-	lfsmake2 rust-block-buffer
-	lfsmake2 rust-digest
-	lfsmake2 rust-ppv-lite86
-	lfsmake2 rust-rand_core
-	lfsmake2 rust-rand_core-0.4.2
-	lfsmake2 rust-rand_core-0.3.1
-	lfsmake2 rust-rand_chacha
-	lfsmake2 rust-rand_hc
-	lfsmake2 rust-rand
-	lfsmake2 rust-rdrand
-	lfsmake2 rust-rand-0.4
-	lfsmake2 rust-log
-	lfsmake2 rust-num_cpus
-	lfsmake2 rust-crossbeam-utils
-	lfsmake2 rust-autocfg
-	lfsmake2 rust-memoffset
-	lfsmake2 rust-scopeguard
-	lfsmake2 rust-crossbeam-epoch
-	lfsmake2 rust-crossbeam-deque
-	lfsmake2 rust-either
-	lfsmake2 rust-crossbeam-channel
-	lfsmake2 rust-rayon-core
-	lfsmake2 rust-rayon
-	lfsmake2 rust-remove_dir_all
-	lfsmake2 rust-tempdir
-	lfsmake2 rust-glob
-	lfsmake2 rust-once_cell
-	lfsmake2 rust-termcolor
-	lfsmake2 rust-toml
-	lfsmake2 rust-serde_derive
-	lfsmake2 rust-trybuild
-	lfsmake2 rust-unindent
-	lfsmake2 rust-proc-macro-hack
-	lfsmake2 rust-indoc-impl
-	lfsmake2 rust-indoc
-	lfsmake2 rust-indoc-0.3.6
-	lfsmake2 rust-instant
-	lfsmake2 rust-lock_api
-	lfsmake2 rust-smallvec
-	lfsmake2 rust-parking_lot_core
-	lfsmake2 rust-parking_lot
-	lfsmake2 rust-paste-impl
-	lfsmake2 rust-paste
-	lfsmake2 rust-paste-0.1.18
-	lfsmake2 rust-ctor
-	lfsmake2 rust-ghost
-	lfsmake2 rust-inventory-impl
-	lfsmake2 rust-inventory
-	lfsmake2 rust-pyo3-build-config
-	lfsmake2 rust-pyo3-macros-backend
-	lfsmake2 rust-pyo3-macros
-	lfsmake2 rust-pyo3
-	lfsmake2 rust-num-traits
-	lfsmake2 rust-num-integer
-	lfsmake2 rust-num_threads
-	lfsmake2 rust-time
-	lfsmake2 rust-iana-time-zone
-	lfsmake2 rust-chrono
-	lfsmake2 rust-asn1_derive
-	lfsmake2 rust-asn1
-	lfsmake2 rust-proc-macro-error-attr
-	lfsmake2 rust-proc-macro-error
-	lfsmake2 rust-Inflector
-	lfsmake2 rust-ouroboros_macro
-	lfsmake2 rust-aliasable
-	lfsmake2 rust-stable_deref_trait
-	lfsmake2 rust-ouroboros
-	lfsmake2 rust-base64
-	lfsmake2 rust-pem
+	#lfsmake2 rust-dissimilar
+	#lfsmake2 rust-cfg-if
+	#lfsmake2 rust-libc
+	#lfsmake2 rust-getrandom
+	#lfsmake2 rust-typenum
+	#lfsmake2 rust-version-check
+	#lfsmake2 rust-generic-array
+	#lfsmake2 rust-crypto-common
+	#lfsmake2 rust-cipher
+	#lfsmake2 rust-hex
+	#lfsmake2 rust-unicode-xid
+	#lfsmake2 rust-proc-macro2
+	#lfsmake2 rust-quote
+	#lfsmake2 rust-syn
+	#lfsmake2 rust-home
+	#lfsmake2 rust-lazy-static
+	#lfsmake2 rust-memchr
+	#lfsmake2 rust-aho-corasick
+	#lfsmake2 rust-regex-syntax
+	#lfsmake2 rust-regex
+	#lfsmake2 rust-ucd-trie
+	#lfsmake2 rust-pest
+	#lfsmake2 rust-semver-parser
+	#lfsmake2 rust-semver
+	#lfsmake2 rust-same-file
+	#lfsmake2 rust-walkdir
+	#lfsmake2 rust-dirs
+	#lfsmake2 rust-toolchain_find
+	#lfsmake2 rust-serde
+	#lfsmake2 rust-itoa
+	#lfsmake2 rust-ryu
+	#lfsmake2 rust-serde_json
+	#lfsmake2 rust-synstructure
+	#lfsmake2 rust-block-buffer
+	#lfsmake2 rust-digest
+	#lfsmake2 rust-ppv-lite86
+	#lfsmake2 rust-rand_core
+	#lfsmake2 rust-rand_core-0.4.2
+	#lfsmake2 rust-rand_core-0.3.1
+	#lfsmake2 rust-rand_chacha
+	#lfsmake2 rust-rand_hc
+	#lfsmake2 rust-rand
+	#lfsmake2 rust-rdrand
+	#lfsmake2 rust-rand-0.4
+	#lfsmake2 rust-log
+	#lfsmake2 rust-num_cpus
+	#lfsmake2 rust-crossbeam-utils
+	#lfsmake2 rust-autocfg
+	#lfsmake2 rust-memoffset
+	#lfsmake2 rust-scopeguard
+	#lfsmake2 rust-crossbeam-epoch
+	#lfsmake2 rust-crossbeam-deque
+	#lfsmake2 rust-either
+	#lfsmake2 rust-crossbeam-channel
+	#lfsmake2 rust-rayon-core
+	#lfsmake2 rust-rayon
+	#lfsmake2 rust-remove_dir_all
+	#lfsmake2 rust-tempdir
+	#lfsmake2 rust-glob
+	#lfsmake2 rust-once_cell
+	#lfsmake2 rust-termcolor
+	#lfsmake2 rust-toml
+	#lfsmake2 rust-serde_derive
+	#lfsmake2 rust-trybuild
+	#lfsmake2 rust-unindent
+	#lfsmake2 rust-proc-macro-hack
+	#lfsmake2 rust-indoc-impl
+	#lfsmake2 rust-indoc
+	#lfsmake2 rust-indoc-0.3.6
+	#lfsmake2 rust-instant
+	#lfsmake2 rust-lock_api
+	#lfsmake2 rust-smallvec
+	#lfsmake2 rust-parking_lot_core
+	#lfsmake2 rust-parking_lot
+	#lfsmake2 rust-paste-impl
+	#lfsmake2 rust-paste
+	#lfsmake2 rust-paste-0.1.18
+	#lfsmake2 rust-ctor
+	#lfsmake2 rust-ghost
+	#lfsmake2 rust-inventory-impl
+	#lfsmake2 rust-inventory
+	#lfsmake2 rust-pyo3-build-config
+	#lfsmake2 rust-pyo3-macros-backend
+	#lfsmake2 rust-pyo3-macros
+	#lfsmake2 rust-pyo3
+	#lfsmake2 rust-num-traits
+	#lfsmake2 rust-num-integer
+	#lfsmake2 rust-num_threads
+	#lfsmake2 rust-time
+	#lfsmake2 rust-iana-time-zone
+	#lfsmake2 rust-chrono
+	#lfsmake2 rust-asn1_derive
+	#lfsmake2 rust-asn1
+	#lfsmake2 rust-proc-macro-error-attr
+	#lfsmake2 rust-proc-macro-error
+	#lfsmake2 rust-Inflector
+	#lfsmake2 rust-ouroboros_macro
+	#lfsmake2 rust-aliasable
+	#lfsmake2 rust-stable_deref_trait
+	#lfsmake2 rust-ouroboros
+	#lfsmake2 rust-base64
+	#lfsmake2 rust-pem
 	lfsmake2 gdb
 	lfsmake2 grub
 	lfsmake2 mandoc
@@ -1771,7 +1772,7 @@ build_system() {
 	lfsmake2 colm
 	lfsmake2 ragel
 	lfsmake2 vectorscan
-	lfsmake2 suricata
+	#lfsmake2 suricata
 	lfsmake2 ids-ruleset-sources
 	lfsmake2 ipblocklist-sources
 	lfsmake2 squid
@@ -1797,7 +1798,7 @@ build_system() {
 	lfsmake2 poppler
 	lfsmake2 poppler-data
 	lfsmake2 cups-filters
-	lfsmake2 epson-inkjet-printer-escpr
+	#lfsmake2 epson-inkjet-printer-escpr
 	lfsmake2 cups-pdf
 	lfsmake2 foomatic
 	lfsmake2 hplip
@@ -1815,7 +1816,7 @@ build_system() {
 	lfsmake2 chkconfig
 	lfsmake2 postfix
 	lfsmake2 fetchmail
-	lfsmake2 clamav
+	#lfsmake2 clamav
 	lfsmake2 perl-NetAddr-IP
 	lfsmake2 dma
 	lfsmake2 alsa
@@ -1834,7 +1835,7 @@ build_system() {
 	lfsmake2 rsync
 	lfsmake2 rpcbind
 	lfsmake2 keyutils
-	lfsmake2 nfs
+	#lfsmake2 nfs
 	lfsmake2 ncat
 	lfsmake2 nmap
 	lfsmake2 etherwake
@@ -1864,10 +1865,10 @@ build_system() {
 	lfsmake2 spice
 	lfsmake2 sdl2
 	lfsmake2 libusbredir
-	lfsmake2 libseccomp
+	#lfsmake2 libseccomp
 	lfsmake2 libslirp
 	lfsmake2 dtc
-	lfsmake2 qemu
+	#lfsmake2 qemu
 	lfsmake2 netsnmpd
 	lfsmake2 nagios_nrpe
 	lfsmake2 nagios-plugins
@@ -1883,7 +1884,7 @@ build_system() {
 	lfsmake2 vdr_eepg
 	lfsmake2 w_scan
 	lfsmake2 fmt
-	lfsmake2 mpd
+	#lfsmake2 mpd
 	lfsmake2 libmpdclient
 	lfsmake2 mpc
 	lfsmake2 perl-Net-CIDR-Lite
@@ -1915,7 +1916,7 @@ build_system() {
 	lfsmake2 perl-DBD-SQLite
 	lfsmake2 perl-File-ReadBackwards
 	lfsmake2 openvmtools
-	lfsmake2 joe
+	#lfsmake2 joe
 	lfsmake2 monit
 	lfsmake2 nut
 	lfsmake2 watchdog
@@ -1955,7 +1956,7 @@ build_system() {
 	lfsmake2 python3-pyasn1
 	lfsmake2 python3-botocore
 	lfsmake2 python3-cffi
-	lfsmake2 python3-cryptography
+	#lfsmake2 python3-cryptography
 	lfsmake2 python3-circuitbreaker
 	lfsmake2 python3-pytz
 	lfsmake2 python3-click
@@ -1986,7 +1987,7 @@ build_system() {
 	lfsmake2 miniupnpc
 	lfsmake2 transmission
 	lfsmake2 mtr
-	lfsmake2 minidlna
+	#lfsmake2 minidlna
 	lfsmake2 acpid
 	lfsmake2 fping
 	lfsmake2 telnet
@@ -2046,7 +2047,7 @@ build_system() {
 	lfsmake2 dehydrated
 	lfsmake2 libplist
 	lfsmake2 nqptp
-	lfsmake2 shairport-sync
+	#lfsmake2 shairport-sync
 	lfsmake2 libxxhash
 	lfsmake2 borgbackup
 	lfsmake2 lmdb
@@ -2099,7 +2100,7 @@ build_system() {
 
 	# Build images
 	lfsmake2 cdrom
-	lfsmake2 flash-images
+	#lfsmake2 flash-images
 	lfsmake2 core-updates
 }
 
@@ -2332,7 +2333,7 @@ done
 
 # Check the architecture
 case "${BUILD_ARCH}" in
-	aarch64|x86_64|riscv64)
+	aarch64|x86_64|riscv64|loongarch64)
 		;;
 
 	*)
@@ -2352,6 +2353,9 @@ case "${BUILD_ARCH}" in
 
 	x86_64)
 		BUILD_PLATFORM="x86"
+		;;
+	loongarch64)
+		BUILD_PLATFORM="loongarch"
 		;;
 esac
 
