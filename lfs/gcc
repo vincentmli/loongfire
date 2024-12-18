@@ -231,6 +231,10 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 
 ifeq "$(TOOLCHAIN)" "1"
 
+#loongarch64
+ifeq "$(BUILD_ARCH)" "loongarch64"
+	sed -i.orig '/ABI_GRLEN_SPEC/s@"/lib" ABI_GRLEN_SPEC@"$(TOOLS_DIR)/lib" ABI_GRLEN_SPEC@g' $(DIR_APP)/gcc/config/loongarch/gnu-user.h
+endif
 	for file in $$(find $(DIR_APP)/gcc/config -name linux64.h -o -name linux.h \
 			-o -name sysv4.h -o -name linux-eabi.h -o -name linux-elf.h -o -name aarch64-linux.h); do \
 		echo "Processing $${file}..."; \
