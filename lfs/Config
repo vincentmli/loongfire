@@ -132,7 +132,7 @@ endif
 
 ifeq "$(BUILD_ARCH)" "loongarch64"
 	EFI = 1
-	EFI_ARCH = $(BUILD_ARCH)
+	EFI_ARCH = LOONGARCH64
 	GRUB_ARCH = $(BUILD_ARCH)
 endif
 

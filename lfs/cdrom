@@ -198,7 +198,7 @@ ifeq "$(EFI)" "1"
 	mkdir -pv $(DIR_TMP)/cdrom/EFI/BOOT
 	grub-mkimage \
 		--format=$(GRUB_ARCH)-efi \
-		--output=$(DIR_TMP)/cdrom/EFI/BOOT/boot$(EFI_ARCH).efi \
+		--output=$(DIR_TMP)/cdrom/EFI/BOOT/BOOT$(EFI_ARCH).EFI \
 		--config=$(DIR_TMP)/grub-efi.cfg \
 		--compression=xz \
 		--prefix=/EFI/BOOT \
@@ -219,8 +219,8 @@ ifeq "$(EFI)" "1"
 
 	# Copy the bootloader into the image
 	mkdir -p $(DIR_TMP)/efiboot.img/EFI/BOOT
-	cp -a $(DIR_TMP)/cdrom/EFI/BOOT/boot$(EFI_ARCH).efi \
-		$(DIR_TMP)/efiboot.img/EFI/BOOT/boot$(EFI_ARCH).efi
+	cp -a $(DIR_TMP)/cdrom/EFI/BOOT/BOOT$(EFI_ARCH).EFI \
+		$(DIR_TMP)/efiboot.img/EFI/BOOT/BOOT$(EFI_ARCH).EFI
 
 	# Cleanup
 	umount $(DIR_TMP)/efiboot.img

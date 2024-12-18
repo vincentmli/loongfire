@@ -174,9 +174,8 @@ else
 	# Loongarch64 make requires no argument to build vmlinuz and EFI under arch/loongarch/boot
 ifeq "$(BUILD_ARCH)" "loongarch64"
 	cd $(DIR_APP) && make $(MAKETUNING)
-	cd $(DIR_APP) && make $(MAKETUNING) modules
 else
-	cd $(DIR_APP) && make V=1 $(MAKETUNING) $(KERNEL_TARGET) modules
+	cd $(DIR_APP) && make $(MAKETUNING) $(KERNEL_TARGET) modules
 endif
 
 	# Install the kernel

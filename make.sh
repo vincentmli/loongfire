@@ -2100,7 +2100,7 @@ build_system() {
 
 	# Build images
 	lfsmake2 cdrom
-	#lfsmake2 flash-images
+	lfsmake2 flash-images
 	lfsmake2 core-updates
 }
 
