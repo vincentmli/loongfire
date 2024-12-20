@@ -24,7 +24,7 @@
 
 include Config
 
-VER         = 6.6.63
+VER         = 6.12.5
 
 THISAPP    = linux-$(VER)
 DL_FILE    = linux-$(VER).tar.xz
@@ -75,7 +75,7 @@ objects = \
 
 $(DL_FILE) = $(URL_IPFIRE)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = e7e00e6e7e333929be3145784d0dc4cac53e236154627026bd2be0030cc76c347bffa43dffc69677b4a74a19725c54483b14f3168e743e4607e3c5228bd32aa4
+$(DL_FILE)_BLAKE2 = bca871f8ebc2b2d286c0d2fb8526aeff835aa9eb4af43c307dea08c9da31592310e3e103d3294152a7e011f8539629c0cec925d23cb635191cdd41da86babc29
 
 install : $(TARGET)
 
@@ -117,7 +117,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 
 	# Wlan Patches
 	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/linux-4.14_ath_user_regd.patch
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/linux-4.9.8-iwlwifi-noibss_only_on_radar_chan.patch
+	#cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/linux-4.9.8-iwlwifi-noibss_only_on_radar_chan.patch
 
 	# Fix igb and e1000e crash
 	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/linux-4.14.1-igb-e1000e_fix_lock_at_update_stats.patch
@@ -132,7 +132,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/linux-5.15.17-security-perf-allow-further-restriction-of-perf_event_open.patch
 
 	# https://bugzilla.ipfire.org/show_bug.cgi?id=12760
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/linux-5.15-NFQUEUE-Hold-RCU-read-lock-while-calling-nf_reinject.patch
+	#cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/linux-5.15-NFQUEUE-Hold-RCU-read-lock-while-calling-nf_reinject.patch
 
 	# Fix external module compile
 	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/linux-6.0-fix_external_module_build.patch
@@ -177,6 +177,8 @@ ifeq "$(BUILD_ARCH)" "loongarch64"
 else
 	cd $(DIR_APP) && make $(MAKETUNING) $(KERNEL_TARGET) modules
 endif
+	# Build objtool
+	cd $(DIR_APP)/tools/objtool && make $(MAKETUNING)
 
 	# Install the kernel
 	cd $(DIR_APP) && cp -v arch/$(KERNEL_ARCH)/boot/$(KERNEL_TARGET) /boot/vmlinuz-$(KVER)
@@ -219,7 +221,7 @@ endif
 	# Install objtool
 	cd $(DIR_APP) && cp -a tools/objtool/objtool \
 		/lib/modules/$(KVER)/build/tools/objtool/ || :
-	cd $(DIR_APP) && cp -a --parents tools/build/{Build,Build.include,fixdep.c} \
+	cd $(DIR_APP) && cp -a --parents tools/build/{Build.include,fixdep.c} \
 		tools/scripts/utilities.mak /lib/modules/$(KVER)/build
 
 	# Make sure we can build external modules

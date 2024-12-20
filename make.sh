@@ -2090,7 +2090,7 @@ build_system() {
 	lfsmake2 grub-btrfs
 
 	lfsmake2 linux
-	lfsmake2 rtl8812au
+	#lfsmake2 rtl8812au
 	lfsmake2 linux-initrd
 
 	lfsmake2 memtest
