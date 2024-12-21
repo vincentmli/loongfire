@@ -1476,7 +1476,7 @@ build_system() {
 	lfsmake2 configroot
 	lfsmake2 initscripts
 	lfsmake2 backup
-	#lfsmake2 rust
+	lfsmake2 rust
 	lfsmake2 openssl
 	lfsmake2 popt
 	lfsmake2 libedit
@@ -1772,7 +1772,7 @@ build_system() {
 	lfsmake2 colm
 	lfsmake2 ragel
 	lfsmake2 vectorscan
-	#lfsmake2 suricata
+	lfsmake2 suricata
 	lfsmake2 ids-ruleset-sources
 	lfsmake2 ipblocklist-sources
 	lfsmake2 squid
