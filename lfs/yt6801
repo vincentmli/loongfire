@@ -1,0 +1,94 @@
+###############################################################################
+#                                                                             #
+# IPFire.org - A linux based firewall                                         #
+# Copyright (C) 2007-2023  IPFire Team <info@ipfire.org>                      #
+# Copyright (C) 2024  BPFire Team                                             #
+#                                                                             #
+# This program is free software: you can redistribute it and/or modify        #
+# it under the terms of the GNU General Public License as published by        #
+# the Free Software Foundation, either version 3 of the License, or           #
+# (at your option) any later version.                                         #
+#                                                                             #
+# This program is distributed in the hope that it will be useful,             #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of              #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               #
+# GNU General Public License for more details.                                #
+#                                                                             #
+# You should have received a copy of the GNU General Public License           #
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.       #
+#                                                                             #
+###############################################################################
+
+###############################################################################
+# Definitions
+###############################################################################
+
+include Config
+
+VER        = 1.0.29
+
+THISAPP    = yt6801-$(VER)
+DL_FILE    = $(THISAPP).tar.gz
+DL_FROM    = $(URL_IPFIRE)
+DIR_APP    = $(DIR_SRC)/$(THISAPP)
+TARGET     = $(DIR_INFO)/$(THISAPP)-kmod-$(KVER)
+
+MODPATH    = /lib/modules/$(KVER)/extra/yt6801
+
+###############################################################################
+# Top-level Rules
+###############################################################################
+
+objects = $(DL_FILE)
+
+$(DL_FILE) = $(DL_FROM)/$(DL_FILE)
+
+$(DL_FILE)_BLAKE2 = 57cd442a646d50b1ad11f066080e3e994abb93c223b0481c4f02979759d096ef89ec016a67c96edb7d4cbc2a79303a34909aa7d2ac20c7688f674043acba7ad5
+
+install : $(TARGET)
+
+check : $(patsubst %,$(DIR_CHK)/%,$(objects))
+
+download :$(patsubst %,$(DIR_DL)/%,$(objects))
+
+b2 : $(subst %,%_BLAKE2,$(objects))
+
+dist:
+	$(PAK)
+
+###############################################################################
+# Downloading, checking, b2sum
+###############################################################################
+
+$(patsubst %,$(DIR_CHK)/%,$(objects)) :
+	@$(CHECK)
+
+$(patsubst %,$(DIR_DL)/%,$(objects)) :
+	@$(LOAD)
+
+$(subst %,%_BLAKE2,$(objects)) :
+	@$(B2SUM)
+
+###############################################################################
+# Installation Details
+###############################################################################
+
+$(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
+	@$(PREBUILD)
+	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
+	cd $(DIR_APP) && make $(MAKETUNING) \
+		-C /lib/modules/$(KVER)/build/ M=$(DIR_APP)/ modules
+
+	# Install the built kernel modules.
+	mkdir -p $(MODPATH)
+	cd $(DIR_APP) && for f in $$(ls *.ko); do \
+		/lib/modules/$(KVER)/build/scripts/sign-file sha512 \
+			/lib/modules/$(KVER)/build/certs/signing_key.pem \
+			/lib/modules/$(KVER)/build/certs/signing_key.x509 \
+			$$f; \
+		xz --check=crc32 --lzma2=dict=512KiB $$f; \
+		install -v -m 644 $$f.xz $(MODPATH); \
+	done
+
+	@rm -rf $(DIR_APP)
+	@$(POSTBUILD)
