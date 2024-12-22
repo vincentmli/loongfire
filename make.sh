@@ -2089,6 +2089,7 @@ build_system() {
 	lfsmake2 inotify-tools
 	lfsmake2 grub-btrfs
 	lfsmake2 pahole
+	lfsmake2 libbpf
 	lfsmake2 llvm-project
 
 	lfsmake2 linux
