@@ -180,6 +180,10 @@ endif
 	# Build objtool
 	cd $(DIR_APP)/tools/objtool && make $(MAKETUNING)
 
+        # Build bpftool
+	cd $(DIR_APP)/tools/bpf/bpftool && sed -i -e 's/^prefix ?= \/usr\/local/prefix ?= \/usr/' Makefile
+	cd $(DIR_APP)/tools/bpf/bpftool && make $(MAKETUNING)
+
 	# Install the kernel
 	cd $(DIR_APP) && cp -v arch/$(KERNEL_ARCH)/boot/$(KERNEL_TARGET) /boot/vmlinuz-$(KVER)
 	cd $(DIR_APP) && cp -v System.map /boot/System.map-$(KVER)
@@ -223,6 +227,9 @@ endif
 		/lib/modules/$(KVER)/build/tools/objtool/ || :
 	cd $(DIR_APP) && cp -a --parents tools/build/{Build.include,fixdep.c} \
 		tools/scripts/utilities.mak /lib/modules/$(KVER)/build
+
+	# Install bpftool
+	cd $(DIR_APP)/tools/bpf/bpftool && make install
 
 	# Make sure we can build external modules
 	touch -r /lib/modules/$(KVER)/build/Makefile \
