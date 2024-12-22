@@ -86,8 +86,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 			/lib/modules/$(KVER)/build/certs/signing_key.pem \
 			/lib/modules/$(KVER)/build/certs/signing_key.x509 \
 			$$f; \
-		xz --check=crc32 --lzma2=dict=512KiB $$f; \
-		install -v -m 644 $$f.xz $(MODPATH); \
+		install -v -m 644 $$f $(MODPATH); \
 	done
 
 	@rm -rf $(DIR_APP)
