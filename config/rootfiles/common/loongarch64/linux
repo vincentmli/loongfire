@@ -23752,3 +23752,4 @@ usr/lib/libcpupower.so.1
 #usr/share/locale/ka/LC_MESSAGES/cpupower.mo
 #usr/share/locale/pt/LC_MESSAGES/cpupower.mo
 usr/sbin/bpftool
+usr/sbin/perf
