@@ -1,29 +1,36 @@
-# IPFire 2.x - The Open Source Firewall
+# LoongFire - The Open Source Firewall on Loongson CPU (龙芯开源防火墙）
 
-# What is IPFire?
+# What is LoongFire?
 
-IPFire is a hardened, versatile, state-of-the-art Open Source firewall based on
+LoongFire is port of IPFire for Loongson CPU which is designed and made in China.
+
+LoongFire is a hardened, versatile, state-of-the-art Open Source firewall based on
 Linux. Its ease of use, high performance in any scenario and extensibility make
 it usable for everyone. For a full list of features have a look [here](https://www.ipfire.org/about).
 
-This repository contains the source code of IPFire 2.x which is used to build
-the whole distribution from scratch, since IPFire is not based on any other
+LoongFire also enables revolutionary kernel eBPF XDP/TC features for dynamic, high
+speed network processing.
+
+LoongFire 是IPFire 2.x 移植到龙芯的, 一个基于Linux的安全坚固、多功能、先进的开源防火墙. LoongFire 为普罗大众带来革命创新性的eBPF技术，为家庭>用户或任何大小组织企业的网络安全保驾护航. 当前支持的eBPF应用包括：
+
+1. XDP DNS monitor, blocking
+2. XDP SSL/TLS server name indicator (SNI) monitor, blocking
+
+Loongson mini PC Home Internet Firewall Demo [here](https://youtu.be/rVHkBf1HB7Y?si=cxZphLIn4RhRp3-F)
+
+This repository contains the source code of LoongFire which is used to build
+the whole distribution from scratch, since LoongFire is not based on any other
 distribution.
 
-# Where can I get IPFire?
+# Where can I get LoongFire?
 
-Just head over to https://www.ipfire.org/download
+中国大陆用户下载地址: https://www.vcn.bc.ca/~vli/bpfire/
 
-# How do I use this software?
+http://bpfire.net/download/
 
-We have a long and detailed documentation located [here](https://ipfire.org/docs) which
-should answer most of your questions.
+# What computer hardwares LoongFire requires?
 
-# But I have some questions left. Where can I get support?
+LoongFire support Loongson 3A6000 mini PC (NUC), Loongson server should be supported, but not tested due to lack of hardware for testing.
 
-You can ask your question at our community located [here](https://community.ipfire.org/).
-A complete list of our support channels can be found [here](https://www.ipfire.org/help).
+for example [mini PC](https://www.aliexpress.us/item/3256807861547435.html?spm=a2g0o.order_list.order_list_main.5.6c6c1802f4v4tf&gatewayAdapt=glo2usa) I use at home.
 
-# How can I contribute?
-
-We have another document for this. Please look [here](doc/CONTRIBUTING.md).
