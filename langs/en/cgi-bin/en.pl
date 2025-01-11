@@ -3117,6 +3117,8 @@
 'workgroup' => 'Workgroup',
 'working' => 'Working',
 'written bytes' => 'Bytes Written',
+'xdpsni log' => 'TLS/SSL Web Access Log from XDP',
+'xdpsni hits' => 'Total number of TLS/SSL Web Access Log from XDP',
 'xtaccess all error' => 'You cannot set an external access to ALL, that is done in the port forwarding record.',
 'xtaccess bad transfert' => 'If you specify a port destination range, the source range must be identical !',
 'year' => 'Year',

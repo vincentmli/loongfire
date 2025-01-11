@@ -3156,6 +3156,8 @@
 'workgroup' => 'Workgroup',
 'working' => '工作中',
 'written bytes' => 'Writen Bytes',
+'xdpsni log' => 'XDP记录的加密网站访问日志',
+'xdpsni hits' => '加密网站访问日志总数',
 'xtaccess all error' => '您不能在端口转发条目中设置对全部(All)的外部访问。',
 'xtaccess bad transfert' => '如果指定端口目标范围，则源范围必须相同!',
 'year' => '年',
