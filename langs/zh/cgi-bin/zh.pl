@@ -3156,6 +3156,8 @@
 'workgroup' => 'Workgroup',
 'working' => '工作中',
 'written bytes' => 'Writen Bytes',
+'xdpdns log' => 'XDP记录的域名解析日志',
+'xdpdns hits' => '域名解析日志总数',
 'xdpsni log' => 'XDP记录的加密网站访问日志',
 'xdpsni hits' => '加密网站访问日志总数',
 'xtaccess all error' => '您不能在端口转发条目中设置对全部(All)的外部访问。',
