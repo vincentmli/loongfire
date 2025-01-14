@@ -149,6 +149,10 @@ ifeq "$(BUILD_ARCH)" "aarch64"
 	GOARCH = arm64
 endif
 
+ifeq "$(BUILD_ARCH)" "loongarch64"
+	GOARCH = loong64
+endif
+
 # Rust
 ifeq "$(BUILD_ARCH)" "riscv64"
 	RUST_ARCH = riscv64gc
