@@ -34,3 +34,8 @@ LoongFire support Loongson 3A6000 mini PC (NUC), Loongson server should be suppo
 
 for example [mini PC](https://www.aliexpress.us/item/3256807861547435.html?spm=a2g0o.order_list.order_list_main.5.6c6c1802f4v4tf&gatewayAdapt=glo2usa) I use at home.
 
+# How to build LoongFire?
+
+1. git clone https://github.com/vincentmli/BPFire.git
+2. cd BPFire; wget http://www.bpfire.net/download/cache.tar.xz; tar xJvf cache.tar.xz
+3. git checkout loongfire; ./make.sh build
