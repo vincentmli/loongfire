@@ -2511,6 +2511,18 @@ build)
 
 	print_build_summary $(( SECONDS - START_TIME ))
 	;;
+build_package)
+	START_TIME="${SECONDS}"
+
+	# Launch in a new namespace
+	exec_in_namespace "$@"
+
+	# Prepare the environment
+	prepareenv --required-space=8192
+
+	# Build all packages
+	build_packages
+	;;
 tail)
 	tail -F \
 		"${LOG_DIR}/_build.preparation.log" \
