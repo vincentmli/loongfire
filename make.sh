@@ -2129,6 +2129,7 @@ build_packages() {
 		fi
 
 		pkgs["${path##*/}"]="${path}"
+		#echo "Added to pkgs: ${path##*/} -> ${path}"
 	done
 
 	# Package them all
