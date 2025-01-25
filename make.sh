@@ -2093,6 +2093,7 @@ build_system() {
 	lfsmake2 llvm-project
 	lfsmake2 xdp-tools
 	lfsmake2 loxilb
+	lfsmake2 loxicmd
 
 	lfsmake2 linux
 	lfsmake2 yt6801
