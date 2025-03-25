@@ -7,6 +7,7 @@ usr/lib/bpf/xdp_sni.bpf.o
 usr/lib/bpf/xdp_geoip.bpf.o
 usr/lib/bpf/xdp_udpddos.bpf.o
 usr/lib/bpf/xdp_tailcall.bpf.o
+usr/lib/bpf/xdp_synproxy_tailcall.bpf.o
 usr/sbin/xdp-udp
 usr/sbin/xdp_dns
 usr/sbin/xdp_dns_log
