@@ -129,9 +129,15 @@ print<<END;
 
 		// Check if we are dealing with a protocol, that knows ports.
 		if (\$.inArray(protocol, PROTOCOLS_WITH_PORTS) >= 0) {
+			if (protocol === "TCP") {
+				\$("#XDP_SYNPROXY").show();
+			} else {
+				\$("#XDP_SYNPROXY").hide();
+			}
 			\$("#PROTOCOL_PORTS").show();
 		} else {
 			\$("#PROTOCOL_PORTS").hide();
+			\$("#XDP_SYNPROXY").hide();
 		}
 
 		// Handle ICMP.
@@ -301,8 +307,8 @@ if ($fwdfwsettings{'ACTION'} eq 'saverule')
 	#check if we have an identical rule already
 	if($fwdfwsettings{'oldrulenumber'} eq $fwdfwsettings{'rulepos'}){
 		foreach my $key (sort keys %rulehash){
-			if (   "$fwdfwsettings{'RULE_ACTION'},$fwdfwsettings{'ACTIVE'},$fwdfwsettings{'grp1'},$fwdfwsettings{$fwdfwsettings{'grp1'}},$fwdfwsettings{'grp2'},$fwdfwsettings{$fwdfwsettings{'grp2'}},$fwdfwsettings{'USE_SRC_PORT'},$fwdfwsettings{'PROT'},$fwdfwsettings{'ICMP_TYPES'},$fwdfwsettings{'SRC_PORT'},$fwdfwsettings{'USESRV'},$fwdfwsettings{'TGT_PROT'},$fwdfwsettings{'ICMP_TGT'},$fwdfwsettings{'grp3'},$fwdfwsettings{$fwdfwsettings{'grp3'}},$fwdfwsettings{'ruleremark'},$fwdfwsettings{'LOG'},$fwdfwsettings{'TIME'},$fwdfwsettings{'TIME_MON'},$fwdfwsettings{'TIME_TUE'},$fwdfwsettings{'TIME_WED'},$fwdfwsettings{'TIME_THU'},$fwdfwsettings{'TIME_FRI'},$fwdfwsettings{'TIME_SAT'},$fwdfwsettings{'TIME_SUN'},$fwdfwsettings{'TIME_FROM'},$fwdfwsettings{'TIME_TO'},$fwdfwsettings{'USE_NAT'},$fwdfwsettings{$fwdfwsettings{'nat'}},$fwdfwsettings{'dnatport'},$fwdfwsettings{'nat'},$fwdfwsettings{'LIMIT_CON_CON'},$fwdfwsettings{'concon'},$fwdfwsettings{'RATE_LIMIT'},$fwdfwsettings{'ratecon'},$fwdfwsettings{'RATETIME'},$fwdfwsettings{'SYN_FLOOD_PROTECTION'}"
-				eq "$rulehash{$key}[0],$rulehash{$key}[2],$rulehash{$key}[3],$rulehash{$key}[4],$rulehash{$key}[5],$rulehash{$key}[6],$rulehash{$key}[7],$rulehash{$key}[8],$rulehash{$key}[9],$rulehash{$key}[10],$rulehash{$key}[11],$rulehash{$key}[12],$rulehash{$key}[13],$rulehash{$key}[14],$rulehash{$key}[15],$rulehash{$key}[16],$rulehash{$key}[17],$rulehash{$key}[18],$rulehash{$key}[19],$rulehash{$key}[20],$rulehash{$key}[21],$rulehash{$key}[22],$rulehash{$key}[23],$rulehash{$key}[24],$rulehash{$key}[25],$rulehash{$key}[26],$rulehash{$key}[27],$rulehash{$key}[28],$rulehash{$key}[29],$rulehash{$key}[30],$rulehash{$key}[31],$rulehash{$key}[32],$rulehash{$key}[33],$rulehash{$key}[34],$rulehash{$key}[35],$rulehash{$key}[36],$rulehash{$key}[37]"){
+			if (   "$fwdfwsettings{'RULE_ACTION'},$fwdfwsettings{'ACTIVE'},$fwdfwsettings{'grp1'},$fwdfwsettings{$fwdfwsettings{'grp1'}},$fwdfwsettings{'grp2'},$fwdfwsettings{$fwdfwsettings{'grp2'}},$fwdfwsettings{'USE_SRC_PORT'},$fwdfwsettings{'PROT'},$fwdfwsettings{'ICMP_TYPES'},$fwdfwsettings{'SRC_PORT'},$fwdfwsettings{'USESRV'},$fwdfwsettings{'TGT_PROT'},$fwdfwsettings{'ICMP_TGT'},$fwdfwsettings{'grp3'},$fwdfwsettings{$fwdfwsettings{'grp3'}},$fwdfwsettings{'ruleremark'},$fwdfwsettings{'LOG'},$fwdfwsettings{'TIME'},$fwdfwsettings{'TIME_MON'},$fwdfwsettings{'TIME_TUE'},$fwdfwsettings{'TIME_WED'},$fwdfwsettings{'TIME_THU'},$fwdfwsettings{'TIME_FRI'},$fwdfwsettings{'TIME_SAT'},$fwdfwsettings{'TIME_SUN'},$fwdfwsettings{'TIME_FROM'},$fwdfwsettings{'TIME_TO'},$fwdfwsettings{'USE_NAT'},$fwdfwsettings{$fwdfwsettings{'nat'}},$fwdfwsettings{'dnatport'},$fwdfwsettings{'nat'},$fwdfwsettings{'LIMIT_CON_CON'},$fwdfwsettings{'concon'},$fwdfwsettings{'RATE_LIMIT'},$fwdfwsettings{'ratecon'},$fwdfwsettings{'RATETIME'},$fwdfwsettings{'SYN_FLOOD_PROTECTION'},$fwdfwsettings{'XDP_SYNPROXY_ACCELERATION'}"
+				eq "$rulehash{$key}[0],$rulehash{$key}[2],$rulehash{$key}[3],$rulehash{$key}[4],$rulehash{$key}[5],$rulehash{$key}[6],$rulehash{$key}[7],$rulehash{$key}[8],$rulehash{$key}[9],$rulehash{$key}[10],$rulehash{$key}[11],$rulehash{$key}[12],$rulehash{$key}[13],$rulehash{$key}[14],$rulehash{$key}[15],$rulehash{$key}[16],$rulehash{$key}[17],$rulehash{$key}[18],$rulehash{$key}[19],$rulehash{$key}[20],$rulehash{$key}[21],$rulehash{$key}[22],$rulehash{$key}[23],$rulehash{$key}[24],$rulehash{$key}[25],$rulehash{$key}[26],$rulehash{$key}[27],$rulehash{$key}[28],$rulehash{$key}[29],$rulehash{$key}[30],$rulehash{$key}[31],$rulehash{$key}[32],$rulehash{$key}[33],$rulehash{$key}[34],$rulehash{$key}[35],$rulehash{$key}[36],$rulehash{$key}[37],$rulehash{$key}[38]"){
 					$errormessage.=$Lang::tr{'fwdfw err ruleexists'};
 					if($fwdfwsettings{'oldruleremark'} ne $fwdfwsettings{'ruleremark'} && $fwdfwsettings{'updatefwrule'} eq 'on' && $fwdfwsettings{'ruleremark'} ne '' && !&validremark($fwdfwsettings{'ruleremark'})){
 						$errormessage=$Lang::tr{'fwdfw err remark'}."<br>";
@@ -320,8 +326,8 @@ if ($fwdfwsettings{'ACTION'} eq 'saverule')
 	if($fwdfwsettings{'rulepos'} > 0 && !$fwdfwsettings{'oldrulenumber'}){
 		$fwdfwsettings{'oldrulenumber'}=$maxkey;
 		foreach my $key (sort keys %rulehash){
-			if (   "$fwdfwsettings{'RULE_ACTION'},$fwdfwsettings{'ACTIVE'},$fwdfwsettings{'grp1'},$fwdfwsettings{$fwdfwsettings{'grp1'}},$fwdfwsettings{'grp2'},$fwdfwsettings{$fwdfwsettings{'grp2'}},$fwdfwsettings{'USE_SRC_PORT'},$fwdfwsettings{'PROT'},$fwdfwsettings{'ICMP_TYPES'},$fwdfwsettings{'SRC_PORT'},$fwdfwsettings{'USESRV'},$fwdfwsettings{'TGT_PROT'},$fwdfwsettings{'ICMP_TGT'},$fwdfwsettings{'grp3'},$fwdfwsettings{$fwdfwsettings{'grp3'}},$fwdfwsettings{'TIME'},$fwdfwsettings{'TIME_MON'},$fwdfwsettings{'TIME_TUE'},$fwdfwsettings{'TIME_WED'},$fwdfwsettings{'TIME_THU'},$fwdfwsettings{'TIME_FRI'},$fwdfwsettings{'TIME_SAT'},$fwdfwsettings{'TIME_SUN'},$fwdfwsettings{'TIME_FROM'},$fwdfwsettings{'TIME_TO'},$fwdfwsettings{'USE_NAT'},$fwdfwsettings{$fwdfwsettings{'nat'}},$fwdfwsettings{'dnatport'},$fwdfwsettings{'nat'},$fwdfwsettings{'LIMIT_CON_CON'},$fwdfwsettings{'concon'},$fwdfwsettings{'RATE_LIMIT'},$fwdfwsettings{'ratecon'},$fwdfwsettings{'RATETIME'}"
-				eq "$rulehash{$key}[0],$rulehash{$key}[2],$rulehash{$key}[3],$rulehash{$key}[4],$rulehash{$key}[5],$rulehash{$key}[6],$rulehash{$key}[7],$rulehash{$key}[8],$rulehash{$key}[9],$rulehash{$key}[10],$rulehash{$key}[11],$rulehash{$key}[12],$rulehash{$key}[13],$rulehash{$key}[14],$rulehash{$key}[15],$rulehash{$key}[18],$rulehash{$key}[19],$rulehash{$key}[20],$rulehash{$key}[21],$rulehash{$key}[22],$rulehash{$key}[23],$rulehash{$key}[24],$rulehash{$key}[25],$rulehash{$key}[26],$rulehash{$key}[27],$rulehash{$key}[28],$rulehash{$key}[29],$rulehash{$key}[30],$rulehash{$key}[31],$rulehash{$key}[32],$rulehash{$key}[33],$rulehash{$key}[34],$rulehash{$key}[35],$rulehash{$key}[36]"){
+			if (   "$fwdfwsettings{'RULE_ACTION'},$fwdfwsettings{'ACTIVE'},$fwdfwsettings{'grp1'},$fwdfwsettings{$fwdfwsettings{'grp1'}},$fwdfwsettings{'grp2'},$fwdfwsettings{$fwdfwsettings{'grp2'}},$fwdfwsettings{'USE_SRC_PORT'},$fwdfwsettings{'PROT'},$fwdfwsettings{'ICMP_TYPES'},$fwdfwsettings{'SRC_PORT'},$fwdfwsettings{'USESRV'},$fwdfwsettings{'TGT_PROT'},$fwdfwsettings{'ICMP_TGT'},$fwdfwsettings{'grp3'},$fwdfwsettings{$fwdfwsettings{'grp3'}},$fwdfwsettings{'TIME'},$fwdfwsettings{'TIME_MON'},$fwdfwsettings{'TIME_TUE'},$fwdfwsettings{'TIME_WED'},$fwdfwsettings{'TIME_THU'},$fwdfwsettings{'TIME_FRI'},$fwdfwsettings{'TIME_SAT'},$fwdfwsettings{'TIME_SUN'},$fwdfwsettings{'TIME_FROM'},$fwdfwsettings{'TIME_TO'},$fwdfwsettings{'USE_NAT'},$fwdfwsettings{$fwdfwsettings{'nat'}},$fwdfwsettings{'dnatport'},$fwdfwsettings{'nat'},$fwdfwsettings{'LIMIT_CON_CON'},$fwdfwsettings{'concon'},$fwdfwsettings{'RATE_LIMIT'},$fwdfwsettings{'ratecon'},$fwdfwsettings{'RATETIME'},$fwdfwsettings{'XDP_SYNPROXY_ACCELERATION'}"
+				eq "$rulehash{$key}[0],$rulehash{$key}[2],$rulehash{$key}[3],$rulehash{$key}[4],$rulehash{$key}[5],$rulehash{$key}[6],$rulehash{$key}[7],$rulehash{$key}[8],$rulehash{$key}[9],$rulehash{$key}[10],$rulehash{$key}[11],$rulehash{$key}[12],$rulehash{$key}[13],$rulehash{$key}[14],$rulehash{$key}[15],$rulehash{$key}[18],$rulehash{$key}[19],$rulehash{$key}[20],$rulehash{$key}[21],$rulehash{$key}[22],$rulehash{$key}[23],$rulehash{$key}[24],$rulehash{$key}[25],$rulehash{$key}[26],$rulehash{$key}[27],$rulehash{$key}[28],$rulehash{$key}[29],$rulehash{$key}[30],$rulehash{$key}[31],$rulehash{$key}[32],$rulehash{$key}[33],$rulehash{$key}[34],$rulehash{$key}[35],$rulehash{$key}[36],$rulehash{$key}[38]"){
 					$errormessage.=$Lang::tr{'fwdfw err ruleexists'};
 			}
 		}
@@ -1624,6 +1630,7 @@ sub newrule
 				$fwdfwsettings{'ratecon'}				= $hash{$key}[35];
 				$fwdfwsettings{'RATETIME'}				= $hash{$key}[36];
 				$fwdfwsettings{'SYN_FLOOD_PROTECTION'}			= $hash{$key}[37];
+				$fwdfwsettings{'XDP_SYNPROXY_ACCELERATION'}		= $hash{$key}[38];
 				$checked{'grp1'}{$fwdfwsettings{'grp1'}} 				= 'CHECKED';
 				$checked{'grp2'}{$fwdfwsettings{'grp2'}} 				= 'CHECKED';
 				$checked{'grp3'}{$fwdfwsettings{'grp3'}} 				= 'CHECKED';
@@ -1632,6 +1639,7 @@ sub newrule
 				$checked{'ACTIVE'}{$fwdfwsettings{'ACTIVE'}} 			= 'CHECKED';
 				$checked{'LOG'}{$fwdfwsettings{'LOG'}} 					= 'CHECKED';
 				$checked{'SYN_FLOOD_PROTECTION'}{$fwdfwsettings{'SYN_FLOOD_PROTECTION'}} 		= 'CHECKED';
+				$checked{'XDP_SYNPROXY_ACCELERATION'}{$fwdfwsettings{'XDP_SYNPROXY_ACCELERATION'}} 	= 'CHECKED';
 				$checked{'TIME'}{$fwdfwsettings{'TIME'}} 				= 'CHECKED';
 				$checked{'TIME_MON'}{$fwdfwsettings{'TIME_MON'}} 		= 'CHECKED';
 				$checked{'TIME_TUE'}{$fwdfwsettings{'TIME_TUE'}} 		= 'CHECKED';
@@ -1667,6 +1675,7 @@ sub newrule
 		$fwdfwsettings{'olduseratelimit'}=$fwdfwsettings{'RATE_LIMIT'};
 		$fwdfwsettings{'olduseratelimitamount'}=$fwdfwsettings{'ratecon'};
 		$fwdfwsettings{'oldratelimittime'}=$fwdfwsettings{'RATETIME'};
+		$fwdfwsettings{'oldxdpsynproxyacceleration'}=$fwdfwsettings{'XDP_SYNPROXY_ACCELERATION'};
 
 		#check if manual ip (source) is orange network
 		if ($fwdfwsettings{'grp1'} eq 'src_addr'){
@@ -1690,6 +1699,7 @@ sub newrule
 		$fwdfwsettings{'oldruleremark'}=$fwdfwsettings{'ruleremark'};
 		$fwdfwsettings{'oldnat'}=$fwdfwsettings{'USE_NAT'};
 		$fwdfwsettings{'oldconcon'}=$fwdfwsettings{'LIMIT_CON_CON'};
+		$fwdfwsettings{'oldxdpsynproxyacceleration'}=$fwdfwsettings{'XDP_SYNPROXY_ACCELERATION'};
 		#check if manual ip (source) is orange network
 		if ($fwdfwsettings{'grp1'} eq 'src_addr'){
 			my ($sip,$scidr) = split("/",$fwdfwsettings{$fwdfwsettings{'grp1'}});
@@ -1901,6 +1911,20 @@ END
 								</td>
 							</tr>
 						</table>
+
+                                                <table width="40%" border="0" id="XDP_SYNPROXY">
+                                                        <tr>
+                                                                <!-- #XDP_SYNPROXY_ACCELERATION -->
+                                                                <td>
+                                                                        $Lang::tr{'fwdfw use synproxy'}
+                                                                </td>
+
+                                                                <td>
+                                                                        <input type='checkbox' name='XDP_SYNPROXY_ACCELERATION' id='XDP_SYNPROXY_ACCELERATION' value="ON" $checked{'XDP_SYNPROXY_ACCELERATION'}{'ON'}>
+                                                                </td>
+                                                        </tr>
+                                                </table>
+
 
 						<table width="100%" border="0" id="PROTOCOL_PORTS">
 							<tr>
@@ -2192,6 +2216,7 @@ END
 			<input type='hidden' name='oldruleremark' value='$fwdfwsettings{'oldruleremark'}' />
 			<input type='hidden' name='oldorange' value='$fwdfwsettings{'oldorange'}' />
 			<input type='hidden' name='oldnat' value='$fwdfwsettings{'oldnat'}' />
+			<input type='hidden' name='oldxdpsynproxyacceleration' value='$fwdfwsettings{'oldxdpsynproxyacceleration'}' />
 			<input type='hidden' name='oldruletype' value='$fwdfwsettings{'oldruletype'}' />
 			<input type='hidden' name='oldconcon' value='$fwdfwsettings{'oldconcon'}' />
 			<input type='hidden' name='ACTION' value='saverule' ></form><form method='post' style='display:inline'><input type='submit' value='$Lang::tr{'fwhost back'}' style='min-width:100px;'><input type='hidden' name='ACTION' value'reset'></td></td>
@@ -2336,6 +2361,7 @@ sub saverule
 			$$hash{$key}[35] = $fwdfwsettings{'ratecon'};
 			$$hash{$key}[36] = $fwdfwsettings{'RATETIME'};
 			$$hash{$key}[37] = $fwdfwsettings{'SYN_FLOOD_PROTECTION'};
+			$$hash{$key}[38] = $fwdfwsettings{'XDP_SYNPROXY_ACCELERATION'};
 			&General::writehasharray("$config", $hash);
 		}else{
 			foreach my $key (sort {$a <=> $b} keys %$hash){
@@ -2378,6 +2404,7 @@ sub saverule
 					$$hash{$key}[35] = $fwdfwsettings{'ratecon'};
 					$$hash{$key}[36] = $fwdfwsettings{'RATETIME'};
 					$$hash{$key}[37] = $fwdfwsettings{'SYN_FLOOD_PROTECTION'};
+					$$hash{$key}[38] = $fwdfwsettings{'XDP_SYNPROXY_ACCELERATION'};
 					last;
 				}
 			}

@@ -42,6 +42,7 @@ my $CHAIN                 = $CHAIN_FORWARD;
 my $CHAIN_NAT_SOURCE      = "NAT_SOURCE";
 my $CHAIN_NAT_DESTINATION = "NAT_DESTINATION";
 my $CHAIN_MANGLE_NAT_DESTINATION_FIX = "NAT_DESTINATION";
+my $CHAIN_XDP_SYNPROXY = "XDP_SYNPROXY";
 my @VALID_CHAINS          = ($CHAIN_INPUT, $CHAIN_FORWARD, $CHAIN_OUTPUT);
 my @ANY_ADDRESSES         = ("0.0.0.0/0.0.0.0", "0.0.0.0/0", "0/0");
 
@@ -222,6 +223,8 @@ sub flush {
 	run("$IPTABLES -t nat -F $CHAIN_NAT_DESTINATION");
 	run("$IPTABLES -t mangle -F $CHAIN_MANGLE_NAT_DESTINATION_FIX");
 	run("$IPTABLES -t raw -F SYN_FLOOD_PROTECT");
+	run("$IPTABLES -F $CHAIN_XDP_SYNPROXY");
+	run("$IPTABLES -t raw -F $CHAIN_XDP_SYNPROXY");
 }
 
 sub buildrules {
@@ -301,6 +304,9 @@ sub buildrules {
 		# Enable SYN flood protection?
 		my $SYN_FLOOD_PROTECTION = 0;
 
+		# Enable XDP SYNPROXY acceleration?
+		my $XDP_SYNPROXY_ACCELERATION = 0;
+
 		# Set up time constraints.
 		my @time_options = ();
 		if ($$hash{$key}[18] eq 'ON') {
@@ -377,6 +383,11 @@ sub buildrules {
 		# DoS Protection
 		if (($elements ge 38) && ($$hash{$key}[37] eq "ON")) {
 			$SYN_FLOOD_PROTECTION = 1;
+		}
+
+		# XDP SYNPROXY DDoS Protection Acceleration
+		if (($elements ge 39) && ($$hash{$key}[38] eq "ON")) {
+			$XDP_SYNPROXY_ACCELERATION = 1;
 		}
 
 		# Check which protocols are used in this rule and so that we can
@@ -619,6 +630,23 @@ sub buildrules {
 
 					if ($SYN_FLOOD_PROTECTION && ($protocol eq "tcp")) {
 						run("$IPTABLES -t raw -A SYN_FLOOD_PROTECT @options -j CT --notrack");
+					}
+
+					if ($XDP_SYNPROXY_ACCELERATION && ($protocol eq "tcp")) {
+					        my $dport = &get_external_port($hash, $key);
+                                                my @raw_options = ("-p", "tcp", "-m", "tcp", "--syn");
+                                                my @in_options = ("-p", "tcp", "-m", "tcp");
+                                                my @options = ("--sack-perm", "--timestamp", "--wscale", "7", "--mss", "1460");
+                                                push(@raw_options, "--dport", "$dport");
+                                                push(@in_options, "--dport", "$dport", "-m", "state", "--state", "INVALID,UNTRACKED");
+                                                if ($LOG) {
+                                                        run("$IPTABLES -t raw -A  $CHAIN_XDP_SYNPROXY -i $RED_DEV @raw_options -j LOG --log-prefix '$CHAIN_XDP_SYNPROXY '");
+                                                }
+                                                run("$IPTABLES -t raw -A $CHAIN_XDP_SYNPROXY -i $RED_DEV @raw_options -j CT --notrack");
+                                                if ($LOG) {
+                                                        run("$IPTABLES -A  $CHAIN_XDP_SYNPROXY -i $RED_DEV @in_options -j LOG --log-prefix '$CHAIN_XDP_SYNPROXY ' @options");
+                                                }
+                                                run("$IPTABLES -A $CHAIN_XDP_SYNPROXY -i $RED_DEV @in_options -j SYNPROXY @options");
 					}
 
 					# Handle forwarding rules and add corresponding rules for firewall access.
@@ -956,6 +984,22 @@ sub get_dnat_target_port {
 			return $$hash{$key}[15];
 		}
 	}
+}
+
+sub get_external_port {
+        my $hash = shift;
+        my $key  = shift;
+
+        if ($$hash{$key}[14] eq "TGT_PORT") {
+                my $port = $$hash{$key}[15];
+                my $external_port = $$hash{$key}[30];
+
+                if ($external_port && ($port ne $external_port)) {
+                        return $external_port;
+                } else {
+                        return $port;
+                }
+        }
 }
 
 sub add_dnat_mangle_rules {

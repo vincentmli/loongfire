@@ -403,6 +403,10 @@ iptables_init() {
 	iptables -t raw -N SYN_FLOOD_PROTECT
 	iptables -t raw -A PREROUTING -p tcp --syn -j SYN_FLOOD_PROTECT
 
+	# XDP SYNPROXY acceleration
+	iptables -N XDP_SYNPROXY
+	iptables -t raw -N XDP_SYNPROXY
+
 	# Populate IPsec chains
 	/usr/lib/firewall/ipsec-policy
 
