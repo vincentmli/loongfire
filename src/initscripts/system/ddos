@@ -1,0 +1,77 @@
+#!/bin/sh
+###############################################################################
+#                                                                             #
+# IPFire.org - A linux based firewall                                         #
+# Copyright (C) 2007-2022  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2024-2025  BPFire <vincent.mc.li@gmail.com>                     #
+#                                                                             #
+# This program is free software: you can redistribute it and/or modify        #
+# it under the terms of the GNU General Public License as published by        #
+# the Free Software Foundation, either version 3 of the License, or           #
+# (at your option) any later version.                                         #
+#                                                                             #
+# This program is distributed in the hope that it will be useful,             #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of              #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               #
+# GNU General Public License for more details.                                #
+#                                                                             #
+# You should have received a copy of the GNU General Public License           #
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.       #
+#                                                                             #
+###############################################################################
+
+. /etc/sysconfig/rc
+. $rc_functions
+
+eval $(/usr/local/bin/readhash /var/ipfire/ddos/settings)
+
+
+load_ddos () {
+        /usr/sbin/xdp-loader status red0 | grep -w 'xdp_ddos'
+        if [ $? -ne 0 ]; then
+                xdp-loader load red0 -P 80 -p /sys/fs/bpf/xdp-ddos -n xdp_ddos /usr/lib/bpf/xdp_ddos.bpf.o
+                if [ $? -ge 1 ]; then
+                        boot_mesg "Native mode not supported, try SKB"
+                        xdp-loader load red0 -m skb -P 80 -p /sys/fs/bpf/xdp-ddos -n xdp_ddos /usr/lib/bpf/xdp_ddos.bpf.o
+                fi
+
+        fi
+}
+
+unload_ddos () {
+        /usr/sbin/xdp-loader status red0 | grep -w 'xdp_ddos'
+        if [ $? -eq 0 ]; then
+                prog_id=$(xdp-loader status red0 | grep 'xdp_ddos' | awk '{print $4}')
+                /usr/sbin/xdp-loader unload -i $prog_id red0
+        else
+                boot_mesg "Error xdp_ddos not loaded!"
+        fi
+}
+
+
+case "$1" in
+	start)
+		boot_mesg -n "Starting xdp-ddos..."
+		if [ "$ENABLE_DDOS" == "on" ]; then
+			load_ddos
+		fi
+		;;
+
+	stop)
+		boot_mesg "Stopping xdp-ddos..."
+		if [ "$ENABLE_DDOS" == "off" ]; then
+			unload_ddos
+		fi
+		;;
+
+	restart)
+		$0 stop
+		sleep 1
+		$0 start
+		;;
+
+	*)
+		echo "Usage: $0 {start|stop|restart}"
+		exit 1
+		;;
+esac
