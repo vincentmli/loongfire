@@ -1,0 +1,112 @@
+#!/bin/sh
+###############################################################################
+#                                                                             #
+# IPFire.org - A linux based firewall                                         #
+# Copyright (C) 2007-2022  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2024-2025  BPFire <vincent.mc.li@gmail.com>                     #
+#                                                                             #
+# This program is free software: you can redistribute it and/or modify        #
+# it under the terms of the GNU General Public License as published by        #
+# the Free Software Foundation, either version 3 of the License, or           #
+# (at your option) any later version.                                         #
+#                                                                             #
+# This program is distributed in the hope that it will be useful,             #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of              #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               #
+# GNU General Public License for more details.                                #
+#                                                                             #
+# You should have received a copy of the GNU General Public License           #
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.       #
+#                                                                             #
+###############################################################################
+
+. /etc/sysconfig/rc
+. $rc_functions
+
+eval $(/usr/local/bin/readhash /var/ipfire/ddos/tcp-ddos-settings)
+
+MSSOPTS="--mss4 1460 --mss6 1440"
+TTLOPTS="--ttl 64"
+WSCALE="--wscale 0"
+BPF_OBJECT_FILE="/usr/lib/bpf/xdp_synproxy.bpf.o"
+PROG_NAME="syncookie_xdp"
+MAP_PIN_PATH="/sys/fs/bpf/xdp-ddos/ddos_progs"
+KEY=0
+
+get_ports () {
+# Define an empty variable to store the output
+	local output=""
+	local ddos_port_file="$1"
+
+# Read the input file line by line
+	while IFS= read -r line; do
+		# Check if the line contains '=on'
+		if [[ "$line" == [0-9]*"=on" ]]; then
+			# Extract the service/port number
+			service=$(echo "$line" | cut -d'=' -f1)
+			# Append the service/port number to the output string
+			output="$output$service,"
+		fi
+	done < $ddos_port_file
+
+	# Remove the trailing comma from the output string
+	output="${output%,}"
+	echo $output
+}
+
+load_syncookie () {
+	sysctl -w net.ipv4.tcp_syncookies=1
+	sysctl -w net.ipv4.tcp_timestamps=1
+	sysctl -w net.netfilter.nf_conntrack_tcp_loose=0
+	/usr/sbin/xdp_ddos add $BPF_OBJECT_FILE $PROG_NAME $MAP_PIN_PATH $KEY
+	if [ $? -eq 0 ]; then
+		prog_id=$(bpftool prog | grep syncookie_xdp | awk '{print $1}' | cut -d':' -f1)
+		xdp_synproxy --prog $prog_id $MSSOPTS $WSCALE $TTLOPTS --ports="$tcp_ports"
+	else
+		boot_mesg "Error to load $BPF_OBJECT_FILE"
+	fi
+}
+
+unload_syncookie () {
+	sysctl -w net.ipv4.tcp_syncookies=1
+	/usr/sbin/xdp_ddos del $MAP_PIN_PATH $KEY
+	if [ $? -eq 0 ]; then
+		boot_mesg "syncookie_xdp unloaded!"
+	else
+		boot_mesg "Error syncookie_xdp not unloaded!"
+	fi
+}
+
+tcp_ports="$(get_ports /var/ipfire/ddos/tcp-ddos-settings)"
+
+case "$1" in
+	start)
+		if [ ! -e /var/ipfire/red/active ]; then
+			boot_mesg " ERROR! Red0 interface not online!"
+			echo_warning
+			exit 1
+		fi
+		boot_mesg -n "Starting tcp ddos..."
+		if [ "$ENABLE_TCP_DDOS" == "on" ]; then
+			load_syncookie
+		fi
+		;;
+
+	stop)
+		boot_mesg "Stopping tcp ddos..."
+		if [ "$ENABLE_TCP_DDOS" == "off" ]; then
+			unload_syncookie
+		fi
+		;;
+
+	restart)
+		$0 stop
+		sleep 1
+		$0 start
+		;;
+
+	*)
+		echo "Usage: $0 {start|stop|restart}"
+		exit 1
+		;;
+esac

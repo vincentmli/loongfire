@@ -113,6 +113,8 @@ $(TARGET) :
 	cp $(DIR_SRC)/config/fwhosts/customservices             $(CONFIG_ROOT)/fwhosts/customservices.default
 	cp $(DIR_SRC)/config/cfgroot/xdptailcall-settings	$(CONFIG_ROOT)/xdptailcall/settings
 	cp $(DIR_SRC)/config/cfgroot/ddos-settings		$(CONFIG_ROOT)/ddos/settings
+	cp $(DIR_SRC)/config/cfgroot/tcp-ddos-settings		$(CONFIG_ROOT)/ddos/tcp-ddos-settings
+	cp $(DIR_SRC)/config/cfgroot/tcp_ports			$(CONFIG_ROOT)/ddos/tcp_ports
 	# Oneliner configfiles
 	echo  "ENABLED=off"		> $(CONFIG_ROOT)/vpn/settings
 	echo  "01"			> $(CONFIG_ROOT)/certs/serial
