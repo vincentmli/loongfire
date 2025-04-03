@@ -3,6 +3,11 @@
 				  'title' => "Pakfire",
 				  'enabled' => 1,
 				  };
+    $subipfire->{'20.xdptcpddos'} = {'caption' => 'XDP TCP DDoS',
+				  'uri' => '/cgi-bin/tcp-ddos.cgi',
+				  'title' => "XDP TCP DDoS",
+				  'enabled' => 1,
+				  };
     $subipfire->{'99.help'} = {'caption' => $Lang::tr{'help'},
 				  'uri' => '/cgi-bin/help.cgi',
 				  'title' => "$Lang::tr{'help'}",
