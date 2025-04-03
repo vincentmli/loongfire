@@ -29,6 +29,7 @@ usr/local/bin/suricatactrl
 usr/local/bin/sshctrl
 usr/local/bin/syslogdctrl
 usr/local/bin/timectrl
+usr/local/bin/tcpddosctrl
 #usr/local/bin/torctrl
 usr/local/bin/unboundctrl
 usr/local/bin/updxlratorctrl
