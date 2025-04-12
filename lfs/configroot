@@ -119,29 +119,7 @@ $(TARGET) :
 	echo  "ENABLED=off"		> $(CONFIG_ROOT)/vpn/settings
 	echo  "01"			> $(CONFIG_ROOT)/certs/serial
 	echo  "nameserver    1.2.3.4"	> $(CONFIG_ROOT)/ppp/fake-resolv.conf
-	echo  "FWBRIDGEMODE=off"	>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "BRIDGENETFILTER=off"	>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "DROPNEWNOTSYN=on"	>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "DROPINPUT=on"		>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "DROPFORWARD=on"		>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "FWPOLICY=DROP"		>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "FWPOLICY1=DROP"		>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "FWPOLICY2=DROP"		>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "DROPPORTSCAN=on"		>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "DROPOUTGOING=on"		>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "DROPSAMBA=off"		>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "DROPPROXY=off"		>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "SHOWREMARK=on"		>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "SHOWCOLORS=on"		>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "SHOWTABLES=off"		>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "SHOWDROPDOWN=off"	>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "DROPWIRELESSINPUT=on"	>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "DROPWIRELESSFORWARD=on"	>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "DROPSPOOFEDMARTIAN=on"	>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "DROPHOSTILE=on"		>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "LOGDROPHOSTILEIN=on"		>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "LOGDROPHOSTILEOUT=on"	>> $(CONFIG_ROOT)/optionsfw/settings
-	echo  "LOGDROPCTINVALID=on"	>> $(CONFIG_ROOT)/optionsfw/settings
+	cp $(DIR_SRC)/config/cfgroot/optionsfw-settings		$(CONFIG_ROOT)/optionsfw/settings
 	echo  "POLICY=MODE2"		>> $(CONFIG_ROOT)/firewall/settings
 	echo  "POLICY1=MODE2"		>> $(CONFIG_ROOT)/firewall/settings
 	echo  "USE_ISP_NAMESERVERS=on"  >> $(CONFIG_ROOT)/dns/settings
