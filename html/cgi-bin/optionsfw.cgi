@@ -79,6 +79,9 @@ if ($errormessage) {
 }
 
 # Set new defaults
+if (!$settings{'FWBRIDGEMODE'}) {
+	$settings{'FWBRIDGEMODE'} = 'off';
+}
 if (!$settings{'MASQUERADE_GREEN'}) {
 	$settings{'MASQUERADE_GREEN'} = 'on';
 }
@@ -170,12 +173,32 @@ $selected{'MASQUERADE_ORANGE'}{$settings{'MASQUERADE_ORANGE'}} = 'selected="sele
 $selected{'MASQUERADE_BLUE'}{'off'} = '';
 $selected{'MASQUERADE_BLUE'}{'on'} = '';
 $selected{'MASQUERADE_BLUE'}{$settings{'MASQUERADE_BLUE'}} = 'selected="selected"';
+$selected{'FWBRIDGEMODE'}{'off'} = '';
+$selected{'FWBRIDGEMODE'}{'on'} = '';
+$selected{'FWBRIDGEMODE'}{$settings{'FWBRIDGEMODE'}} = 'selected="selected"';
 
 &Header::openbox('100%', 'center',);
 print "<form method='post' action='$ENV{'SCRIPT_NAME'}'>";
 
 print <<END;
 <form method='post' action='$ENV{'SCRIPT_NAME'}'>
+        <table width='95%' cellspacing='0'>
+                <tr bgcolor='$color{'color20'}'>
+                        <td colspan='2' align='left'><b>$Lang::tr{'fw mode'}</b></td>
+                </tr>
+                <tr>
+                        <td align='left' width='60%'>$Lang::tr{'fw bridge mode'}</td>
+                        <td>
+                                <select name='FWBRIDGEMODE'>
+                                        <option value='off' $selected{'FWBRIDGEMODE'}{'off'}>$Lang::tr{'fw bridge mode disabled'}</option>
+                                        <option value='on' $selected{'FWBRIDGEMODE'}{'on'}>$Lang::tr{'fw bridge mode enabled'}</option>
+                                </select>
+                        </td>
+                </tr>
+	</table>
+
+	<br>
+
 	<table width='95%' cellspacing='0'>
 		<tr bgcolor='$color{'color20'}'>
 			<td colspan='2' align='left'><b>$Lang::tr{'masquerading'}</b></td>
@@ -348,6 +371,7 @@ END
 <tr bgcolor='$color{'color20'}'><td colspan='2' align='left'><b>$Lang::tr{'fw default drop'}</b></td></tr>
 <tr><td align='left' width='60%'>$Lang::tr{'drop action'}</td><td><select name='FWPOLICY'>
 <option value='DROP' $selected{'FWPOLICY'}{'DROP'}>DROP</option>
+<option value='ACCEPT' $selected{'FWPOLICY'}{'ACCEPT'}>ACCEPT</option>
 <option value='REJECT' $selected{'FWPOLICY'}{'REJECT'}>REJECT</option></select>
 </td></tr>
 <tr><td align='left' width='60%'>$Lang::tr{'drop action1'}</td><td><select name='FWPOLICY1'>
