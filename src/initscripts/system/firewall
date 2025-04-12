@@ -55,6 +55,8 @@ SYNPROXY_OPTIONS=(
 	"--mss" "1460"
 )
 
+FWBRIDGE="fwbridge"
+
 function iptables() {
 	/sbin/iptables --wait "$@"
 }
@@ -432,6 +434,11 @@ iptables_init() {
 	iptables -N POLICYOUT
 	iptables -A OUTPUT -j POLICYOUT
 
+	# Enable bridge netfilter.
+	if [ "${BRIDGENETFILTER}" = "on" ]; then
+		modprobe br_netfilter
+		sysctl -w net.bridge.bridge-nf-call-iptables=1
+	fi
 	# Initialize firewall policies.
 	/usr/sbin/firewall-policy
 
@@ -442,6 +449,13 @@ iptables_init() {
 	# add the blocking rules for MASQUERADE
 	if [ ! -e "/var/ipfire/red/active" ]; then
 		iptables_red_down
+	fi
+
+	if [ "${FWBRIDGEMODE}" = "on" ]; then
+		ip link add name $FWBRIDGE type bridge
+		ip link set $RED_DEV master $FWBRIDGE
+		ip link set $GREEN_DEV master $FWBRIDGE
+		ip link set $FWBRIDGE up
 	fi
 }
 

@@ -119,6 +119,8 @@ $(TARGET) :
 	echo  "ENABLED=off"		> $(CONFIG_ROOT)/vpn/settings
 	echo  "01"			> $(CONFIG_ROOT)/certs/serial
 	echo  "nameserver    1.2.3.4"	> $(CONFIG_ROOT)/ppp/fake-resolv.conf
+	echo  "FWBRIDGEMODE=off"	>> $(CONFIG_ROOT)/optionsfw/settings
+	echo  "BRIDGENETFILTER=off"	>> $(CONFIG_ROOT)/optionsfw/settings
 	echo  "DROPNEWNOTSYN=on"	>> $(CONFIG_ROOT)/optionsfw/settings
 	echo  "DROPINPUT=on"		>> $(CONFIG_ROOT)/optionsfw/settings
 	echo  "DROPFORWARD=on"		>> $(CONFIG_ROOT)/optionsfw/settings
