@@ -1164,6 +1164,8 @@
 'from warn email bad' => 'From e-mail address is not valid',
 'fw mode' => 'Firewall Mode',
 'fw bridge mode' => 'Firewall Bridge Mode',
+'fw bridge ip' => 'Firewall Bridge IP',
+'fw bridge mask' => 'Firewall Bridge Netmask',
 'fw bridge mode disabled' => 'disabled',
 'fw bridge mode enabled' => 'enabled',
 'fw blue' => 'Firewall options for BLUE interface',

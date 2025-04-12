@@ -82,6 +82,12 @@ if ($errormessage) {
 if (!$settings{'FWBRIDGEMODE'}) {
 	$settings{'FWBRIDGEMODE'} = 'off';
 }
+if (!$settings{'FWBRIDGEIP'}) {
+	$settings{'FWBRIDGEIP'} = '0.0.0.0';
+}
+if (!$settings{'FWBRIDGEMASK'}) {
+	$settings{'FWBRIDGEMASK'} = '0.0.0.0';
+}
 if (!$settings{'MASQUERADE_GREEN'}) {
 	$settings{'MASQUERADE_GREEN'} = 'on';
 }
@@ -193,6 +199,18 @@ print <<END;
                                         <option value='off' $selected{'FWBRIDGEMODE'}{'off'}>$Lang::tr{'fw bridge mode disabled'}</option>
                                         <option value='on' $selected{'FWBRIDGEMODE'}{'on'}>$Lang::tr{'fw bridge mode enabled'}</option>
                                 </select>
+                        </td>
+                </tr>
+                <tr>
+                        <td align='left' width='60%'>$Lang::tr{'fw bridge ip'}</td>
+                        <td>
+				<input type='text' name='FWBRIDGEIP' value='$settings{'FWBRIDGEIP'}'/>
+                        </td>
+                </tr>
+                <tr>
+                        <td align='left' width='60%'>$Lang::tr{'fw bridge mask'}</td>
+                        <td>
+				<input type='text' name='FWBRIDGEMASK' value='$settings{'FWBRIDGEMASK'}'/>
                         </td>
                 </tr>
 	</table>
