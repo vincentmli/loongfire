@@ -88,6 +88,9 @@ if (!$settings{'FWBRIDGEIP'}) {
 if (!$settings{'FWBRIDGEMASK'}) {
 	$settings{'FWBRIDGEMASK'} = '0.0.0.0';
 }
+if (!$settings{'BRIDGENETFILTER'}) {
+	$settings{'BRIDGENETFILTER'} = 'off';
+}
 if (!$settings{'MASQUERADE_GREEN'}) {
 	$settings{'MASQUERADE_GREEN'} = 'on';
 }
@@ -182,6 +185,9 @@ $selected{'MASQUERADE_BLUE'}{$settings{'MASQUERADE_BLUE'}} = 'selected="selected
 $selected{'FWBRIDGEMODE'}{'off'} = '';
 $selected{'FWBRIDGEMODE'}{'on'} = '';
 $selected{'FWBRIDGEMODE'}{$settings{'FWBRIDGEMODE'}} = 'selected="selected"';
+$selected{'BRIDGENETFILTER'}{'off'} = '';
+$selected{'BRIDGENETFILTER'}{'on'} = '';
+$selected{'BRIDGENETFILTER'}{$settings{'BRIDGENETFILTER'}} = 'selected="selected"';
 
 &Header::openbox('100%', 'center',);
 print "<form method='post' action='$ENV{'SCRIPT_NAME'}'>";
@@ -211,6 +217,15 @@ print <<END;
                         <td align='left' width='60%'>$Lang::tr{'fw bridge mask'}</td>
                         <td>
 				<input type='text' name='FWBRIDGEMASK' value='$settings{'FWBRIDGEMASK'}'/>
+                        </td>
+                </tr>
+                <tr>
+                        <td align='left' width='60%'>$Lang::tr{'fw bridge netfilter'}</td>
+                        <td>
+                                <select name='BRIDGENETFILTER'>
+                                        <option value='off' $selected{'BRIDGENETFILTER'}{'off'}>$Lang::tr{'fw bridge netfilter disabled'}</option>
+                                        <option value='on' $selected{'BRIDGENETFILTER'}{'on'}>$Lang::tr{'fw bridge netfilter enabled'}</option>
+                                </select>
                         </td>
                 </tr>
 	</table>
