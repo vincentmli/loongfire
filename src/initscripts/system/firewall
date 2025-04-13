@@ -458,6 +458,7 @@ iptables_init() {
 		ip link set $FWBRIDGE up
 		ip a add $FWBRIDGEIP/$FWBRIDGEMASK dev $FWBRIDGE
 		iptables -t filter -A GUIINPUT -i $FWBRIDGE -p tcp -m tcp --dport 444 -j ACCEPT
+		iptables -t filter -A GUIINPUT -i $FWBRIDGE -p tcp -m tcp --dport 22 -j ACCEPT
 	fi
 }
 
