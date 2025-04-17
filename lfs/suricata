@@ -71,10 +71,12 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar zxf $(DIR_DL)/$(DL_FILE)
 	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/suricata/suricata-disable-sid-2210059.patch
-	cd $(DIR_APP) && LDFLAGS="$(LDFLAGS)" ./configure \
+	cd $(DIR_APP) && CC=clang LDFLAGS="$(LDFLAGS)" ./configure \
 		--prefix=/usr \
 		--sysconfdir=/etc \
 		--localstatedir=/var \
+		--enable-ebpf \
+		--enable-ebpf-build \
 		--enable-gccprotect \
 		--disable-gccmarch-native \
 		--enable-non-bundled-htp \
@@ -89,6 +91,9 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install
 	cd $(DIR_APP) && make install-conf
+
+        #Copy suricata bpf program to /usr/lib/bpf
+	cd $(DIR_APP) && cp -f ebpf/xdp_filter.bpf /usr/lib/bpf/
 
 	# Remove default suricata config file.
 	rm -rvf /etc/suricata/suricata.yaml
