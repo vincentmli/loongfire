@@ -40,7 +40,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = dc39279b99880762bee2b1788fea9046dc63c01560332ffc167844673314165456dcbff3b0d05d32c931741b397fd68e9e294d2ee6c526a3d286445c2a83b789
+$(DL_FILE)_BLAKE2 = 6fc54db3992526693980388b3326e57c6a868dfc780426094385ef90b0b07a4776fac9f3b3f525313dabac42211e461ce79bdf21a0ca37cc764dd61980afdc75
 
 install : $(TARGET)
 
@@ -100,6 +100,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 
 	# Install IPFire related config file.
 	install -m 0644 $(DIR_SRC)/config/suricata/suricata.yaml /etc/suricata
+	install -m 0644 $(DIR_SRC)/config/suricata/suricata-xdp.yaml /etc/suricata
 
 	# Create emtpy rules directory.
 	-mkdir -p /var/lib/suricata
