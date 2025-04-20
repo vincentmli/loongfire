@@ -24,7 +24,7 @@
 
 include Config
 
-VER         = 6.14-rc5
+VER         = 6.15-rc1
 
 THISAPP    = linux-$(VER)
 DL_FILE    = linux-$(VER).tar.xz
@@ -75,7 +75,7 @@ objects = \
 
 $(DL_FILE) = $(URL_IPFIRE)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = c935b7a5798db31bc9f8f0e6a36e9bb209ace4472f69f386ed85a7adb56252073d0385db87ee76b242f28411e0d4528e87021670711aa9ce5f6d3e5a3328d5d2
+$(DL_FILE)_BLAKE2 = 1181e8917d750fbd97540faab303a1de125a42b64461d7b322e541101039aef83a07eed769dfdb411811a261ad5712d35534917983169e63eecb5d0b997a174b
 
 install : $(TARGET)
 
