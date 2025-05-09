@@ -73,7 +73,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 
 	cd $(DIR_APP)/llvm && mkdir build
 	cd $(DIR_APP)/llvm/build && cmake .. -G "Ninja" -DLLVM_TARGETS_TO_BUILD="BPF;LoongArch" \
-		-DLLVM_ENABLE_PROJECTS="clang"    \
+		-DLLVM_ENABLE_PROJECTS="clang;lldb"    \
 		-DCMAKE_BUILD_TYPE=Release        \
 		-DLLVM_BUILD_RUNTIME=OFF \
 		-DCMAKE_INSTALL_PREFIX=/usr \
