@@ -34,7 +34,7 @@ usr/lib/bpf/xsk_def_xdp_prog_5.3.o
 usr/lib/libxdp.a
 usr/lib/libxdp.so
 usr/lib/libxdp.so.1
-usr/lib/libxdp.so.1.4.0
+usr/lib/libxdp.so.1.5.0
 usr/lib/pkgconfig/libxdp.pc
 usr/sbin/xdp-bench
 usr/sbin/xdp-filter
@@ -46,3 +46,4 @@ usr/sbin/xdp-udp
 usr/sbin/xdpdump
 usr/share/xdp-tools/xdp_drop.o
 usr/share/xdp-tools/xdp_pass.o
+usr/sbin/xdp-forward
