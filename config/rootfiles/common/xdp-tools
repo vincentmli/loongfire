@@ -39,6 +39,8 @@ usr/lib/pkgconfig/libxdp.pc
 usr/sbin/xdp-bench
 usr/sbin/xdp-filter
 usr/sbin/xdp-loader
+usr/sbin/tc-loader
+usr/lib/bpf/tc-dummy.bpf.o
 usr/sbin/xdp-monitor
 usr/sbin/xdp-trafficgen
 usr/sbin/xdp_synproxy
