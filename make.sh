@@ -2082,6 +2082,8 @@ build_system() {
 	lfsmake2 perl-Imager-QRCode
 	lfsmake2 perl-MIME-Base32
 	lfsmake2 perl-URI-Encode
+	lfsmake2 perl-Net-Netmask
+	lfsmake2 perl-Net-ISP-Balance
 	lfsmake2 rsnapshot
 	lfsmake2 mympd
 	lfsmake2 wsdd
