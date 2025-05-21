@@ -25,7 +25,7 @@
 
 include Config
 
-VER        = 0.2
+VER        = 0.3
 
 THISAPP    = libbpf-bootstrap-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -41,7 +41,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = e90e4a047093c0438c6f10534a6c899afb7cd124acfc94b73cdb1eaa60687fc43325669002d95b882a57ca372a606a10179a6636524e95f98cb6db7cfcbaaccc
+$(DL_FILE)_BLAKE2 = dfd2c7316ed468297b710be4f26b19d33345bc7dcadcbfecc86679a99b7c183427d1bacec051c855028514f0f1eba88f974d1544fa0b39c7f4513d512fff4192
 
 install : $(TARGET)
 
@@ -73,6 +73,6 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar zxf $(DIR_DL)/$(DL_FILE)
 
 	cd $(DIR_APP)/examples/c && make $(MAKETUNING)
-	cd $(DIR_APP)/examples/c && cp -vf kprobe ksyscall profile /usr/bin/
+	cd $(DIR_APP)/examples/c && cp -vf kprobe ksyscall profile netqtop /usr/bin/
 	@rm -rf $(DIR_APP)
 	@$(POSTBUILD)
