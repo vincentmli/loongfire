@@ -2095,6 +2095,7 @@ build_system() {
 	lfsmake2 llvm-project
 	lfsmake2 libbpf-bootstrap
 	lfsmake2 bcc
+	lfsmake2 ply
 	lfsmake2 xdp-tools
 	lfsmake2 loxilb
 	lfsmake2 loxicmd
