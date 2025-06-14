@@ -26,7 +26,7 @@ include Config
 
 SUMMARY    = A highly DNS-, DoS- and abuse-aware loadbalancer
 
-VER        = 1.9.6
+VER        = 1.9.10
 
 THISAPP    = dnsdist-$(VER)
 DL_FILE    = $(THISAPP).tar.bz2
@@ -50,7 +50,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = adb56707bb768ceae974cd9b725d2bf1f4beaa6e3edc6ede22a7d93920214614f10c82d71dbb773741f56dff04e0f0aa26dc0a0e2d5d405bee89d8ada1130303
+$(DL_FILE)_BLAKE2 = ea66ca17ef66ecc64fd3a7379b22c2b0448c2a41f325e574a4edb20dfe408315be84a407b78f30a441479fbbcba31a28da2e310c275877739918ad3f9870acd1
 
 install : $(TARGET)
 
@@ -90,6 +90,8 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 		--disable-gnutls \
 		--enable-dns-over-tls \
 		--with-lua \
+		--with-ebpf \
+		--with-xsk \
 		--without-net-snmp
 
 	cd $(DIR_APP) && make $(MAKETUNING)
