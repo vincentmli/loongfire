@@ -1,4 +1,5 @@
 usr/bin/kdig
+usr/bin/kxdpgun
 #usr/lib/libcontrib.a
 #usr/lib/libcontrib.la
 #usr/lib/libdnssec.la
