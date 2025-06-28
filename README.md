@@ -42,7 +42,7 @@ for example [mini PC](https://www.aliexpress.us/item/3256807861547435.html?spm=a
 
 On LoongArch machine (I used Loongson 3A6000 mini PC running Fedora):
 
-1. git clone https://github.com/vincentmli/BPFire.git
-2. cd BPFire; git checkout loongfire
+1. git clone https://github.com/vincentmli/loongfire.git
+2. cd loongfire
 3. wget --mirror --convert-links --adjust-extension --page-requisites --no-parent --cut-dirs=2 -nH --reject "index.html*" --reject "*.gif" https://www.bpfire.net/download/loongfire/cache/
 4. ./make.sh build
