@@ -25,6 +25,7 @@ $General::swroot = 'CONFIG_ROOT';
 $General::noipprefix = 'noipg-';
 
 require "${General::swroot}/network-functions.pl";
+require "${General::swroot}/wireguard-functions.pl";
 
 # This function executes a shell command without forking a shell or do any other
 # Perl-voodoo before it. It deprecates the "system" command and is the only way
@@ -252,6 +253,13 @@ sub setup_default_networks
 			$defaultNetworks->{"IPsec RW (${netaddress}/${prefix})"}{'NAME'} = "IPsec RW";
 			$defaultNetworks->{"IPsec RW (${netaddress}/${prefix})"}{'NET'}  = $netaddress;
 		}
+	}
+
+	# WireGuard
+	if ($Wireguard::settings{'CLIENT_POOL'}) {
+		my $name = $Lang::tr{'wg rw peers'};
+
+		$defaultNetworks->{$name}{'NAME'} = "WGRW";
 	}
 }
 sub get_aliases
