@@ -36,6 +36,7 @@ usr/local/bin/updxlratorctrl
 usr/local/bin/urlfilterctrl
 #usr/local/bin/wiohelper
 #usr/local/bin/wioscan
+usr/local/bin/wireguardctrl
 usr/local/bin/wirelessclient
 usr/local/bin/wirelessctrl
 #usr/local/bin/wlanapctrl
