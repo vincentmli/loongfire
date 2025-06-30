@@ -23728,7 +23728,7 @@ usr/bin/cpupower
 #usr/include/cpuidle.h
 #usr/include/powercap.h
 #usr/lib/libcpupower.so
-usr/lib/libcpupower.so.0.0.1
+usr/lib/libcpupower.so.1.0.1
 usr/lib/libcpupower.so.1
 #usr/man/man1/cpupower-frequency-info.1
 #usr/man/man1/cpupower-frequency-set.1
