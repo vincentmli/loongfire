@@ -1772,7 +1772,6 @@ build_system() {
 	lfsmake2 colm
 	lfsmake2 ragel
 	lfsmake2 vectorscan
-	lfsmake2 suricata
 	lfsmake2 ids-ruleset-sources
 	lfsmake2 ipblocklist-sources
 	lfsmake2 squid
@@ -2022,7 +2021,6 @@ build_system() {
 	lfsmake2 lua
 	lfsmake2 haproxy
 	lfsmake2 ipset
-	lfsmake2 dnsdist
 	lfsmake2 bird
 	lfsmake2 libyang
 	lfsmake2 abseil-cpp
@@ -2051,7 +2049,6 @@ build_system() {
 	lfsmake2 libxxhash
 	lfsmake2 borgbackup
 	lfsmake2 lmdb
-	lfsmake2 knot
 	lfsmake2 spectre-meltdown-checker
 	lfsmake2 zabbix_agentd
 	lfsmake2 flashrom
@@ -2093,19 +2090,25 @@ build_system() {
 	lfsmake2 pahole
 	lfsmake2 libbpf
 	lfsmake2 llvm-project
-	lfsmake2 libbpf-bootstrap
-	lfsmake2 bcc
+	lfsmake2 ipblocklist-sources
 	lfsmake2 ply
 	lfsmake2 pwru
-	lfsmake2 xdp-tools
-	lfsmake2 loxilb
 	lfsmake2 loxicmd
 	lfsmake2 wireguard-tools
 
 	lfsmake2 linux
+	lfsmake2 loxilb
 	lfsmake2 yt6801
 	#lfsmake2 rtl8812au
 	lfsmake2 linux-initrd
+
+	lfsmake2 xdp-tools
+	lfsmake2 knot
+	lfsmake2 dnsdist
+	lfsmake2 suricata
+	lfsmake2 ids-ruleset-sources
+	lfsmake2 ipblocklist-sources
+	lfsmake2 libbpf-bootstrap
 
 	lfsmake2 memtest
 
