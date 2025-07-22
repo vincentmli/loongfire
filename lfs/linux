@@ -156,7 +156,7 @@ ifeq "$(HEADERS)" "1"
 else
 
 	# Install ipfire logo
-	cd $(DIR_APP) && cp -vf $(DIR_SRC)/config/kernel/ipfire_logo.ppm \
+	cd $(DIR_APP) && cp -vf $(DIR_SRC)/config/kernel/loongfire_logo.ppm \
 		drivers/video/logo/logo_linux_clut224.ppm
 
 	# Cleanup kernel source
