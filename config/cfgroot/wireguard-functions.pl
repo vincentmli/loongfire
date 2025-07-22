@@ -576,6 +576,9 @@ sub parse_configuration($$) {
 
 				# Check if all networks are valid
 				foreach my $network (@networks) {
+					# Skip any IPv6 networks
+					next if ($network =~ m/:/);
+
 					unless (&Network::check_subnet($network)) {
 						push(@errormessages, $Lang::tr{'invalid network'} . " $network");
 					}
