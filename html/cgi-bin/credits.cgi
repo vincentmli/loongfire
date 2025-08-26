@@ -38,6 +38,14 @@ require "${General::swroot}/header.pl";
 &Header::openbox('100%', 'left', $Lang::tr{'donation'});
 
 print <<END
+<p>$Lang::tr{'loongfire-donation-text'}</p>
+
+<div align="center">
+	<a href="https://www.bpfire.net/donate.html">
+		<strong>$Lang::tr{'donation'}</strong>
+	</a>
+</div>
+
 <p>$Lang::tr{'donation-text'}</p>
 
 <div align="center">

@@ -932,6 +932,7 @@
 'donation' => 'Donation',
 'donation-link' => 'https://www.paypal.com/en_US/GB/i/btn/btn_donateCC_LG.gif',
 'donation-text' => '<strong>IPFire</strong> is driven and maintained by volunteers in their free time. To keep this project running costs incurred, if you like to support us we would be pleased by a small donation.',
+'loongfire-donation-text' => '<strong>LoongFire</strong> is driven and maintained by Vincent Li in his free time, and is impossible without LoongArch open source community support. if you like to support LoongFire, we would be pleased by a small donation.',
 'done' => 'Done',
 'dos charset' => 'DOS Charset',
 'down and up speed' => 'Enter your Down- and Uplink-Speed <br /> and then press <i>Save</i>.',

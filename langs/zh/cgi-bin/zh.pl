@@ -930,7 +930,7 @@
 'donation-bpfire' => 'BPFire 捐款',
 'donation-link' => 'https://www.paypal.com/en_US/GB/i/btn/btn_donateCC_LG.gif',
 'donation-ipfire-text' => '<strong>IPFire</strong>由志愿者在空闲时间进行维护。为了保持该项目的运行成本，如果您愿意支持我们，请您为我们提供一小笔捐款。',
-'donation-bpfire-text' => '<strong>BPFire</strong>为普罗大众带来革命创新性的eBPF技术，为家庭用户或任何大小组织企业的网络安全保驾护航. 由Vincent Li在空闲时间进行维护。为了保持该项目的运行成本，如果您愿意支持他，请您为他提供一小笔捐款。',
+'loongfire-donation-text' => '<strong>LoongFire</strong>龙芯开源防火墙是IPFire移植到龙芯的采用革命创新性Linux内核eBPF技术，据有高性能，动态可编程网络的防火墙，从底层龙芯龙架构指令集，编译工具链，操作系统，网络应用，实现自主可控。 由Vincent Li发起并维护,并获得龙芯开源社区贡献者的支持。如果您愿意支持LoongFire，请您提供一小笔捐款。',
 'done' => '完成',
 'dos charset' => 'DOS字符集',
 'down and up speed' => '输入您的下行和上行速度<br /> 然后点击<i>保存</i>。',
