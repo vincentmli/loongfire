@@ -223,8 +223,8 @@ print <<END
 		<div id="header" class="fixed">
 			<div id="logo">
 				<h1>
-					<a href="https://www.ipfire.org">
-						IPFire_
+					<a href="https://www.bpfire.net">
+						LoongFire_
 					</a>
 END
 ;
@@ -283,8 +283,8 @@ print <<END;
 
 	<div id="footer" class='bigbox fixed'>
 		<span class="pull-right">
-			<a href="https://www.ipfire.org/" target="_blank"><strong>IPFire.org</strong></a> &bull;
-			<a href="https://www.ipfire.org/donate" target="_blank">$Lang::tr{'support donation'}</a>
+			<a href="https://www.bpfire.net/" target="_blank"><strong>BPFire.net</strong></a> &bull;
+			<a href="https://www.bpfire.net/donate.html" target="_blank">$Lang::tr{'support donation'}</a>
 		</span>
 
 		<strong>$system_release</strong>
