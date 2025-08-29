@@ -42,3 +42,4 @@ usr/local/bin/wirelessctrl
 #usr/local/bin/wlanapctrl
 usr/local/bin/xdpgeoipctrl
 usr/local/bin/xdpsnictrl
+usr/local/bin/xdpdnsctrl
