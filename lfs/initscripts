@@ -186,7 +186,7 @@ $(TARGET) :
 	ln -sf ../init.d/localnet		/etc/rc.d/rcsysinit.d/S80localnet
 	ln -sf ../init.d/firewall		/etc/rc.d/rcsysinit.d/S85firewall
 	ln -sf ../init.d/xdptailcall            /etc/rc.d/rc3.d/S102xdptailcall
-	#ln -sf ../init.d/xdpsni                 /etc/rc.d/rc3.d/S103xdpsni
+	ln -sf ../init.d/xdpsni                 /etc/rc.d/rc3.d/S103xdpsni
 	ln -sf ../init.d/xdpgeoip               /etc/rc.d/rc3.d/S104xdpgeoip
 	ln -sf ../init.d/ddos                   /etc/rc.d/rc3.d/S105ddos
 	ln -sf ../init.d/loxilb                 /etc/rc.d/rc3.d/S106loxilb
