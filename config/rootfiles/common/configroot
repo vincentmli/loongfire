@@ -208,4 +208,5 @@ var/ipfire/wireless
 #var/ipfire/wireless/settings
 var/ipfire/xdptailcall
 var/ipfire/xdpsni
+var/ipfire/xdpdns
 var/ipfire/ddos
