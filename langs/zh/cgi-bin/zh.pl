@@ -2483,7 +2483,7 @@
 'keepalived virtual address' => '虚拟 IP地址',
 'xdpdns status' => '运行状态',
 'xdpdns enable' => '启动',
-'xdpdns domain' => 'eBPF XDP 域名过滤服务',
+'xdpdns domain' => 'XDP 域名过滤服务',
 'xdpdns domain edit' => '编辑域名',
 'xdpdns domain add' => '添加域名',
 'xdpdns domain name' => '域名',
