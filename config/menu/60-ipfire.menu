@@ -8,6 +8,16 @@
 				  'title' => "XDP TCP DDoS",
 				  'enabled' => 1,
 				  };
+    $subipfire->{'25.xdpdns'} = {'caption' => $Lang::tr{'xdpdns domain'},
+                                'uri' => '/cgi-bin/xdpdns.cgi',
+                                'title' => "$Lang::tr{'xdpdns domain'}",
+                                'enabled' => 1,
+                                };
+    $subipfire->{'26.xdpsni'} = {'caption' => $Lang::tr{'xdpsni domain'},
+                                'uri' => '/cgi-bin/xdpsni.cgi',
+                                'title' => "$Lang::tr{'xdpsni domain'}",
+                                'enabled' => 1,
+                                };
     $subipfire->{'99.help'} = {'caption' => $Lang::tr{'help'},
 				  'uri' => '/cgi-bin/help.cgi',
 				  'title' => "$Lang::tr{'help'}",
