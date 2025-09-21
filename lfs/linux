@@ -132,11 +132,12 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	# Patch performance monitoring restrictions to allow further hardening
 	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/linux-5.15.17-security-perf-allow-further-restriction-of-perf_event_open.patch
 
-	# https://bugzilla.ipfire.org/show_bug.cgi?id=12760
-	#cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/linux-5.15-NFQUEUE-Hold-RCU-read-lock-while-calling-nf_reinject.patch
-
 	# Fix external module compile
 	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/linux-6.0-fix_external_module_build.patch
+
+	# Patch bpf trampoline fixes from loongarch mailing list https://lore.kernel.org/loongarch/20250923085450.140602-1-hengqi.chen@gmail.com/T/#t
+	# b4 am -o . 20250923085450.140602-1-hengqi.chen@gmail.com download and create the patchset mbx file
+	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/v6_20250923_hengqi_chen_loongarch_fix_bpf_trampoline_related_issues.mbx
 
 ifeq "$(BUILD_ARCH)" "aarch64"
 	# Apply Arm kernel patches.
