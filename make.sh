@@ -2095,6 +2095,7 @@ build_system() {
 	lfsmake2 pwru
 	lfsmake2 loxicmd
 	lfsmake2 wireguard-tools
+	lfsmake2 arpwatch
 
 	lfsmake2 linux
 	lfsmake2 loxilb
