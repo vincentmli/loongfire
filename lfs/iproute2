@@ -71,10 +71,11 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
+	cd $(DIR_APP) && ./configure
 	cd $(DIR_APP) && make $(MAKETUNING) SBINDIR=/sbin
 	cd $(DIR_APP) && make SBINDIR=/sbin install
 	cd $(DIR_APP) && mv -v /sbin/arpd /usr/sbin
-	cd $(DIR_APP) && mv -v /usr/share/iproute2 /etc/iproute2
+	cd $(DIR_APP) && mv -fv /usr/share/iproute2 /etc/iproute2
 
 	# Add table for static routing
 	echo "200	static" >> /etc/iproute2/rt_tables
