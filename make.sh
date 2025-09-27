@@ -1499,6 +1499,8 @@ build_system() {
 	lfsmake2 libnetfilter_cthelper
 	lfsmake2 libnetfilter_cttimeout
 	lfsmake2 iptables
+	lfsmake2 libsepol
+	lfsmake2 libselinux
 	lfsmake2 iproute2
 	lfsmake2 screen
 	lfsmake2 elfutils
