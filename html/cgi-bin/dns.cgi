@@ -2,7 +2,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2005-2024  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2005-2025  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -127,15 +127,17 @@ if (($cgiparams{'SERVERS'} eq $Lang::tr{'save'}) || ($cgiparams{'SERVERS'} eq $L
 		$errormessage = "$Lang::tr{'invalid ip'}: $cgiparams{'NAMESERVER'}";
 	}
 
+	# Check if the provided hostname is valid
+	if ($cgiparams{'TLS_HOSTNAME'} ne "") {
+		unless (&General::validfqdn($cgiparams{"TLS_HOSTNAME"})) {
+			$errormessage = "$Lang::tr{'invalid ip or hostname'}: " . &Header::escape($cgiparams{'TLS_HOSTNAME'});
+		}
+	}
+
 	# Check if a TLS is enabled and no TLS_HOSTNAME has benn specified.
-	elsif($settings{'PROTO'} eq "TLS") {
-		unless($cgiparams{"TLS_HOSTNAME"}) {
+	if ($settings{'PROTO'} eq "TLS") {
+		unless ($cgiparams{"TLS_HOSTNAME"}) {
 			$errormessage = "$Lang::tr{'dns no tls hostname given'}";
-		} else {
-			# Check if the provided domain is valid.
-			unless(&General::validfqdn($cgiparams{"TLS_HOSTNAME"})) {
-				$errormessage = "$Lang::tr{'invalid ip or hostname'}: $cgiparams{'TLS_HOSTNAME'}";
-			}
 		}
 	}
 
