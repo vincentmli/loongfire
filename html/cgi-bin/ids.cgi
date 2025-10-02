@@ -1360,7 +1360,8 @@ print <<END;
 				<tr>
 					<td>$Lang::tr{'remark'}</td>
 					<td>
-						<input type='text' name=IGNORE_ENTRY_REMARK value='$entry_remark' size='24' />
+						<input type='text' name=IGNORE_ENTRY_REMARK
+							value='@{[ &Header::escape($entry_remark) ]}' size='24' />
 					</td>
 				</tr>
 
