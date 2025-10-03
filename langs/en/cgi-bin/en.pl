@@ -1352,6 +1352,7 @@
 'fwhost hint' => 'Note',
 'fwhost hosts' => 'Firewall Hosts',
 'fwhost icmptype' => 'ICMP type:',
+'fwhost invalid country code' => 'Invalid Country Code',
 'fwhost ip_mac' => 'IP/MAC address',
 'fwhost ipadr' => 'IP address:',
 'fwhost ipsec host' => 'IPsec clients:',
