@@ -139,6 +139,9 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	# b4 am -o . 20250923085450.140602-1-hengqi.chen@gmail.com download and create the patchset mbx file
 	# cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/v6_20250923_hengqi_chen_loongarch_fix_bpf_trampoline_related_issues.mbx
 
+	# Disable bpf trampoline trace to kernel module functions
+	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/LoongArch-BPF-Disable-bpf-trampoline-kernel-module-f.patch
+
 ifeq "$(BUILD_ARCH)" "aarch64"
 	# Apply Arm kernel patches.
 	cd $(DIR_APP) && cat patch $(DIR_SRC)/src/patches/linux/aarch64/* | patch -Np1
