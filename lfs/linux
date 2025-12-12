@@ -25,7 +25,7 @@
 
 include Config
 
-VER         = 6.17.7
+VER         = 6.18.0
 
 THISAPP    = linux-$(VER)
 DL_FILE    = linux-$(VER).tar.xz
@@ -76,7 +76,7 @@ objects = \
 
 $(DL_FILE) = $(URL_IPFIRE)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 7338c33e209a87d2acdc80cb30066b719a1924ac38db0ac4087c4cb2ae6d510d75fbc97eeadac9bbc070afe09f29e65fd7ab18383fe677adcf993c17d4407535
+$(DL_FILE)_BLAKE2 = a1fe14700581494d19df51f86bcd5290586b6b91d3c5717d93cfc6aee019ffe3ba80c0f089c270e8e4bd43bf3bc811a1bb71e53a1036699989566f657292ba24
 
 install : $(TARGET)
 
@@ -140,7 +140,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	# cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/v6_20250923_hengqi_chen_loongarch_fix_bpf_trampoline_related_issues.mbx
 
 	# Disable bpf trampoline trace to kernel module functions
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/LoongArch-BPF-Disable-bpf-trampoline-kernel-module-f.patch
+	# cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/LoongArch-BPF-Disable-bpf-trampoline-kernel-module-f.patch
 
 ifeq "$(BUILD_ARCH)" "aarch64"
 	# Apply Arm kernel patches.
