@@ -1626,10 +1626,10 @@ if [ "${BUILD_ARCH}" != "loongarch64" ]; then
 	lfsmake2 rust-paste-impl
 	lfsmake2 rust-paste
 	lfsmake2 rust-paste-0.1.18
-	lfsmake2 rust-ctor
+	#lfsmake2 rust-ctor
 	lfsmake2 rust-ghost
 	lfsmake2 rust-inventory-impl
-	lfsmake2 rust-inventory
+	#lfsmake2 rust-inventory
 	lfsmake2 rust-pyo3-build-config
 	lfsmake2 rust-pyo3-macros-backend
 	lfsmake2 rust-pyo3-macros
