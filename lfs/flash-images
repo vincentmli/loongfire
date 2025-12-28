@@ -238,11 +238,16 @@ endif
 
 	# zerofree the ext4 images to get better compression
 ifneq "$(PART_TYPE)" "c"
+	# zerofree cause error on X86 build host
+ifeq "$(BUILD_ARCH)" "loongarch64"
 	zerofree $(PART_BOOT)
+endif
 	-fsck.ext2 -f -y $(PART_BOOT)
 	fsck.ext2 -f -y $(PART_BOOT)
 endif
+ifeq "$(BUILD_ARCH)" "loongarch64"
 	zerofree $(PART_ROOT)
+endif
 	-fsck.ext4 -f -y $(PART_ROOT)
 	fsck.ext4 -f -y $(PART_ROOT)
 
