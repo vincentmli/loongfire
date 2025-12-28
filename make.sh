@@ -1959,7 +1959,11 @@ fi
 	lfsmake2 python3-pyasn1
 	lfsmake2 python3-botocore
 	lfsmake2 python3-cffi
-	#lfsmake2 python3-cryptography
+if [ "${BUILD_ARCH}" != "loongarch64" ]; then
+	#python3-cryptography relies on rust that loongfire
+	#does not support for now
+	lfsmake2 python3-cryptography
+fi
 	lfsmake2 python3-circuitbreaker
 	lfsmake2 python3-pytz
 	lfsmake2 python3-click
