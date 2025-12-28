@@ -72,7 +72,11 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar zxf $(DIR_DL)/$(DL_FILE)
 
+ifeq "$(BUILD_ARCH)" "loongarch64"
 	cd $(DIR_APP) && TARGET_GOARCH=loong64 GOARCH=loong64 make pwru
+else
+	cd $(DIR_APP) && make pwru
+endif
 	cd $(DIR_APP) && cp -vf pwru /usr/bin/
 
 	@rm -rf $(DIR_APP)
