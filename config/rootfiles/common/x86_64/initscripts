@@ -148,7 +148,6 @@ etc/rc.d/rc3.d/S99grub-btrfsd
 #etc/rc.d/rc3.d/S99vdradmin
 etc/rc.d/rc3.d/S102xdptailcall
 etc/rc.d/rc3.d/S104xdpgeoip
-etc/rc.d/rc3.d/S105ddos
 #etc/rc.d/rc6.d
 etc/rc.d/rc6.d/K01grub-btrfsd
 #etc/rc.d/rc6.d/K01imspetor

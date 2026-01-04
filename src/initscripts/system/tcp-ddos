@@ -3,7 +3,7 @@
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
 # Copyright (C) 2007-2022  IPFire Team  <info@ipfire.org>                     #
-# Copyright (C) 2024-2025  BPFire <vincent.mc.li@gmail.com>                     #
+# Copyright (C) 2024-2026  LoongFire <vincent.mc.li@gmail.com>                #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -29,9 +29,6 @@ MSSOPTS="--mss4 1460 --mss6 1440"
 TTLOPTS="--ttl 64"
 WSCALE="--wscale 0"
 BPF_OBJECT_FILE="/usr/lib/bpf/xdp_synproxy.bpf.o"
-PROG_NAME="syncookie_xdp"
-MAP_PIN_PATH="/sys/fs/bpf/xdp-ddos/ddos_progs"
-KEY=0
 
 get_ports () {
 # Define an empty variable to store the output
@@ -54,30 +51,41 @@ get_ports () {
 	echo $output
 }
 
+tcp_ports="$(get_ports /var/ipfire/ddos/tcp-ddos-settings)"
+
 load_syncookie () {
-	sysctl -w net.ipv4.tcp_syncookies=1
-	sysctl -w net.ipv4.tcp_timestamps=1
-	sysctl -w net.netfilter.nf_conntrack_tcp_loose=0
-	/usr/sbin/xdp_ddos add $BPF_OBJECT_FILE $PROG_NAME $MAP_PIN_PATH $KEY
-	if [ $? -eq 0 ]; then
-		prog_id=$(bpftool prog | grep syncookie_xdp | awk '{print $1}' | cut -d':' -f1)
-		xdp_synproxy --prog $prog_id $MSSOPTS $WSCALE $TTLOPTS --ports="$tcp_ports"
-	else
-		boot_mesg "Error to load $BPF_OBJECT_FILE"
-	fi
+        sysctl -w net.ipv4.tcp_syncookies=1
+        sysctl -w net.ipv4.tcp_timestamps=1
+        sysctl -w net.netfilter.nf_conntrack_tcp_loose=0
+        /usr/sbin/xdp-loader status red0 | grep 'syncookie_xdp'
+        if [ $? -eq 0 ]; then
+                prog_id=$(xdp-loader status red0 | grep 'syncookie_xdp' | awk '{print $4}')
+                xdp_synproxy --prog $prog_id $MSSOPTS $WSCALE $TTLOPTS --ports="$tcp_ports"
+        else
+                xdp-loader load red0 $BPF_OBJECT_FILE
+                if [ $? -ge 1 ]; then
+                        boot_mesg "Native mode not supported, try SKB"
+                        xdp-loader load red0 -m skb $BPF_OBJECT_FILE
+                        prog_id=$(/usr/sbin/xdp-loader status red0 | grep 'syncookie_xdp' | awk '{print $4}')
+                        xdp_synproxy --prog $prog_id $MSSOPTS $WSCALE $TTLOPTS --ports="$tcp_ports"
+                else
+                        prog_id=$(/usr/sbin/xdp-loader status red0 | grep 'syncookie_xdp' | awk '{print $4}')
+                        xdp_synproxy --prog $prog_id $MSSOPTS $WSCALE $TTLOPTS --ports="$tcp_ports"
+                fi
+        fi
 }
 
 unload_syncookie () {
-	sysctl -w net.ipv4.tcp_syncookies=1
-	/usr/sbin/xdp_ddos del $MAP_PIN_PATH $KEY
-	if [ $? -eq 0 ]; then
-		boot_mesg "syncookie_xdp unloaded!"
-	else
-		boot_mesg "Error syncookie_xdp not unloaded!"
-	fi
+        sysctl -w net.ipv4.tcp_syncookies=1
+        /usr/sbin/xdp-loader status red0 | grep 'syncookie_xdp'
+        if [ $? -eq 0 ]; then
+                prog_id=$(xdp-loader status red0 | grep 'syncookie_xdp' | awk '{print $4}')
+                /usr/sbin/xdp-loader unload -i $prog_id red0
+        else
+                boot_mesg "Error syncookie_xdp not loaded!"
+        fi
 }
 
-tcp_ports="$(get_ports /var/ipfire/ddos/tcp-ddos-settings)"
 
 case "$1" in
 	start)
