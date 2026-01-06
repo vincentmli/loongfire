@@ -32,3 +32,5 @@ var/ipfire/backup/include
 var/ipfire/dhcpc/dhcpcd.conf
 var/ipfire/graphs.pl
 var/ipfire/network-functions.pl
+var/ipfire/lldp
+var/ipfire/main/manualpages
