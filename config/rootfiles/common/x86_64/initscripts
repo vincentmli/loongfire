@@ -30,6 +30,7 @@ etc/rc.d/init.d/grub-btrfsd
 etc/rc.d/init.d/halt
 etc/rc.d/init.d/ipsec
 etc/rc.d/init.d/leds
+etc/rc.d/init.d/lldpd
 etc/rc.d/init.d/localnet
 etc/rc.d/init.d/loxilb
 etc/rc.d/init.d/modules
@@ -105,6 +106,7 @@ etc/rc.d/rc0.d/K01grub-btrfsd
 #etc/rc.d/rc0.d/K01motion
 #etc/rc.d/rc0.d/K01vdradmin
 etc/rc.d/rc0.d/K08fcron
+etc/rc.d/rc0.d/K09lldpd
 etc/rc.d/rc0.d/K28apache
 etc/rc.d/rc0.d/K30sshd
 etc/rc.d/rc0.d/K47setclock
@@ -141,6 +143,7 @@ etc/rc.d/rc3.d/S24cyrus-sasl
 etc/rc.d/rc3.d/S30sshd
 etc/rc.d/rc3.d/S32apache
 etc/rc.d/rc3.d/S40fcron
+etc/rc.d/rc3.d/S41lldpd
 etc/rc.d/rc3.d/S98rc.local
 etc/rc.d/rc3.d/S99grub-btrfsd
 #etc/rc.d/rc3.d/S99imspetor
@@ -153,6 +156,7 @@ etc/rc.d/rc6.d/K01grub-btrfsd
 #etc/rc.d/rc6.d/K01motion
 #etc/rc.d/rc6.d/K01vdradmin
 etc/rc.d/rc6.d/K08fcron
+etc/rc.d/rc6.d/K09lldpd
 etc/rc.d/rc6.d/K28apache
 etc/rc.d/rc6.d/K30sshd
 etc/rc.d/rc6.d/K47setclock

@@ -96,6 +96,7 @@ $(TARGET) :
 	ln -sf ../init.d/motion			/etc/rc.d/rc0.d/K01motion
 	ln -sf ../init.d/vdradmin		/etc/rc.d/rc0.d/K01vdradmin
 	ln -sf ../init.d/fcron			/etc/rc.d/rc0.d/K08fcron
+	ln -sf ../init.d/lldpd                  /etc/rc.d/rc0.d/K09lldpd
 	ln -sf ../init.d/arpwatch		/etc/rc.d/rc0.d/K12arpwatch
 	ln -sf ../init.d/apache			/etc/rc.d/rc0.d/K28apache
 	ln -sf ../init.d/sshd			/etc/rc.d/rc0.d/K30sshd
@@ -133,6 +134,7 @@ $(TARGET) :
 	ln -sf ../init.d/apache			/etc/rc.d/rc3.d/S32apache
 	ln -sf ../init.d/haproxy		/etc/rc.d/rc3.d/S35haproxy
 	ln -sf ../init.d/fcron			/etc/rc.d/rc3.d/S40fcron
+	ln -sf ../init.d/lldpd                  /etc/rc.d/rc3.d/S41lldpd
 	ln -sf ../init.d/wireguard		/etc/rc.d/rc3.d/S50wireguard
 	ln -sf ../init.d/arpwatch		/etc/rc.d/rc3.d/S64arpwatch
 	ln -sf ../../sysconfig/rc.local		/etc/rc.d/rc3.d/S98rc.local
@@ -146,6 +148,7 @@ $(TARGET) :
 	ln -sf ../init.d/motion			/etc/rc.d/rc6.d/K01motion
 	ln -sf ../init.d/vdradmin		/etc/rc.d/rc6.d/K01vdradmin
 	ln -sf ../init.d/fcron			/etc/rc.d/rc6.d/K08fcron
+	ln -sf ../init.d/lldpd                  /etc/rc.d/rc6.d/K09lldpd
 	ln -sf ../init.d/arpwatch		/etc/rc.d/rc6.d/K12arpwatch
 	ln -sf ../init.d/apache			/etc/rc.d/rc6.d/K28apache
 	ln -sf ../init.d/sshd			/etc/rc.d/rc6.d/K30sshd
