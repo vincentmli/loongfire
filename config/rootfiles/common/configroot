@@ -98,6 +98,8 @@ var/ipfire/langs
 #var/ipfire/langs/pl.pl
 #var/ipfire/langs/ru.pl
 #var/ipfire/langs/tr.pl
+var/ipfire/lldp
+#var/ipfire/lldp/settings
 var/ipfire/logging
 #var/ipfire/logging/settings
 var/ipfire/loxilb
