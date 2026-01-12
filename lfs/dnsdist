@@ -26,10 +26,10 @@ include Config
 
 SUMMARY    = A highly DNS-, DoS- and abuse-aware loadbalancer
 
-VER        = 1.9.10
+VER        = 2.0.2
 
 THISAPP    = dnsdist-$(VER)
-DL_FILE    = $(THISAPP).tar.bz2
+DL_FILE    = $(THISAPP).tar.xz
 DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
@@ -50,7 +50,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 4490a6faf11b6b7e48fc821be37d0cee1ad93455ec09dadc61e236704bb743d8e5189d085352c775d19933934230e1c5b68ed233b7de7c5cb196f7da4dc16719
+$(DL_FILE)_BLAKE2 = 87a4179f474d7f8117e4e03c4ff680f79207c8056765c6925ee21b3011e4555e47ad9c97950f30ab2876ac0978ee07555017cb1bbc6b93792992c1821f8da27a
 
 install : $(TARGET)
 
@@ -83,6 +83,8 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
+	cd $(DIR_APP) && patch -Np3 < $(DIR_SRC)/src/patches/dnsdist-2.0.2-dnsdist-xsk.patch
+	cd $(DIR_APP) && patch -Np3 < $(DIR_SRC)/src/patches/dnsdist-2.0.2-vloginfo.patch
 	cd $(DIR_APP) && ./configure \
 		--prefix=/usr \
 		--sysconfdir=/etc \
@@ -93,6 +95,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 		--with-ebpf \
 		--with-xsk \
 		--without-net-snmp
+		--disable-systemd
 
 	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install

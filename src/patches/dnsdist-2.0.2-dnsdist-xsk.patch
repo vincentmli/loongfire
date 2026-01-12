@@ -1,0 +1,13 @@
+diff --git a/pdns/dnsdistdist/dnsdist-xsk.cc b/pdns/dnsdistdist/dnsdist-xsk.cc
+index 42e74bd96..e61a3f544 100644
+--- a/pdns/dnsdistdist/dnsdist-xsk.cc
++++ b/pdns/dnsdistdist/dnsdist-xsk.cc
+@@ -217,7 +217,7 @@ void XskClientThread(ClientState* clientState)
+ 
+ static std::string getDestinationMap(bool isV6)
+ {
+-  return !isV6 ? "/sys/fs/bpf/dnsdist/xsk-destinations-v4" : "/sys/fs/bpf/dnsdist/xsk-destinations-v6";
++  return !isV6 ? "/sys/fs/bpf/dnsdist/xskDestinationsV4" : "/sys/fs/bpf/dnsdist/xskDestinationsV6";
+ }
+ 
+ void addDestinationAddress(const ComboAddress& addr)
