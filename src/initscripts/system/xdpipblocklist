@@ -1,0 +1,158 @@
+#!/bin/sh
+###############################################################################
+#                                                                             #
+# IPFire.org - A linux based firewall                                         #
+# Copyright (C) 2007-2022  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2024-2026  LoongFire <vincent.mc.li@gmail.com>                #
+#                                                                             #
+# This program is free software: you can redistribute it and/or modify        #
+# it under the terms of the GNU General Public License as published by        #
+# the Free Software Foundation, either version 3 of the License, or           #
+# (at your option) any later version.                                         #
+#                                                                             #
+# This program is distributed in the hope that it will be useful,             #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of              #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               #
+# GNU General Public License for more details.                                #
+#                                                                             #
+# You should have received a copy of the GNU General Public License           #
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.       #
+#                                                                             #
+###############################################################################
+
+. /etc/sysconfig/rc
+. $rc_functions
+
+eval $(/usr/local/bin/readhash /var/ipfire/ipblocklist/settings)
+
+ipblocksetting="/var/ipfire/ipblocklist/settings"
+
+load_ipblocklist () {
+    /usr/sbin/xdp-loader status red0 | grep -w 'xdp_ipblocklist'
+    if [ $? -ne 0 ]; then
+        boot_mesg "Loading xdp_ipblocklist..."
+        xdp-loader load red0 -P 60 -p /sys/fs/bpf/xdp-ipblocklist -n xdp_ipblocklist /usr/lib/bpf/xdp_ipblocklist.bpf.o
+        if [ $? -ge 1 ]; then
+            boot_mesg "Native mode not supported, trying SKB mode..."
+            xdp-loader load red0 -m skb -P 60 -p /sys/fs/bpf/xdp-ipblocklist -n xdp_ipblocklist /usr/lib/bpf/xdp_ipblocklist.bpf.o
+        fi
+
+        # allow WUI nobody with permission to update map
+        chown -R nobody /sys/fs/bpf/xdp-ipblocklist
+
+        boot_mesg "Adding enabled IP blocklists to XDP map..."
+        
+        # Loop through all enabled blocklists from settings
+        while IFS='=' read -r blocklist status; do
+            # Skip special settings
+            if [ "$blocklist" = "ENABLE" ] || [ "$blocklist" = "LOGGING" ] || [ "$blocklist" = "XDP_ACCEL" ] || [ "$blocklist" = "DEBUG" ]; then
+                continue
+            fi
+            
+            # Process only enabled blocklists
+            if [ "$status" = "on" ]; then
+                # Construct the file path for the blocklist
+                file="/var/lib/ipblocklist/${blocklist}.conf"
+                
+                # Check if blocklist file exists
+                if [ -f "$file" ]; then
+                    boot_mesg "Adding $blocklist to XDP map..."
+                    /usr/local/sbin/xdp_ipblocklist add "$file" >> /dev/null 2>&1
+                    if [ $? -eq 0 ]; then
+                        boot_mesg "  $blocklist added successfully"
+                    else
+                        boot_mesg "  Failed to add $blocklist"
+                    fi
+                else
+                    boot_mesg "  Blocklist file not found: $file"
+                fi
+            fi
+        done < "$ipblocksetting"
+        
+        boot_mesg "XDP IP blocklist loaded successfully"
+    else
+        boot_mesg "xdp_ipblocklist already loaded"
+    fi
+}
+
+unload_ipblocklist () {
+    /usr/sbin/xdp-loader status red0 | grep -w 'xdp_ipblocklist'
+    if [ $? -eq 0 ]; then
+        boot_mesg "Unloading xdp_ipblocklist..."
+        prog_id=$(xdp-loader status red0 | grep 'xdp_ipblocklist' | awk '{print $4}')
+        /usr/sbin/xdp-loader unload -i $prog_id red0
+        boot_mesg "XDP IP blocklist unloaded successfully"
+    else
+        boot_mesg "xdp_ipblocklist not loaded"
+    fi
+}
+
+is_xdp_ipblocklist_attached () {
+    /usr/sbin/xdp-loader status red0 | grep -w 'xdp_ipblocklist' >> /dev/null
+    if [ $? -eq 0 ]; then
+        echo "xdp_ipblocklist is attached to red0"
+    else
+        echo "xdp_ipblocklist is not attached to red0"
+    fi
+}
+
+case "$1" in
+    start)
+        boot_mesg -n "Starting xdp-ipblocklist..."
+        if [ "$XDP_ACCEL" == "on" ]; then
+            load_ipblocklist
+        else
+            boot_mesg "XDP acceleration disabled in settings"
+        fi
+        ;;
+
+    stop)
+        boot_mesg "Stopping xdp-ipblocklist..."
+        if [ "$XDP_ACCEL" == "off" ]; then
+            unload_ipblocklist
+        else
+            boot_mesg "XDP acceleration enabled in settings, not unloading"
+        fi
+        ;;
+
+    status)
+        is_xdp_ipblocklist_attached
+        ;;
+
+    restart)
+        $0 stop
+        sleep 1
+        $0 start
+        ;;
+
+    reload)
+        boot_mesg "Reloading IP blocklists..."
+        if [ "$XDP_ACCEL" == "on" ]; then
+            # Clear existing map first
+            /usr/local/sbin/xdp_ipblocklist clear >> /dev/null 2>&1
+            
+            # Re-add all enabled blocklists
+            boot_mesg "Re-adding enabled IP blocklists..."
+            while IFS='=' read -r blocklist status; do
+                if [ "$blocklist" = "ENABLE" ] || [ "$blocklist" = "LOGGING" ] || [ "$blocklist" = "XDP_ACCEL" ] || [ "$blocklist" = "DEBUG" ]; then
+                    continue
+                fi
+                
+                if [ "$status" = "on" ]; then
+                    file="/var/lib/ipblocklist/${blocklist}.conf"
+                    if [ -f "$file" ]; then
+                        /usr/local/sbin/xdp_ipblocklist add "$file" >> /dev/null 2>&1
+                        boot_mesg "  $blocklist reloaded"
+                    fi
+                fi
+            done < "$ipblocksetting"
+        else
+            boot_mesg "XDP acceleration disabled, cannot reload"
+        fi
+        ;;
+
+    *)
+        echo "Usage: $0 {start|stop|restart|status|reload}"
+        exit 1
+        ;;
+esac
