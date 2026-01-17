@@ -11,6 +11,7 @@ usr/lib/bpf/xdp_synproxy_tailcall.bpf.o
 usr/lib/bpf/xdp_ddos.bpf.o
 usr/lib/bpf/dnsdist_xdp.bpf.o
 usr/lib/bpf/class_filter.bpf.o
+usr/lib/bpf/xdp_ipblocklist.bpf.o
 usr/sbin/xdp-udp
 usr/sbin/xdp_dns
 usr/sbin/xdp_dns_log
@@ -21,6 +22,7 @@ etc/rc.d/rc3.d/S103xdpsni
 usr/sbin/xdp_geoip
 usr/sbin/xdp_ddos
 usr/sbin/class_filter
+usr/sbin/xdp_ipblocklist
 usr/lib/bpf/xdpdump_bpf.o
 usr/lib/bpf/xdpdump_xdp.o
 usr/lib/bpf/xdpfilt_alw_all.o
