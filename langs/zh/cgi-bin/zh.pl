@@ -3275,6 +3275,13 @@
 'ipblocklist name' => '名称',
 'ipblocklist output' => '丢弃的数据包 (出)',
 'ipblocklist use ipblocklists' => '启用IP黑名单',
+'ipblocklist use xdp' => '启用XDP加速(网卡驱动拦截)',
+'ipblocklist xdp active' => 'XDP 加速已启用：',
+'ipblocklist xdp blocking' => '系统在网络驱动层通过 XDP 执行拦截。修改拦截列表时无需重新加载防火墙。',
+'ipblocklist iptables active' => '传统 iptables 已启用：',
+'ipblocklist iptables blocking' => '拦截功能使用 iptables/ipset 实现。修改拦截列表时需要重新加载防火墙。',
+'ipblocklist log option' => '启用 XDP 加速后，日志记录选项不可用。XDP 会在数据包到达 iptables 日志记录链之前，于网络驱动层直接拦截数据包。',
+'ipblocklist xdp notice' => 'XDP 加速已启用（无需重新加载防火墙）。',
 'percentage' => '百分比',
 );
 

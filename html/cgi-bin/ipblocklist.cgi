@@ -6,8 +6,7 @@
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
-# the Free Software Foundation, either version 3 of the License, or           #
-# (at your option) any later version.                                         #
+# or (at your option) any later version.                                      #
 #                                                                             #
 # This program is distributed in the hope that it will be useful,             #
 # but WITHOUT ANY WARRANTY; without even the implied warranty of              #
@@ -41,6 +40,9 @@ require "${General::swroot}/ipblocklist/sources";
 
 my $settings      = "${General::swroot}/ipblocklist/settings";
 my %cgiparams     = ('ACTION' => '');
+my $xdp_program   = "/usr/sbin/xdp_ipblocklist";  # Path to XDP user space program
+my $blocklist_dir = "/var/lib/ipblocklist";             # Directory with blocklist files
+my $xdp_ctrl      = "/usr/local/bin/xdpipblocklistctrl";  # Secure wrapper for init script
 
 ###############################################################################
 # Variables
@@ -51,12 +53,15 @@ my $headline = "$Lang::tr{'error message'}";
 my $updating      = 0;
 my %mainsettings;
 my %color;
+my %old_settings;  # To store previous settings for comparison
+my $firewall_reload_needed = 0;  # Flag to track if firewall reload is needed
 
 # Default settings - normally overwritten by settings file
 my %settings = (
 	'DEBUG'           => 0,
 	'LOGGING'         => 'on',
-	'ENABLE'          => 'off'
+	'ENABLE'          => 'off',
+	'XDP_ACCEL'       => 'off'  # New: XDP acceleration enable/disable
 );
 
 # Read all parameters
@@ -75,45 +80,72 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
 	# Assign checkbox values, in case they are not checked.
 	$cgiparams{'ENABLE'} = "off" unless($cgiparams{'ENABLE'});
 	$cgiparams{'LOGGING'} = "off" unless($cgiparams{'LOGGING'});
-
+	$cgiparams{'XDP_ACCEL'} = "off" unless($cgiparams{'XDP_ACCEL'});  # New XDP acceleration checkbox
+	
+	# IMPORTANT: If XDP acceleration is enabled, force LOGGING to off
+	# because XDP doesn't support iptables logging
+	if ($cgiparams{'XDP_ACCEL'} eq 'on') {
+		$cgiparams{'LOGGING'} = 'off';
+		&General::log("IP Blocklist: XDP acceleration enabled, forcing LOGGING to off");
+	}
+	
+	# Read current settings to compare with new ones
+	&General::readhash($settings, \%old_settings) if (-r $settings);
+	
+	# Validate settings: XDP acceleration requires main feature to be enabled
+	if ($cgiparams{'XDP_ACCEL'} eq 'on' && $cgiparams{'ENABLE'} eq 'off') {
+		$headline = "$Lang::tr{'error message'}";
+		$errormessage = "XDP acceleration requires IP blocklist feature to be enabled. Please enable IP blocklists first or disable XDP acceleration.";
+	}
+	
 	# Array to store if blocklists are missing on the system
 	# and needs to be downloaded first.
 	my @missing_blocklists = ();
 
-	# Loop through the array of supported blocklists.
-	foreach my $blocklist (@blocklists) {
-		# Skip the blocklist if it is not enabled.
-		next if($cgiparams{$blocklist} ne "on");
+	# Only check for missing blocklists if the feature is enabled
+	if ($cgiparams{'ENABLE'} eq 'on') {
+		# Loop through the array of supported blocklists.
+		foreach my $blocklist (@blocklists) {
+			# Get the current and new state
+			my $old_state = $old_settings{$blocklist} || 'off';
+			my $new_state = $cgiparams{$blocklist} || 'off';
+			
+			# Skip the blocklist if it is not enabled.
+			next if($cgiparams{$blocklist} ne "on");
 
-		# Get the file name which keeps the converted blocklist.
-		my $ipset_db_file = &IPblocklist::get_ipset_db_file($blocklist);
+			# Get the file name which keeps the converted blocklist.
+			my $ipset_db_file = &IPblocklist::get_ipset_db_file($blocklist);
 
-		# Check if the blocklist already has been downloaded.
-		if(-f "$ipset_db_file") {
-			# Blocklist already exits, we can skip it.
-			next;
-		} else {
-			# Blocklist not present, store in array to download it.
-			push(@missing_blocklists, $blocklist);
+			# Check if the blocklist already has been downloaded.
+			if(-f "$ipset_db_file") {
+				# Blocklist already exits, we can skip it.
+				next;
+			} else {
+				# Blocklist not present, store in array to download it.
+				push(@missing_blocklists, $blocklist);
+			}
 		}
 	}
 
-	# Check if the red device is not active and blocklists are missing.
-	if ((not -e "${General::swroot}/red/active") && (@missing_blocklists)) {
-		# The system is offline, cannot download the missing blocklists.
-		# Store an error message.
-		$errormessage = "$Lang::tr{'system is offline'}";
-	} else {
-		# Loop over the array of missing blocklists.
-		foreach my $missing_blocklist (@missing_blocklists) {
-			# Call the download and convert function to get the missing blocklist.
-			my $status = &IPblocklist::download_and_create_blocklist($missing_blocklist);
+	# Check if there was an error from validation
+	unless($errormessage) {
+		# Check if the red device is not active and blocklists are missing.
+		if ((not -e "${General::swroot}/red/active") && (@missing_blocklists)) {
+			# The system is offline, cannot download the missing blocklists.
+			# Store an error message.
+			$errormessage = "$Lang::tr{'system is offline'}";
+		} else {
+			# Loop over the array of missing blocklists.
+			foreach my $missing_blocklist (@missing_blocklists) {
+				# Call the download and convert function to get the missing blocklist.
+				my $status = &IPblocklist::download_and_create_blocklist($missing_blocklist);
 
-			# Check if there was an error during download.
-			if ($status eq "dl_error") {
-				$errormessage = "$Lang::tr{'ipblocklist could not download blocklist'} - $Lang::tr{'ipblocklist download error'}";
-			} elsif ($status eq "empty_list") {
-				$errormessage = "$Lang::tr{'ipblocklist could not download blocklist'} - $Lang::tr{'ipblocklist empty blocklist received'}";
+				# Check if there was an error during download.
+				if ($status eq "dl_error") {
+					$errormessage = "$Lang::tr{'ipblocklist could not download blocklist'} - $Lang::tr{'ipblocklist download error'}";
+				} elsif ($status eq "empty_list") {
+					$errormessage = "$Lang::tr{'ipblocklist could not download blocklist'} - $Lang::tr{'ipblocklist empty blocklist received'}";
+				}
 			}
 		}
 	}
@@ -123,12 +155,37 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
 		# Write configuration hash.
 		&General::writehash($settings, \%cgiparams);
 
-		# Call function to mark a required reload of the firewall.
-		&General::firewall_config_changed();
+		# Manage XDP acceleration based on both ENABLE and XDP_ACCEL settings
+		&manage_xdp_state(\%old_settings, \%cgiparams);
+		
+		# Manage XDP blocklists when settings change
+		&manage_xdp_blocklists(\%old_settings, \%cgiparams);
+		
+		# Determine if firewall reload is needed
+		# Firewall reload is needed when:
+		# 1. Main feature is enabled AND
+		# 2. XDP acceleration is disabled (using traditional iptables/ipset)
+		if ($cgiparams{'ENABLE'} eq 'on' && $cgiparams{'XDP_ACCEL'} eq 'off') {
+			$firewall_reload_needed = 1;
+			&General::log("IP Blocklist: Firewall reload needed (using traditional iptables/ipset path)");
+		} else {
+			&General::log("IP Blocklist: Firewall reload not needed (XDP acceleration or feature disabled)");
+		}
 
-		# Display notice about a required reload of the firewall.
-		$headline = "$Lang::tr{'notice'}";
-		$errormessage = "$Lang::tr{'fw rules reload notice'}";
+		# Call function to mark a required reload of the firewall if needed
+		if ($firewall_reload_needed) {
+			&General::firewall_config_changed();
+			# Display notice about a required reload of the firewall.
+			$headline = "$Lang::tr{'notice'}";
+			$errormessage = "$Lang::tr{'fw rules reload notice'}";
+		} else {
+			# Display success message
+			$headline = "$Lang::tr{'notice'}";
+			$errormessage = "Settings saved successfully.";
+			if ($cgiparams{'XDP_ACCEL'} eq 'on') {
+				$errormessage .= " $Lang::tr{'ipblocklist xdp notice'}";
+			}
+		}
 	}
 }
 
@@ -170,23 +227,88 @@ print<<END;
 		<table style='width:100%' border='0'>
 			<tr>
 				<td style='width:24em'>$Lang::tr{'ipblocklist use ipblocklists'}</td>
-				<td><input type='checkbox' name='ENABLE' id='ENABLE'$enable></td>
+				<td><input type='checkbox' name='ENABLE' id='ENABLE'$enable 
+					onchange="toggleXdpAccel(this.checked)" 
+					title="Main switch for IP blocklist feature. Required for XDP acceleration."></td>
 			</tr>
-		</table><br>
 END
 
-	# The following are only displayed if the blacklists are enabled
-	$enable = ($settings{'LOGGING'} eq 'on') ? ' checked' : '';
+	# XDP Acceleration checkbox (new) - disabled if main feature is off
+	my $xdp_enable = ($settings{'XDP_ACCEL'} eq 'on') ? ' checked' : '';
+	my $xdp_disabled = ($settings{'ENABLE'} eq 'off') ? ' disabled' : '';
+	my $xdp_title = ($settings{'ENABLE'} eq 'off') ? 
+		"Enable IP blocklists first to use XDP acceleration" : 
+		"Kernel-level acceleration for faster blocking (bypasses iptables)";
+	
+print<<END;
+			<tr>
+				<td style='width:24em'>$Lang::tr{'ipblocklist use xdp'}</td>
+				<td><input type='checkbox' name='XDP_ACCEL' id='XDP_ACCEL'$xdp_enable$xdp_disabled 
+					title="$xdp_title"></td>
+			</tr>
+END
 
-print <<END;
+	# JavaScript to enable/disable XDP checkbox based on main feature
+print<<END;
+		<script type="text/javascript">
+		function toggleXdpAccel(enabled) {
+			var xdpCheckbox = document.getElementById('XDP_ACCEL');
+			if (enabled) {
+				xdpCheckbox.disabled = false;
+				xdpCheckbox.title = "Kernel-level acceleration for faster blocking (bypasses iptables)";
+			} else {
+				xdpCheckbox.disabled = true;
+				xdpCheckbox.checked = false;
+				xdpCheckbox.title = "Enable IP blocklists first to use XDP acceleration";
+			}
+		}
+		</script>
+END
+
+	# Information about XDP acceleration vs traditional blocking
+	my $info_message = "";
+	if ($settings{'ENABLE'} eq 'on') {
+		if ($settings{'XDP_ACCEL'} eq 'on') {
+			$info_message = "<div style='color: green; margin: 10px 0; padding: 10px; background-color: #f0f8f0; border: 1px solid #90ee90;'>
+				<strong>$Lang::tr{'ipblocklist xdp active'}</strong>$Lang::tr{'ipblocklist xdp blocking'}
+				<br><em>Note: Logging is not available for XDP acceleration.</em>
+				</div>";
+		} else {
+			$info_message = "<div style='color: blue; margin: 10px 0; padding: 10px; background-color: #f0f0ff; border: 1px solid #add8e6;'>
+				<strong>$Lang::tr{'ipblocklist iptables active'}</strong>$Lang::tr{'ipblocklist iptables blocking'}
+				</div>";
+		}
+	}
+	
+print<<END;
+		$info_message
+		</table><br>
 		<div class='sources'>
+END
+
+	# Show LOGGING checkbox only when using traditional iptables/ipset path
+	if ($settings{'ENABLE'} eq 'on' && $settings{'XDP_ACCEL'} ne 'on') {
+		my $logging_checked = ($settings{'LOGGING'} eq 'on') ? ' checked' : '';
+		
+print<<END;
 			<table style='width:100%' border='0'>
 				<tr>
 					<td style='width:24em'>$Lang::tr{'ipblocklist log'}</td>
-					<td><input type='checkbox' name="LOGGING" id="LOGGING"$enable></td>
+					<td><input type='checkbox' name="LOGGING" id="LOGGING"$logging_checked 
+						title="Log blocked connections to syslog (iptables/ipset path only)"></td>
 				</tr>
 			</table>
+END
+	} elsif ($settings{'ENABLE'} eq 'on' && $settings{'XDP_ACCEL'} eq 'on') {
+		# Show info about logging not being available with XDP
+print<<END;
+			<div style='margin: 10px 0; padding: 8px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px;'>
+				<strong>Note:</strong>$Lang::tr{'ipblocklist log option'}
+			</div>
+END
+	}
 
+print<<END;
 			<br><br>
 			<h2>$Lang::tr{'ipblocklist blocklist settings'}</h2>
 
@@ -204,13 +326,14 @@ END
 
 	foreach my $blocklist (@blocklists) {
 		# Display blocklist name or provide a link to the website if available.
-		my $website = "$blocklist";
+		my $website = $blocklist;
 		if ($IPblocklist::List::sources{$blocklist}{info}) {
 			$website ="<a href='$IPblocklist::List::sources{$blocklist}{info}' target='_blank'>$blocklist</a>";
 		}
 
 		# Get the full name for the blocklist.
-		my $name = &CGI::escapeHTML( $IPblocklist::List::sources{$blocklist}{'name'} );
+		require CGI;
+		my $name = CGI::escapeHTML($IPblocklist::List::sources{$blocklist}{'name'});
 
 		# Get category for this blocklist.
 		my $category = $Lang::tr{"ipblocklist category $IPblocklist::List::sources{$blocklist}{'category'}"};
@@ -221,7 +344,6 @@ END
 
 		# Set colour for the table columns.
 		my $col = ($lines++ % 2) ? "bgcolor='$color{'color20'}'" : "bgcolor='$color{'color22'}'";
-
 
 print <<END;
 				<tr $col>
@@ -248,6 +370,147 @@ print <<END;
 END
 
 	&Header::closebox();
+}
+
+#------------------------------------------------------------------------------
+# sub manage_xdp_state()
+#
+# Manage XDP program state based on ENABLE and XDP_ACCEL settings
+# Handles all 4 possible state combinations
+#------------------------------------------------------------------------------
+
+sub manage_xdp_state {
+    my ($old_settings_ref, $new_settings_ref) = @_;
+    my %old_settings = %$old_settings_ref;
+    my %new_settings = %$new_settings_ref;
+    
+    my $old_enable = $old_settings{'ENABLE'} || 'off';
+    my $new_enable = $new_settings{'ENABLE'} || 'off';
+    my $old_xdp = $old_settings{'XDP_ACCEL'} || 'off';
+    my $new_xdp = $new_settings{'XDP_ACCEL'} || 'off';
+    
+    # Check if the secure wrapper exists
+    unless (-x $xdp_ctrl) {
+        &General::log("XDP Blocklist: Secure wrapper not found or not executable: $xdp_ctrl");
+        return;
+    }
+    
+    # Skip if neither ENABLE nor XDP_ACCEL has changed
+    if ($old_enable eq $new_enable && $old_xdp eq $new_xdp) {
+        &General::log("XDP Blocklist: No state change detected");
+        return;
+    }
+    
+    # ALWAYS restart when settings change
+    # The init script will decide whether to load or unload based on XDP_ACCEL
+    &General::log("XDP Blocklist: Settings changed, restarting service");
+    my $output = &General::system_output($xdp_ctrl, 'restart');
+    my $result = $?;
+    
+    if ($result == 0) {
+        &General::log("XDP Blocklist: Service restarted successfully");
+    } else {
+        &General::log("XDP Blocklist: Failed to restart service: $output");
+    }
+}
+#------------------------------------------------------------------------------
+# sub manage_xdp_blocklists()
+#
+# Manage XDP blocklists based on settings changes
+# Updates the BPF map directly (when XDP is loaded) or prepares for next load
+#------------------------------------------------------------------------------
+
+sub manage_xdp_blocklists {
+	my ($old_settings_ref, $new_settings_ref) = @_;
+	my %old_settings = %$old_settings_ref;
+	my %new_settings = %$new_settings_ref;
+	
+	# Only manage XDP blocklists if main feature is enabled AND XDP acceleration is enabled
+	if ($new_settings{'ENABLE'} ne 'on' || $new_settings{'XDP_ACCEL'} ne 'on') {
+		if ($new_settings{'ENABLE'} ne 'on') {
+			&General::log("XDP Blocklist: Main feature disabled, skipping XDP blocklist updates");
+		} else {
+			&General::log("XDP Blocklist: XDP acceleration disabled, skipping XDP blocklist updates");
+		}
+		return;
+	}
+	
+	# Check if XDP is currently loaded
+	my $xdp_loaded = &is_xdp_loaded();
+	
+	if (!$xdp_loaded) {
+		&General::log("XDP Blocklist: XDP not loaded, blocklist updates will be applied when XDP starts");
+		return;
+	}
+	
+	# Also handle the overall ENABLE setting first
+	my $old_enable = $old_settings{'ENABLE'} || 'off';
+	my $new_enable = $new_settings{'ENABLE'} || 'off';
+	
+	# If enabling blocklists (from off to on), we need to process all enabled lists
+	if ($old_enable ne $new_enable && $new_enable eq 'on') {
+		&General::log("XDP Blocklist: All blocklists enabled, adding all enabled lists");
+	}
+	
+	# Loop through all blocklists
+	foreach my $blocklist (@blocklists) {
+		my $old_state = $old_settings{$blocklist} || 'off';
+		my $new_state = $new_settings{$blocklist} || 'off';
+		
+		# Skip if state hasn't changed (unless we're enabling all from scratch)
+		next if ($old_state eq $new_state && $new_enable ne 'on');
+		
+		# Get the blocklist file name
+		my $blocklist_file = "$blocklist_dir/$blocklist.conf";
+		
+		# Check if the blocklist file exists
+		if (-f $blocklist_file) {
+			# Determine action based on state
+			# If enabling all from scratch, we need to add all enabled lists
+			my $action = ($new_state eq 'on') ? 'add' : 'delete';
+			
+			# Skip if we're enabling all and this list is disabled
+			next if ($new_enable eq 'on' && $new_state eq 'off');
+			
+			# Use General::system instead of General::system_output
+			my $exit_code = &General::system($xdp_program, $action, $blocklist_file);
+			
+			if ($exit_code == 0) {
+				&General::log("XDP Blocklist: Successfully ${action}ed $blocklist");
+			} else {
+				&General::log("XDP Blocklist: ${action} $blocklist returned exit code $exit_code");
+			}	
+		} else {
+			# Blocklist file doesn't exist, might need to be downloaded first
+			if ($new_state eq 'on') {
+				&General::log("XDP Blocklist: File $blocklist_file not found for $blocklist");
+			}
+		}
+	}
+	
+	# If disabling all blocklists, just log it (map stays intact)
+	if ($old_enable ne $new_enable && $new_enable eq 'off') {
+		&General::log("XDP Blocklist: All blocklists disabled");
+	}
+}
+
+#------------------------------------------------------------------------------
+# sub is_xdp_loaded()
+#
+# Check if XDP IP blocklist is currently loaded
+#------------------------------------------------------------------------------
+
+sub is_xdp_loaded {
+    my @output = &General::system_output($xdp_ctrl, 'status');
+    
+    # Check if ANY element contains "not"
+    if (grep { /not/i } @output) {
+        &General::log("XDP Blocklist: Found 'not' -> NOT loaded");
+        return 0;
+    }
+    
+    &General::log("XDP Blocklist: program Found -> loaded");
+    return 1;
 }
 
 #------------------------------------------------------------------------------
