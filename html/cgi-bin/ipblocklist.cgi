@@ -41,7 +41,7 @@ require "${General::swroot}/ipblocklist/sources";
 my $settings      = "${General::swroot}/ipblocklist/settings";
 my %cgiparams     = ('ACTION' => '');
 my $xdp_program   = "/usr/sbin/xdp_ipblocklist";  # Path to XDP user space program
-my $blocklist_dir = "/var/lib/ipblocklist";             # Directory with blocklist files
+my $blocklist_dir = "/var/lib/ipblocklist";       # Directory with blocklist files
 my $xdp_ctrl      = "/usr/local/bin/xdpipblocklistctrl";  # Secure wrapper for init script
 
 ###############################################################################
@@ -155,22 +155,41 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
 		# Write configuration hash.
 		&General::writehash($settings, \%cgiparams);
 
-		# Manage XDP acceleration based on both ENABLE and XDP_ACCEL settings
+		# Get old and new states for comparison
+		my $old_enable = $old_settings{'ENABLE'} || 'off';
+		my $new_enable = $cgiparams{'ENABLE'} || 'off';
+		my $old_xdp = $old_settings{'XDP_ACCEL'} || 'off';
+		my $new_xdp = $cgiparams{'XDP_ACCEL'} || 'off';
+		
+		# Manage XDP program state
 		&manage_xdp_state(\%old_settings, \%cgiparams);
 		
 		# Manage XDP blocklists when settings change
 		&manage_xdp_blocklists(\%old_settings, \%cgiparams);
 		
-		# Determine if firewall reload is needed
+		# Determine if firewall reload is needed using clean logic:
 		# Firewall reload is needed when:
-		# 1. Main feature is enabled AND
-		# 2. XDP acceleration is disabled (using traditional iptables/ipset)
-		if ($cgiparams{'ENABLE'} eq 'on' && $cgiparams{'XDP_ACCEL'} eq 'off') {
+		# 1. Using iptables mode (XDP_ACCEL='off') AND feature is enabled OR being disabled
+		# 2. Switching between modes (to clean up old rules)
+		
+		if ($new_enable eq 'on' && $new_xdp eq 'off') {
+			# Iptables mode is active - reload needed
 			$firewall_reload_needed = 1;
-			&General::log("IP Blocklist: Firewall reload needed (using traditional iptables/ipset path)");
-		} else {
-			&General::log("IP Blocklist: Firewall reload not needed (XDP acceleration or feature disabled)");
+			&General::log("IP Blocklist: Iptables mode active, firewall reload needed");
 		}
+		elsif ($old_enable eq 'on' && $new_enable eq 'off' && $old_xdp eq 'off') {
+			# Disabling iptables mode - reload needed to clean up
+			$firewall_reload_needed = 1;
+			&General::log("IP Blocklist: Disabling iptables mode, firewall reload needed for cleanup");
+		}
+		elsif ($old_enable eq 'on' && $new_enable eq 'on' && $old_xdp ne $new_xdp) {
+			# Switching between modes - reload needed to clean up old rules
+			$firewall_reload_needed = 1;
+			&General::log("IP Blocklist: Switching between XDP and iptables modes, firewall reload needed");
+		}
+		# Note: No firewall reload needed when:
+		# 1. XDP mode is active (rules.pl will skip iptables rules)
+		# 2. Feature is disabled with XDP (XDP program handles cleanup)
 
 		# Call function to mark a required reload of the firewall if needed
 		if ($firewall_reload_needed) {
@@ -376,7 +395,6 @@ END
 # sub manage_xdp_state()
 #
 # Manage XDP program state based on ENABLE and XDP_ACCEL settings
-# Handles all 4 possible state combinations
 #------------------------------------------------------------------------------
 
 sub manage_xdp_state {
@@ -395,24 +413,32 @@ sub manage_xdp_state {
         return;
     }
     
-    # Skip if neither ENABLE nor XDP_ACCEL has changed
-    if ($old_enable eq $new_enable && $old_xdp eq $new_xdp) {
-        &General::log("XDP Blocklist: No state change detected");
-        return;
+    # Determine what action to take
+    if ($new_enable eq 'on' && $new_xdp eq 'on') {
+        # XDP should be running
+        &General::log("XDP Blocklist: Feature enabled with XDP acceleration, starting/restarting service");
+        my $output = &General::system_output($xdp_ctrl, 'restart');
+        my $result = $?;
+        if ($result == 0) {
+            &General::log("XDP Blocklist: Service restarted successfully");
+        } else {
+            &General::log("XDP Blocklist: Failed to restart service: $output");
+        }
+    } elsif ($old_enable eq 'on' && $old_xdp eq 'on' && ($new_enable eq 'off' || $new_xdp eq 'off')) {
+        # XDP was running but should now be stopped
+        &General::log("XDP Blocklist: Feature disabled or XDP acceleration disabled, stopping service");
+        my $output = &General::system_output($xdp_ctrl, 'stop');
+        my $result = $?;
+        if ($result == 0) {
+            &General::log("XDP Blocklist: Service stopped successfully");
+        } else {
+            &General::log("XDP Blocklist: Failed to stop service: $output");
+        }
     }
-    
-    # ALWAYS restart when settings change
-    # The init script will decide whether to load or unload based on XDP_ACCEL
-    &General::log("XDP Blocklist: Settings changed, restarting service");
-    my $output = &General::system_output($xdp_ctrl, 'restart');
-    my $result = $?;
-    
-    if ($result == 0) {
-        &General::log("XDP Blocklist: Service restarted successfully");
-    } else {
-        &General::log("XDP Blocklist: Failed to restart service: $output");
-    }
+    # Note: If switching from iptables to XDP, XDP will be started above
+    # If switching from XDP to iptables, XDP will be stopped above
 }
+
 #------------------------------------------------------------------------------
 # sub manage_xdp_blocklists()
 #
@@ -443,22 +469,13 @@ sub manage_xdp_blocklists {
 		return;
 	}
 	
-	# Also handle the overall ENABLE setting first
-	my $old_enable = $old_settings{'ENABLE'} || 'off';
-	my $new_enable = $new_settings{'ENABLE'} || 'off';
-	
-	# If enabling blocklists (from off to on), we need to process all enabled lists
-	if ($old_enable ne $new_enable && $new_enable eq 'on') {
-		&General::log("XDP Blocklist: All blocklists enabled, adding all enabled lists");
-	}
-	
 	# Loop through all blocklists
 	foreach my $blocklist (@blocklists) {
 		my $old_state = $old_settings{$blocklist} || 'off';
 		my $new_state = $new_settings{$blocklist} || 'off';
 		
-		# Skip if state hasn't changed (unless we're enabling all from scratch)
-		next if ($old_state eq $new_state && $new_enable ne 'on');
+		# Skip if state hasn't changed
+		next if ($old_state eq $new_state);
 		
 		# Get the blocklist file name
 		my $blocklist_file = "$blocklist_dir/$blocklist.conf";
@@ -466,11 +483,7 @@ sub manage_xdp_blocklists {
 		# Check if the blocklist file exists
 		if (-f $blocklist_file) {
 			# Determine action based on state
-			# If enabling all from scratch, we need to add all enabled lists
 			my $action = ($new_state eq 'on') ? 'add' : 'delete';
-			
-			# Skip if we're enabling all and this list is disabled
-			next if ($new_enable eq 'on' && $new_state eq 'off');
 			
 			# Use General::system instead of General::system_output
 			my $exit_code = &General::system($xdp_program, $action, $blocklist_file);
@@ -486,11 +499,6 @@ sub manage_xdp_blocklists {
 				&General::log("XDP Blocklist: File $blocklist_file not found for $blocklist");
 			}
 		}
-	}
-	
-	# If disabling all blocklists, just log it (map stays intact)
-	if ($old_enable ne $new_enable && $new_enable eq 'off') {
-		&General::log("XDP Blocklist: All blocklists disabled");
 	}
 }
 

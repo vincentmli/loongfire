@@ -78,6 +78,7 @@ my %locationsettings = (
 );
 my %blocklistsettings= (
 	"ENABLE" => "off",
+	"XDP_ACCEL" => "off",  # NEW: Add XDP_ACCEL with default value
 );
 
 my %ipset_loaded_sets = ();
@@ -771,62 +772,154 @@ sub drop_hostile_networks () {
 	run("$IPTABLES -A HOSTILE -o $RED_DEV -m set --match-set $HOSTILE_CCODE dst -j HOSTILE_DROP_OUT");
 }
 
-sub ipblocklist () {
-	# Flush the ipblocklist chains.
-	run("$IPTABLES -F BLOCKLISTIN");
-	run("$IPTABLES -F BLOCKLISTOUT");
 
-	# Check if the blocklist feature is enabled.
-	if($blocklistsettings{'ENABLE'} eq "on") {
-		# Loop through the array of private networks.
-		foreach my $private_network (@PRIVATE_NETWORKS) {
-			# Create firewall rules to never block private networks.
-			run("$IPTABLES -A BLOCKLISTIN -p ALL -i $RED_DEV -s $private_network -j RETURN");
-			run("$IPTABLES -A BLOCKLISTOUT -p ALL -o $RED_DEV -d $private_network -j RETURN");
+sub ipblocklist () {
+    # NEW: Check if XDP acceleration is enabled
+    # If XDP is handling blocking, skip iptables rules entirely
+    if($blocklistsettings{'ENABLE'} eq "on" && $blocklistsettings{'XDP_ACCEL'} eq "on") {
+        &General::log("IP Blocklist: XDP acceleration active, skipping iptables/ipset rules");
+
+        # Clean up any existing iptables chains
+        # Flush and delete main chains
+        run("$IPTABLES -F BLOCKLISTIN");
+        run("$IPTABLES -F BLOCKLISTOUT");
+        if(&firewall_chain_exists("BLOCKLISTIN")) {
+            run("$IPTABLES -X BLOCKLISTIN");
+        }
+        if(&firewall_chain_exists("BLOCKLISTOUT")) {
+            run("$IPTABLES -X BLOCKLISTOUT");
+        }
+
+        # Flush and delete blocklist-specific chains
+        foreach my $blocklist (@blocklists) {
+            if(&firewall_chain_exists("${blocklist}_DROP")) {
+                run("$IPTABLES -F ${blocklist}_DROP");
+                run("$IPTABLES -X ${blocklist}_DROP");
+            }
+
+            # Also destroy ipsets
+            my $exit_code = &General::system("ipset", "list", "$blocklist");
+            if ($exit_code == 0) {
+                run("ipset destroy $blocklist");
+            }
+        }
+
+        return;
+    }
+
+    # Flush the ipblocklist chains.
+    run("$IPTABLES -F BLOCKLISTIN");
+    run("$IPTABLES -F BLOCKLISTOUT");
+
+    # Check if the blocklist feature is enabled.
+    if($blocklistsettings{'ENABLE'} eq "on") {
+        # Loop through the array of private networks.
+        foreach my $private_network (@PRIVATE_NETWORKS) {
+            # Create firewall rules to never block private networks.
+            run("$IPTABLES -A BLOCKLISTIN -p ALL -i $RED_DEV -s $private_network -j RETURN");
+            run("$IPTABLES -A BLOCKLISTOUT -p ALL -o $RED_DEV -d $private_network -j RETURN");
+        }
+    } else {
+        # FEATURE IS DISABLED - delete the chains entirely
+        if(&firewall_chain_exists("BLOCKLISTIN")) {
+            run("$IPTABLES -X BLOCKLISTIN");
+        }
+        if(&firewall_chain_exists("BLOCKLISTOUT")) {
+            run("$IPTABLES -X BLOCKLISTOUT");
+        }
+    }
+
+    # Loop through the array of blocklists.
+    foreach my $blocklist (@blocklists) {
+        # Check if the blocklist feature and the current processed blocklist is enabled.
+        if(($blocklistsettings{'ENABLE'} eq "on") && ($blocklistsettings{$blocklist}) && ($blocklistsettings{$blocklist} eq "on")) {
+            # Call function to load the blocklist.
+            &ipset_restore($blocklist);
+
+            # Call function to check if the corresponding iptables drop chain already has been created.
+            if(&firewall_chain_exists("${blocklist}_DROP")) {
+                # Create iptables chain.
+                run("$IPTABLES -N ${blocklist}_DROP");
+            } else {
+                # Flush the chain.
+                run("$IPTABLES -F ${blocklist}_DROP");
+            }
+
+            # Check if logging is enabled.
+            if(($blocklistsettings{'LOGGING'}) && ($blocklistsettings{'LOGGING'} eq "on")) {
+                # Create logging rule.
+                run("$IPTABLES -A ${blocklist}_DROP -j LOG -m limit --limit 10/second --log-prefix \"BLKLST_$blocklist \"");
+            }
+
+            # Create Drop rule.
+            run("$IPTABLES -A ${blocklist}_DROP -j DROP");
+
+            # Add the rules to check against the set
+            run("$IPTABLES -A BLOCKLISTIN -p ALL -i $RED_DEV -m set --match-set $blocklist src -j ${blocklist}_DROP");
+            run("$IPTABLES -A BLOCKLISTOUT -p ALL -o $RED_DEV -m set --match-set $blocklist dst -j ${blocklist}_DROP");
+
+        # IP blocklist or the blocklist is disabled.
+        } else {
+            # FIXED: Check if the blocklist related iptables drop chain EXISTS
+            if(&firewall_chain_exists("${blocklist}_DROP")) {
+                # Flush the chain.
+                run("$IPTABLES -F ${blocklist}_DROP");
+
+                # Drop the chain.
+                run("$IPTABLES -X ${blocklist}_DROP");
+            }
+
+            # Also destroy the ipset if it exists
+            my $exit_code = &General::system("ipset", "list", "$blocklist");
+            if ($exit_code == 0) {
+                run("ipset destroy $blocklist");
+            }
+        }
+    }
+}
+
+# NEW: Helper function to clean up ipblocklist chains
+sub cleanup_ipblocklist_chains {
+	# Flush and delete main chains
+	if(&firewall_chain_exists("BLOCKLISTIN")) {
+		run("$IPTABLES -F BLOCKLISTIN");
+			# Check if chain exists before trying to delete it
+		my $exit_code = &General::system("iptables", "--wait", "-n", "-L", "BLOCKLISTIN");
+		if ($exit_code == 0) {
+			run("$IPTABLES -X BLOCKLISTIN");
 		}
 	}
-
-	# Loop through the array of blocklists.
+	if(&firewall_chain_exists("BLOCKLISTOUT")) {
+		run("$IPTABLES -F BLOCKLISTOUT");
+		# Check if chain exists before trying to delete it
+		my $exit_code = &General::system("iptables", "--wait", "-n", "-L", "BLOCKLISTOUT");
+		if ($exit_code == 0) {
+			run("$IPTABLES -X BLOCKLISTOUT");
+		}
+	}
+	
+	# Flush and delete blocklist-specific chains
 	foreach my $blocklist (@blocklists) {
-		# Check if the blocklist feature and the current processed blocklist is enabled.
-		if(($blocklistsettings{'ENABLE'} eq "on") && ($blocklistsettings{$blocklist}) && ($blocklistsettings{$blocklist} eq "on")) {
-			# Call function to load the blocklist.
-			&ipset_restore($blocklist);
-
-			# Call function to check if the corresponding iptables drop chain already has been created.
-			if(&firewall_chain_exists("${blocklist}_DROP")) {
-				# Create iptables chain.
-				run("$IPTABLES -N ${blocklist}_DROP");
-			} else {
-				# Flush the chain.
-				run("$IPTABLES -F ${blocklist}_DROP");
-			}
-
-			# Check if logging is enabled.
-			if(($blocklistsettings{'LOGGING'}) && ($blocklistsettings{'LOGGING'} eq "on")) {
-				# Create logging rule.
-				run("$IPTABLES -A ${blocklist}_DROP -j LOG -m limit --limit 10/second --log-prefix \"BLKLST_$blocklist \"");
-			}
-
-			# Create Drop rule.
-			run("$IPTABLES -A ${blocklist}_DROP -j DROP");
-
-			# Add the rules to check against the set
-			run("$IPTABLES -A BLOCKLISTIN -p ALL -i $RED_DEV -m set --match-set $blocklist src -j ${blocklist}_DROP");
-			run("$IPTABLES -A BLOCKLISTOUT -p ALL -o $RED_DEV -m set --match-set $blocklist dst -j ${blocklist}_DROP");
-
-		# IP blocklist or the blocklist is disabled.
-		} else {
-			# Check if the blocklist related iptables drop chain exits.
-			unless(&firewall_chain_exists("${blocklist}_DROP")) {
-				# Flush the chain.
-				run("$IPTABLES -F ${blocklist}_DROP");
-
-				# Drop the chain.
+		if(&firewall_chain_exists("${blocklist}_DROP")) {
+			run("$IPTABLES -F ${blocklist}_DROP");
+			# Check if chain exists before trying to delete it
+			my $exit_code = &General::system("iptables", "--wait", "-n", "-L", "${blocklist}_DROP");
+			if ($exit_code == 0) {
 				run("$IPTABLES -X ${blocklist}_DROP");
 			}
 		}
 	}
+	
+	# Also destroy ipsets
+	foreach my $blocklist (@blocklists) {
+		# Check if ipset exists
+		my $exit_code = &General::system("ipset", "list", "$blocklist");
+		if ($exit_code == 0) {
+			run("ipset destroy $blocklist");
+		}
+	}
+	
+	&General::log("IP Blocklist: Cleaned up iptables/ipset chains for XDP mode");
 }
 
 sub get_protocols {
