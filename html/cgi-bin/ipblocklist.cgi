@@ -451,6 +451,10 @@ sub manage_xdp_blocklists {
 	my %old_settings = %$old_settings_ref;
 	my %new_settings = %$new_settings_ref;
 	
+	# Get old and new XDP states
+	my $old_xdp = $old_settings{'XDP_ACCEL'} || 'off';
+	my $new_xdp = $new_settings{'XDP_ACCEL'} || 'off';
+	
 	# Only manage XDP blocklists if main feature is enabled AND XDP acceleration is enabled
 	if ($new_settings{'ENABLE'} ne 'on' || $new_settings{'XDP_ACCEL'} ne 'on') {
 		if ($new_settings{'ENABLE'} ne 'on') {
@@ -469,20 +473,24 @@ sub manage_xdp_blocklists {
 		return;
 	}
 	
+	# SPECIAL CASE: When switching from iptables to XDP mode,
+	# we need to force update of all enabled blocklists
+	my $force_update = ($old_xdp eq 'off' && $new_xdp eq 'on');
+	
 	# Loop through all blocklists
 	foreach my $blocklist (@blocklists) {
 		my $old_state = $old_settings{$blocklist} || 'off';
 		my $new_state = $new_settings{$blocklist} || 'off';
 		
-		# Skip if state hasn't changed
-		next if ($old_state eq $new_state);
+		# Skip if state hasn't changed AND we're not forcing an update
+		next if (!$force_update && $old_state eq $new_state);
 		
 		# Get the blocklist file name
 		my $blocklist_file = "$blocklist_dir/$blocklist.conf";
 		
 		# Check if the blocklist file exists
 		if (-f $blocklist_file) {
-			# Determine action based on state
+			# Determine action based on NEW state (not change)
 			my $action = ($new_state eq 'on') ? 'add' : 'delete';
 			
 			# Use General::system instead of General::system_output
