@@ -2488,7 +2488,7 @@ LOGFILE="${LOG_DIR}/_build.preparation.log"
 mkdir -p "${CACHE_DIR}" "${LOG_DIR}"
 
 # Toolchain Archive
-readonly TOOLCHAIN="${SNAME}-${VERSION}-toolchain-${TOOLCHAINVER}-${BUILD_ARCH}.tar.zst"
+readonly TOOLCHAIN="toolchain-${TOOLCHAINVER}-${BUILD_ARCH}.tar.zst"
 
 # See what we're supposed to do
 case "$1" in
