@@ -20,7 +20,7 @@
 ###############################################################################
 
 NAME="IPFire"							# Software name
-SNAME="ipfire"							# Short name
+SNAME="loongfire"							# Short name
 # If you update the version don't forget to update backupiso and add it to core update
 VERSION="2.29"							# Version number
 CORE="190"							# Core Level (Filename)
