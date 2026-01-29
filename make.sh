@@ -2111,7 +2111,6 @@ fi
 
 	lfsmake2 linux
 	lfsmake2 loxilb
-	lfsmake2 yt6801
 	#lfsmake2 rtl8812au
 	lfsmake2 linux-initrd
 
