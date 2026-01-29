@@ -1,0 +1,343 @@
+From git@z Thu Jan  1 00:00:00 1970
+Subject: [PATCH v5 1/3] net: stmmac: Add generic suspend/resume helper for PCI-based controllers
+From: Yao Zi <ziyao@disroot.org>
+Date: Mon, 24 Nov 2025 16:04:15 +0000
+Message-Id: <20251124160417.51514-2-ziyao@disroot.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yanteng Si <si.yanteng@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Philipp Stanner <phasta@kernel.org>, Tiezhu Yang <yangtiezhu@loongson.cn>, Qunqin Zhao <zhaoqunqin@loongson.cn>, Yao Zi <ziyao@disroot.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, Furong Xu <0x1207@gmail.com>, Kunihiko Hayashi <hayashi.kunihiko@socionext.com>, Jacob Keller <jacob.e.keller@intel.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Mingcong Bai <jeffbai@aosc.io>, Kexy Biscuit <kexybiscuit@aosc.io>
+In-Reply-To: <20251124160417.51514-1-ziyao@disroot.org>
+References: <20251124160417.51514-1-ziyao@disroot.org>
+List-Id: <linux-kernel.vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Most glue driver for PCI-based DWMAC controllers utilize similar
+platform suspend/resume routines. Add a generic implementation to reduce
+duplicated code.
+
+Signed-off-by: Yao Zi <ziyao@disroot.org>
+Reviewed-by: Yanteng Si<siyanteng@cqsoftware.com.cn>
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  5 ++
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |  1 +
+ .../ethernet/stmicro/stmmac/stmmac_libpci.c   | 48 +++++++++++++++++++
+ .../ethernet/stmicro/stmmac/stmmac_libpci.h   | 12 +++++
+ 4 files changed, 66 insertions(+)
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_libpci.c
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_libpci.h
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+index 87c5bea6c2a2..15ed5c1d071a 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
++++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+@@ -349,6 +349,11 @@ config DWMAC_VISCONTI
+ 
+ endif
+ 
++config STMMAC_LIBPCI
++	tristate
++	help
++	  This option enables the PCI bus helpers for the stmmac driver.
++
+ config DWMAC_INTEL
+ 	tristate "Intel GMAC support"
+ 	default X86
+diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
+index 1681a8a28313..7bf528731034 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/Makefile
++++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
+@@ -44,6 +44,7 @@ obj-$(CONFIG_DWMAC_VISCONTI)	+= dwmac-visconti.o
+ stmmac-platform-objs:= stmmac_platform.o
+ dwmac-altr-socfpga-objs := dwmac-socfpga.o
+ 
++obj-$(CONFIG_STMMAC_LIBPCI)	+= stmmac_libpci.o
+ obj-$(CONFIG_STMMAC_PCI)	+= stmmac-pci.o
+ obj-$(CONFIG_DWMAC_INTEL)	+= dwmac-intel.o
+ obj-$(CONFIG_DWMAC_LOONGSON)	+= dwmac-loongson.o
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_libpci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_libpci.c
+new file mode 100644
+index 000000000000..5c5dd502f79a
+--- /dev/null
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_libpci.c
+@@ -0,0 +1,48 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * PCI bus helpers for STMMAC driver
++ * Copyright (C) 2025 Yao Zi <ziyao@disroot.org>
++ */
++
++#include <linux/device.h>
++#include <linux/pci.h>
++
++#include "stmmac_libpci.h"
++
++int stmmac_pci_plat_suspend(struct device *dev, void *bsp_priv)
++{
++	struct pci_dev *pdev = to_pci_dev(dev);
++	int ret;
++
++	ret = pci_save_state(pdev);
++	if (ret)
++		return ret;
++
++	pci_disable_device(pdev);
++	pci_wake_from_d3(pdev, true);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(stmmac_pci_plat_suspend);
++
++int stmmac_pci_plat_resume(struct device *dev, void *bsp_priv)
++{
++	struct pci_dev *pdev = to_pci_dev(dev);
++	int ret;
++
++	pci_restore_state(pdev);
++	pci_set_power_state(pdev, PCI_D0);
++
++	ret = pci_enable_device(pdev);
++	if (ret)
++		return ret;
++
++	pci_set_master(pdev);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(stmmac_pci_plat_resume);
++
++MODULE_DESCRIPTION("STMMAC PCI helper library");
++MODULE_AUTHOR("Yao Zi <ziyao@disroot.org>");
++MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_libpci.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_libpci.h
+new file mode 100644
+index 000000000000..71553184f982
+--- /dev/null
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_libpci.h
+@@ -0,0 +1,12 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2025 Yao Zi <ziyao@disroot.org>
++ */
++
++#ifndef __STMMAC_LIBPCI_H__
++#define __STMMAC_LIBPCI_H__
++
++int stmmac_pci_plat_suspend(struct device *dev, void *bsp_priv);
++int stmmac_pci_plat_resume(struct device *dev, void *bsp_priv);
++
++#endif /* __STMMAC_LIBPCI_H__ */
+-- 
+2.51.2
+
+From git@z Thu Jan  1 00:00:00 1970
+Subject: [PATCH v5 2/3] net: stmmac: loongson: Use generic PCI suspend/resume routines
+From: Yao Zi <ziyao@disroot.org>
+Date: Mon, 24 Nov 2025 16:04:16 +0000
+Message-Id: <20251124160417.51514-3-ziyao@disroot.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yanteng Si <si.yanteng@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Philipp Stanner <phasta@kernel.org>, Tiezhu Yang <yangtiezhu@loongson.cn>, Qunqin Zhao <zhaoqunqin@loongson.cn>, Yao Zi <ziyao@disroot.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, Furong Xu <0x1207@gmail.com>, Kunihiko Hayashi <hayashi.kunihiko@socionext.com>, Jacob Keller <jacob.e.keller@intel.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Mingcong Bai <jeffbai@aosc.io>, Kexy Biscuit <kexybiscuit@aosc.io>, Yanteng Si <siyanteng@cqsoftware.com.cn>
+In-Reply-To: <20251124160417.51514-1-ziyao@disroot.org>
+References: <20251124160417.51514-1-ziyao@disroot.org>
+List-Id: <linux-kernel.vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Convert glue driver for Loongson DWMAC controller to use the generic
+platform suspend/resume routines for PCI controllers, instead of
+implementing its own one.
+
+Signed-off-by: Yao Zi <ziyao@disroot.org>
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Acked-by: Yanteng Si <siyanteng@cqsoftware.com.cn>
+---
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  3 +-
+ .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 36 ++-----------------
+ 2 files changed, 5 insertions(+), 34 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+index 15ed5c1d071a..ad7ae3618099 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
++++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+@@ -367,8 +367,9 @@ config DWMAC_INTEL
+ config DWMAC_LOONGSON
+ 	tristate "Loongson PCI DWMAC support"
+ 	default MACH_LOONGSON64
+-	depends on (MACH_LOONGSON64 || COMPILE_TEST) && STMMAC_ETH && PCI
++	depends on (MACH_LOONGSON64 || COMPILE_TEST) && PCI
+ 	depends on COMMON_CLK
++	select STMMAC_LIBPCI
+ 	help
+ 	  This selects the LOONGSON PCI bus support for the stmmac driver,
+ 	  Support for ethernet controller on Loongson-2K1000 SoC and LS7A1000 bridge.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index 5f9472f47e35..107a7c84ace8 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -8,6 +8,7 @@
+ #include <linux/device.h>
+ #include <linux/of_irq.h>
+ #include "stmmac.h"
++#include "stmmac_libpci.h"
+ #include "dwmac_dma.h"
+ #include "dwmac1000.h"
+ 
+@@ -502,37 +503,6 @@ static int loongson_dwmac_fix_reset(struct stmmac_priv *priv, void __iomem *ioad
+ 				  10000, 2000000);
+ }
+ 
+-static int loongson_dwmac_suspend(struct device *dev, void *bsp_priv)
+-{
+-	struct pci_dev *pdev = to_pci_dev(dev);
+-	int ret;
+-
+-	ret = pci_save_state(pdev);
+-	if (ret)
+-		return ret;
+-
+-	pci_disable_device(pdev);
+-	pci_wake_from_d3(pdev, true);
+-	return 0;
+-}
+-
+-static int loongson_dwmac_resume(struct device *dev, void *bsp_priv)
+-{
+-	struct pci_dev *pdev = to_pci_dev(dev);
+-	int ret;
+-
+-	pci_restore_state(pdev);
+-	pci_set_power_state(pdev, PCI_D0);
+-
+-	ret = pci_enable_device(pdev);
+-	if (ret)
+-		return ret;
+-
+-	pci_set_master(pdev);
+-
+-	return 0;
+-}
+-
+ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ {
+ 	struct plat_stmmacenet_data *plat;
+@@ -577,8 +547,8 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+ 	plat->bsp_priv = ld;
+ 	plat->mac_setup = loongson_dwmac_setup;
+ 	plat->fix_soc_reset = loongson_dwmac_fix_reset;
+-	plat->suspend = loongson_dwmac_suspend;
+-	plat->resume = loongson_dwmac_resume;
++	plat->suspend = stmmac_pci_plat_suspend;
++	plat->resume = stmmac_pci_plat_resume;
+ 	ld->dev = &pdev->dev;
+ 	ld->loongson_id = readl(res.addr + GMAC_VERSION) & 0xff;
+ 
+-- 
+2.51.2
+
+From git@z Thu Jan  1 00:00:00 1970
+Subject: [PATCH v5 3/3] net: stmmac: pci: Use generic PCI suspend/resume routines
+From: Yao Zi <ziyao@disroot.org>
+Date: Mon, 24 Nov 2025 16:04:17 +0000
+Message-Id: <20251124160417.51514-4-ziyao@disroot.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yanteng Si <si.yanteng@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Philipp Stanner <phasta@kernel.org>, Tiezhu Yang <yangtiezhu@loongson.cn>, Qunqin Zhao <zhaoqunqin@loongson.cn>, Yao Zi <ziyao@disroot.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, Furong Xu <0x1207@gmail.com>, Kunihiko Hayashi <hayashi.kunihiko@socionext.com>, Jacob Keller <jacob.e.keller@intel.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Mingcong Bai <jeffbai@aosc.io>, Kexy Biscuit <kexybiscuit@aosc.io>, Yanteng Si <siyanteng@cqsoftware.com.cn>
+In-Reply-To: <20251124160417.51514-1-ziyao@disroot.org>
+References: <20251124160417.51514-1-ziyao@disroot.org>
+List-Id: <linux-kernel.vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Convert STMMAC PCI glue driver to use the generic platform
+suspend/resume routines for PCI controllers, instead of implementing its
+own one.
+
+Signed-off-by: Yao Zi <ziyao@disroot.org>
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Reviewed-by: Yanteng Si <siyanteng@cqsoftware.com.cn>
+---
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  3 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_pci.c  | 36 ++-----------------
+ 2 files changed, 5 insertions(+), 34 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+index ad7ae3618099..907fe2e927f0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
++++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+@@ -376,8 +376,9 @@ config DWMAC_LOONGSON
+ 
+ config STMMAC_PCI
+ 	tristate "STMMAC PCI bus support"
+-	depends on STMMAC_ETH && PCI
++	depends on PCI
+ 	depends on COMMON_CLK
++	select STMMAC_LIBPCI
+ 	help
+ 	  This selects the platform specific bus support for the stmmac driver.
+ 	  This driver was tested on XLINX XC2V3000 FF1152AMT0221
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+index afb1c53ca6f8..270ad066ced3 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+@@ -14,6 +14,7 @@
+ #include <linux/dmi.h>
+ 
+ #include "stmmac.h"
++#include "stmmac_libpci.h"
+ 
+ struct stmmac_pci_info {
+ 	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
+@@ -102,37 +103,6 @@ static const struct stmmac_pci_info snps_gmac5_pci_info = {
+ 	.setup = snps_gmac5_default_data,
+ };
+ 
+-static int stmmac_pci_suspend(struct device *dev, void *bsp_priv)
+-{
+-	struct pci_dev *pdev = to_pci_dev(dev);
+-	int ret;
+-
+-	ret = pci_save_state(pdev);
+-	if (ret)
+-		return ret;
+-
+-	pci_disable_device(pdev);
+-	pci_wake_from_d3(pdev, true);
+-	return 0;
+-}
+-
+-static int stmmac_pci_resume(struct device *dev, void *bsp_priv)
+-{
+-	struct pci_dev *pdev = to_pci_dev(dev);
+-	int ret;
+-
+-	pci_restore_state(pdev);
+-	pci_set_power_state(pdev, PCI_D0);
+-
+-	ret = pci_enable_device(pdev);
+-	if (ret)
+-		return ret;
+-
+-	pci_set_master(pdev);
+-
+-	return 0;
+-}
+-
+ /**
+  * stmmac_pci_probe
+  *
+@@ -212,8 +182,8 @@ static int stmmac_pci_probe(struct pci_dev *pdev,
+ 	plat->safety_feat_cfg->prtyen = 1;
+ 	plat->safety_feat_cfg->tmouten = 1;
+ 
+-	plat->suspend = stmmac_pci_suspend;
+-	plat->resume = stmmac_pci_resume;
++	plat->suspend = stmmac_pci_plat_suspend;
++	plat->resume = stmmac_pci_plat_resume;
+ 
+ 	return stmmac_dvr_probe(&pdev->dev, plat, &res);
+ }
+-- 
+2.51.2
+

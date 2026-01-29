@@ -142,6 +142,13 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	# Disable bpf trampoline trace to kernel module functions
 	# cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/LoongArch-BPF-Disable-bpf-trampoline-kernel-module-f.patch
 
+	# Patch 6.18.4 for yt6801
+	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/007-stmmac-replace-has_xxxx-with-core_type.patch
+	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/20251114_linux_net_stmmac_clean_up_plat_dat_allocation_initialisation.mbx
+	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/20251119_linux_net_stmmac_simplify_axi_blen_handling.mbx
+	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/v5_20251124_ziyao_unify_platform_suspend_resume_routines_for_pci_dwmac_glue.mbx
+	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/v6_20260109_me_add_dwmac_glue_driver_for_motorcomm_yt6801.mbx
+
 ifeq "$(BUILD_ARCH)" "aarch64"
 	# Apply Arm kernel patches.
 	cd $(DIR_APP) && cat patch $(DIR_SRC)/src/patches/linux/aarch64/* | patch -Np1

@@ -1,0 +1,1203 @@
+From git@z Thu Jan  1 00:00:00 1970
+Subject: [PATCH 1/11] net: stmmac: add stmmac_plat_dat_alloc()
+From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Date: Fri, 14 Nov 2025 15:28:24 +0000
+Message-Id: <E1vJviq-0000000EVjP-0c0l@rmk-PC.armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Chen Wang <unicorn_wang@outlook.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Inochi Amaoto <inochiama@gmail.com>, Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, sophgo@lists.linux.dev
+In-Reply-To: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+References: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+List-Id: <sophgo.lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Add a function to allocate and initialise the plat_stmmacenet_data
+structure with default values.
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c    |  2 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c |  2 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h         |  2 ++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c    | 12 ++++++++++++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c     |  2 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_platform.c    |  2 +-
+ 6 files changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+index b2194e414ec1..7e56fbc3e141 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+@@ -1286,7 +1286,7 @@ static int intel_eth_pci_probe(struct pci_dev *pdev,
+ 	if (!intel_priv)
+ 		return -ENOMEM;
+ 
+-	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
++	plat = stmmac_plat_dat_alloc(&pdev->dev);
+ 	if (!plat)
+ 		return -ENOMEM;
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index dd2fc39ec3e2..2d803fa37e21 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -559,7 +559,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+ 	struct loongson_data *ld;
+ 	int ret;
+ 
+-	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
++	plat = stmmac_plat_dat_alloc(&pdev->dev);
+ 	if (!plat)
+ 		return -ENOMEM;
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+index 0ea74c88a779..e9ed5086c049 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+@@ -408,6 +408,8 @@ int stmmac_reinit_ringparam(struct net_device *dev, u32 rx_size, u32 tx_size);
+ int stmmac_set_clk_tx_rate(void *bsp_priv, struct clk *clk_tx_i,
+ 			   phy_interface_t interface, int speed);
+ 
++struct plat_stmmacenet_data *stmmac_plat_dat_alloc(struct device *dev);
++
+ static inline bool stmmac_xdp_is_enabled(struct stmmac_priv *priv)
+ {
+ 	return !!priv->xdp_prog;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index d202f604161e..400b4b955820 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7555,6 +7555,18 @@ static void stmmac_unregister_devlink(struct stmmac_priv *priv)
+ 	devlink_free(priv->devlink);
+ }
+ 
++struct plat_stmmacenet_data *stmmac_plat_dat_alloc(struct device *dev)
++{
++	struct plat_stmmacenet_data *plat_dat;
++
++	plat_dat = devm_kzalloc(dev, sizeof(*plat_dat), GFP_KERNEL);
++	if (!plat_dat)
++		return NULL;
++
++	return plat_dat;
++}
++EXPORT_SYMBOL_GPL(stmmac_plat_dat_alloc);
++
+ /**
+  * stmmac_dvr_probe
+  * @device: device pointer
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+index 94b3a3b27270..622cdbeca20f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+@@ -191,7 +191,7 @@ static int stmmac_pci_probe(struct pci_dev *pdev,
+ 	int ret;
+ 	int i;
+ 
+-	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
++	plat = stmmac_plat_dat_alloc(&pdev->dev);
+ 	if (!plat)
+ 		return -ENOMEM;
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 6483d52b4c0f..38d574907a04 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -436,7 +436,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ 	void *ret;
+ 	int rc;
+ 
+-	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
++	plat = stmmac_plat_dat_alloc(&pdev->dev);
+ 	if (!plat)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-- 
+2.47.3
+
+From git@z Thu Jan  1 00:00:00 1970
+Subject: [PATCH 2/11] net: stmmac: move initialisation of phy_addr to stmmac_plat_dat_alloc()
+From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Date: Fri, 14 Nov 2025 15:28:29 +0000
+Message-Id: <E1vJviv-0000000EVjV-1CLF@rmk-PC.armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Chen Wang <unicorn_wang@outlook.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Inochi Amaoto <inochiama@gmail.com>, Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, sophgo@lists.linux.dev
+In-Reply-To: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+References: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+List-Id: <sophgo.lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Move the default initialisation of plat_dat->phy_addr to
+stmmac_plat_dat_alloc().
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c  | 3 ---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c     | 5 +++++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c      | 1 -
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 2 --
+ 4 files changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index 2d803fa37e21..8593411844bc 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -114,9 +114,6 @@ static void loongson_default_data(struct pci_dev *pdev,
+ 	plat->clk_ref_rate = 125000000;
+ 	plat->clk_ptp_rate = 125000000;
+ 
+-	/* Default to phy auto-detection */
+-	plat->phy_addr = -1;
+-
+ 	plat->dma_cfg->pbl = 32;
+ 	plat->dma_cfg->pblx8 = true;
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 400b4b955820..1851f7d0702d 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7563,6 +7563,11 @@ struct plat_stmmacenet_data *stmmac_plat_dat_alloc(struct device *dev)
+ 	if (!plat_dat)
+ 		return NULL;
+ 
++	/* Set the defaults:
++	 * - phy autodetection
++	 */
++	plat_dat->phy_addr = -1;
++
+ 	return plat_dat;
+ }
+ EXPORT_SYMBOL_GPL(stmmac_plat_dat_alloc);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+index 622cdbeca20f..b981a9dd511d 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+@@ -112,7 +112,6 @@ static int snps_gmac5_default_data(struct pci_dev *pdev,
+ 	}
+ 
+ 	plat->bus_id = 1;
+-	plat->phy_addr = -1;
+ 	plat->phy_interface = PHY_INTERFACE_MODE_GMII;
+ 
+ 	plat->dma_cfg->pbl = 32;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 38d574907a04..745032fd46ce 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -480,8 +480,6 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ 		plat->bus_id = ++bus_id;
+ 	}
+ 
+-	/* Default to phy auto-detection */
+-	plat->phy_addr = -1;
+ 
+ 	/* Default to get clk_csr from stmmac_clk_csr_set(),
+ 	 * or get clk_csr from device tree.
+-- 
+2.47.3
+
+From git@z Thu Jan  1 00:00:00 1970
+Subject: [PATCH 3/11] net: stmmac: move initialisation of clk_csr to stmmac_plat_dat_alloc()
+From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Date: Fri, 14 Nov 2025 15:28:34 +0000
+Message-Id: <E1vJvj0-0000000EVjb-1jDh@rmk-PC.armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Chen Wang <unicorn_wang@outlook.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Inochi Amaoto <inochiama@gmail.com>, Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, sophgo@lists.linux.dev
+In-Reply-To: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+References: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+List-Id: <sophgo.lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Move the default initialisation of plat_dat->clk_csr to
+stmmac_plat_dat_alloc().
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c     | 2 ++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 5 -----
+ 2 files changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 1851f7d0702d..a36e8a90fcaa 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7565,8 +7565,10 @@ struct plat_stmmacenet_data *stmmac_plat_dat_alloc(struct device *dev)
+ 
+ 	/* Set the defaults:
+ 	 * - phy autodetection
++	 * - determine GMII_Address CR field from CSR clock
+ 	 */
+ 	plat_dat->phy_addr = -1;
++	plat_dat->clk_csr = -1;
+ 
+ 	return plat_dat;
+ }
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 745032fd46ce..fe3d95274fd6 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -480,11 +480,6 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ 		plat->bus_id = ++bus_id;
+ 	}
+ 
+-
+-	/* Default to get clk_csr from stmmac_clk_csr_set(),
+-	 * or get clk_csr from device tree.
+-	 */
+-	plat->clk_csr = -1;
+ 	if (of_property_read_u32(np, "snps,clk-csr", &plat->clk_csr))
+ 		of_property_read_u32(np, "clk_csr", &plat->clk_csr);
+ 
+-- 
+2.47.3
+
+From git@z Thu Jan  1 00:00:00 1970
+Subject: [PATCH 4/11] net: stmmac: move initialisation of maxmtu to stmmac_plat_dat_alloc()
+From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Date: Fri, 14 Nov 2025 15:28:39 +0000
+Message-Id: <E1vJvj5-0000000EVji-2EYA@rmk-PC.armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Chen Wang <unicorn_wang@outlook.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Inochi Amaoto <inochiama@gmail.com>, Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, sophgo@lists.linux.dev
+In-Reply-To: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+References: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+List-Id: <sophgo.lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Move the default initialisation of plat_dat->maxmtu to JUMBO_LEN to
+stmmac_plat_dat_alloc().
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c     | 6 ------
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c  | 3 ---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c     | 2 ++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c      | 6 ------
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 5 -----
+ 5 files changed, 2 insertions(+), 20 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+index 7e56fbc3e141..cf69e659c415 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+@@ -576,9 +576,6 @@ static void common_default_data(struct plat_stmmacenet_data *plat)
+ 	/* Set default value for unicast filter entries */
+ 	plat->unicast_filter_entries = 1;
+ 
+-	/* Set the maxmtu to a default of JUMBO_LEN */
+-	plat->maxmtu = JUMBO_LEN;
+-
+ 	/* Set default number of RX and TX queues to use */
+ 	plat->tx_queues_to_use = 1;
+ 	plat->rx_queues_to_use = 1;
+@@ -712,9 +709,6 @@ static int intel_mgbe_common_data(struct pci_dev *pdev,
+ 	/* Set default value for unicast filter entries */
+ 	plat->unicast_filter_entries = 1;
+ 
+-	/* Set the maxmtu to a default of JUMBO_LEN */
+-	plat->maxmtu = JUMBO_LEN;
+-
+ 	plat->flags |= STMMAC_FLAG_VLAN_FAIL_Q_EN;
+ 
+ 	/* Use the last Rx queue */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index 8593411844bc..89232c788c61 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -101,9 +101,6 @@ static void loongson_default_data(struct pci_dev *pdev,
+ 	/* Set default value for unicast filter entries */
+ 	plat->unicast_filter_entries = 1;
+ 
+-	/* Set the maxmtu to a default of JUMBO_LEN */
+-	plat->maxmtu = JUMBO_LEN;
+-
+ 	/* Disable Priority config by default */
+ 	plat->tx_queues_cfg[0].use_prio = false;
+ 	plat->rx_queues_cfg[0].use_prio = false;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index a36e8a90fcaa..0763ed06715e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7566,9 +7566,11 @@ struct plat_stmmacenet_data *stmmac_plat_dat_alloc(struct device *dev)
+ 	/* Set the defaults:
+ 	 * - phy autodetection
+ 	 * - determine GMII_Address CR field from CSR clock
++	 * - allow MTU up to JUMBO_LEN
+ 	 */
+ 	plat_dat->phy_addr = -1;
+ 	plat_dat->clk_csr = -1;
++	plat_dat->maxmtu = JUMBO_LEN;
+ 
+ 	return plat_dat;
+ }
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+index b981a9dd511d..b0b4358e0adf 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+@@ -34,9 +34,6 @@ static void common_default_data(struct plat_stmmacenet_data *plat)
+ 	/* Set default value for unicast filter entries */
+ 	plat->unicast_filter_entries = 1;
+ 
+-	/* Set the maxmtu to a default of JUMBO_LEN */
+-	plat->maxmtu = JUMBO_LEN;
+-
+ 	/* Set default number of RX and TX queues to use */
+ 	plat->tx_queues_to_use = 1;
+ 	plat->rx_queues_to_use = 1;
+@@ -87,9 +84,6 @@ static int snps_gmac5_default_data(struct pci_dev *pdev,
+ 	/* Set default value for unicast filter entries */
+ 	plat->unicast_filter_entries = 1;
+ 
+-	/* Set the maxmtu to a default of JUMBO_LEN */
+-	plat->maxmtu = JUMBO_LEN;
+-
+ 	/* Set default number of RX and TX queues to use */
+ 	plat->tx_queues_to_use = 4;
+ 	plat->rx_queues_to_use = 4;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index fe3d95274fd6..81a599475577 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -508,11 +508,6 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ 		plat->flags |= STMMAC_FLAG_EN_TX_LPI_CLOCKGATING;
+ 	}
+ 
+-	/* Set the maxmtu to a default of JUMBO_LEN in case the
+-	 * parameter is not present in the device tree.
+-	 */
+-	plat->maxmtu = JUMBO_LEN;
+-
+ 	/* Set default value for multicast hash bins */
+ 	plat->multicast_filter_bins = HASH_TABLE_SIZE;
+ 
+-- 
+2.47.3
+
+From git@z Thu Jan  1 00:00:00 1970
+Subject: [PATCH 5/11] net: stmmac: move initialisation of multicast_filter_bins to stmmac_plat_dat_alloc()
+From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Date: Fri, 14 Nov 2025 15:28:44 +0000
+Message-Id: <E1vJvjA-0000000EVjo-2qVn@rmk-PC.armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Chen Wang <unicorn_wang@outlook.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Inochi Amaoto <inochiama@gmail.com>, Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, sophgo@lists.linux.dev
+In-Reply-To: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+References: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+List-Id: <sophgo.lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Move the default initialisation of plat_dat->multicast_filter_bins to
+HASH_TABLE_SIZE to stmmac_plat_dat_alloc(). This means platform glue
+only needs to override this if different.
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c     | 6 ------
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c  | 2 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c     | 2 ++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c      | 6 ------
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 3 ---
+ 5 files changed, 3 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+index cf69e659c415..a4ef3ec070e2 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+@@ -570,9 +570,6 @@ static void common_default_data(struct plat_stmmacenet_data *plat)
+ 
+ 	plat->mdio_bus_data->needs_reset = true;
+ 
+-	/* Set default value for multicast hash bins */
+-	plat->multicast_filter_bins = HASH_TABLE_SIZE;
+-
+ 	/* Set default value for unicast filter entries */
+ 	plat->unicast_filter_entries = 1;
+ 
+@@ -703,9 +700,6 @@ static int intel_mgbe_common_data(struct pci_dev *pdev,
+ 
+ 	plat->ptp_clk_freq_config = intel_mgbe_ptp_clk_freq_config;
+ 
+-	/* Set default value for multicast hash bins */
+-	plat->multicast_filter_bins = HASH_TABLE_SIZE;
+-
+ 	/* Set default value for unicast filter entries */
+ 	plat->unicast_filter_entries = 1;
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index 89232c788c61..cfdda9e82a19 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -95,7 +95,7 @@ static void loongson_default_data(struct pci_dev *pdev,
+ 	plat->core_type = DWMAC_CORE_GMAC;
+ 	plat->force_sf_dma_mode = 1;
+ 
+-	/* Set default value for multicast hash bins */
++	/* Increase the default value for multicast hash bins */
+ 	plat->multicast_filter_bins = 256;
+ 
+ 	/* Set default value for unicast filter entries */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 0763ed06715e..a7393a3e792f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7567,10 +7567,12 @@ struct plat_stmmacenet_data *stmmac_plat_dat_alloc(struct device *dev)
+ 	 * - phy autodetection
+ 	 * - determine GMII_Address CR field from CSR clock
+ 	 * - allow MTU up to JUMBO_LEN
++	 * - hash table size
+ 	 */
+ 	plat_dat->phy_addr = -1;
+ 	plat_dat->clk_csr = -1;
+ 	plat_dat->maxmtu = JUMBO_LEN;
++	plat_dat->multicast_filter_bins = HASH_TABLE_SIZE;
+ 
+ 	return plat_dat;
+ }
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+index b0b4358e0adf..0c65b24480ae 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+@@ -28,9 +28,6 @@ static void common_default_data(struct plat_stmmacenet_data *plat)
+ 
+ 	plat->mdio_bus_data->needs_reset = true;
+ 
+-	/* Set default value for multicast hash bins */
+-	plat->multicast_filter_bins = HASH_TABLE_SIZE;
+-
+ 	/* Set default value for unicast filter entries */
+ 	plat->unicast_filter_entries = 1;
+ 
+@@ -78,9 +75,6 @@ static int snps_gmac5_default_data(struct pci_dev *pdev,
+ 	plat->flags |= STMMAC_FLAG_TSO_EN;
+ 	plat->pmt = 1;
+ 
+-	/* Set default value for multicast hash bins */
+-	plat->multicast_filter_bins = HASH_TABLE_SIZE;
+-
+ 	/* Set default value for unicast filter entries */
+ 	plat->unicast_filter_entries = 1;
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 81a599475577..9982aaa19519 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -508,9 +508,6 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ 		plat->flags |= STMMAC_FLAG_EN_TX_LPI_CLOCKGATING;
+ 	}
+ 
+-	/* Set default value for multicast hash bins */
+-	plat->multicast_filter_bins = HASH_TABLE_SIZE;
+-
+ 	/* Set default value for unicast filter entries */
+ 	plat->unicast_filter_entries = 1;
+ 
+-- 
+2.47.3
+
+From git@z Thu Jan  1 00:00:00 1970
+Subject: [PATCH 6/11] net: stmmac: move initialisation of unicast_filter_entries to stmmac_plat_dat_alloc()
+From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Date: Fri, 14 Nov 2025 15:28:49 +0000
+Message-Id: <E1vJvjF-0000000EVju-3LfS@rmk-PC.armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Chen Wang <unicorn_wang@outlook.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Inochi Amaoto <inochiama@gmail.com>, Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, sophgo@lists.linux.dev
+In-Reply-To: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+References: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+List-Id: <sophgo.lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Move the default initialisation of plat_dat->unicast_filter_entries to
+1 to stmmac_plat_dat_alloc(). This means platform glue only needs to
+override this if different.
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c     | 6 ------
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c  | 3 ---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c    | 1 -
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c     | 2 ++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c      | 6 ------
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 3 ---
+ 6 files changed, 2 insertions(+), 19 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+index a4ef3ec070e2..de07cca2e625 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+@@ -570,9 +570,6 @@ static void common_default_data(struct plat_stmmacenet_data *plat)
+ 
+ 	plat->mdio_bus_data->needs_reset = true;
+ 
+-	/* Set default value for unicast filter entries */
+-	plat->unicast_filter_entries = 1;
+-
+ 	/* Set default number of RX and TX queues to use */
+ 	plat->tx_queues_to_use = 1;
+ 	plat->rx_queues_to_use = 1;
+@@ -700,9 +697,6 @@ static int intel_mgbe_common_data(struct pci_dev *pdev,
+ 
+ 	plat->ptp_clk_freq_config = intel_mgbe_ptp_clk_freq_config;
+ 
+-	/* Set default value for unicast filter entries */
+-	plat->unicast_filter_entries = 1;
+-
+ 	plat->flags |= STMMAC_FLAG_VLAN_FAIL_Q_EN;
+ 
+ 	/* Use the last Rx queue */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index cfdda9e82a19..99b2d2deaceb 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -98,9 +98,6 @@ static void loongson_default_data(struct pci_dev *pdev,
+ 	/* Increase the default value for multicast hash bins */
+ 	plat->multicast_filter_bins = 256;
+ 
+-	/* Set default value for unicast filter entries */
+-	plat->unicast_filter_entries = 1;
+-
+ 	/* Disable Priority config by default */
+ 	plat->tx_queues_cfg[0].use_prio = false;
+ 	plat->rx_queues_cfg[0].use_prio = false;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
+index 3b7947a7a7ba..24ce17ea35c4 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
+@@ -24,7 +24,6 @@ static int sophgo_sg2044_dwmac_init(struct platform_device *pdev,
+ 	plat_dat->flags |= STMMAC_FLAG_SPH_DISABLE;
+ 	plat_dat->set_clk_tx_rate = stmmac_set_clk_tx_rate;
+ 	plat_dat->multicast_filter_bins = 0;
+-	plat_dat->unicast_filter_entries = 1;
+ 
+ 	return 0;
+ }
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index a7393a3e792f..1d12835d14ce 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7568,11 +7568,13 @@ struct plat_stmmacenet_data *stmmac_plat_dat_alloc(struct device *dev)
+ 	 * - determine GMII_Address CR field from CSR clock
+ 	 * - allow MTU up to JUMBO_LEN
+ 	 * - hash table size
++	 * - one unicast filter entry
+ 	 */
+ 	plat_dat->phy_addr = -1;
+ 	plat_dat->clk_csr = -1;
+ 	plat_dat->maxmtu = JUMBO_LEN;
+ 	plat_dat->multicast_filter_bins = HASH_TABLE_SIZE;
++	plat_dat->unicast_filter_entries = 1;
+ 
+ 	return plat_dat;
+ }
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+index 0c65b24480ae..aea615e76dac 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+@@ -28,9 +28,6 @@ static void common_default_data(struct plat_stmmacenet_data *plat)
+ 
+ 	plat->mdio_bus_data->needs_reset = true;
+ 
+-	/* Set default value for unicast filter entries */
+-	plat->unicast_filter_entries = 1;
+-
+ 	/* Set default number of RX and TX queues to use */
+ 	plat->tx_queues_to_use = 1;
+ 	plat->rx_queues_to_use = 1;
+@@ -75,9 +72,6 @@ static int snps_gmac5_default_data(struct pci_dev *pdev,
+ 	plat->flags |= STMMAC_FLAG_TSO_EN;
+ 	plat->pmt = 1;
+ 
+-	/* Set default value for unicast filter entries */
+-	plat->unicast_filter_entries = 1;
+-
+ 	/* Set default number of RX and TX queues to use */
+ 	plat->tx_queues_to_use = 4;
+ 	plat->rx_queues_to_use = 4;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 9982aaa19519..314cb3e720fd 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -508,9 +508,6 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ 		plat->flags |= STMMAC_FLAG_EN_TX_LPI_CLOCKGATING;
+ 	}
+ 
+-	/* Set default value for unicast filter entries */
+-	plat->unicast_filter_entries = 1;
+-
+ 	/*
+ 	 * Currently only the properties needed on SPEAr600
+ 	 * are provided. All other properties should be added
+-- 
+2.47.3
+
+From git@z Thu Jan  1 00:00:00 1970
+Subject: [PATCH 7/11] net: stmmac: move initialisation of queues_to_use to stmmac_plat_dat_alloc()
+From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Date: Fri, 14 Nov 2025 15:28:54 +0000
+Message-Id: <E1vJvjK-0000000EVk0-3qb2@rmk-PC.armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Chen Wang <unicorn_wang@outlook.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Inochi Amaoto <inochiama@gmail.com>, Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, sophgo@lists.linux.dev
+In-Reply-To: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+References: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+List-Id: <sophgo.lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Move the default initialisation of plat_dat->tx_queues_to_use and
+plat_dat->rx_queues_to_use to 1 to stmmac_plat_dat_alloc(). This means
+platform glue only needs to override this if different.
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ .../net/ethernet/stmicro/stmmac/dwmac-intel.c   |  4 ----
+ .../ethernet/stmicro/stmmac/dwmac-loongson.c    |  2 --
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c   |  4 ++++
+ .../net/ethernet/stmicro/stmmac/stmmac_pci.c    |  4 ----
+ .../ethernet/stmicro/stmmac/stmmac_platform.c   | 17 ++++-------------
+ 5 files changed, 8 insertions(+), 23 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+index de07cca2e625..55f97b2f4e04 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+@@ -570,10 +570,6 @@ static void common_default_data(struct plat_stmmacenet_data *plat)
+ 
+ 	plat->mdio_bus_data->needs_reset = true;
+ 
+-	/* Set default number of RX and TX queues to use */
+-	plat->tx_queues_to_use = 1;
+-	plat->rx_queues_to_use = 1;
+-
+ 	/* Disable Priority config by default */
+ 	plat->tx_queues_cfg[0].use_prio = false;
+ 	plat->rx_queues_cfg[0].use_prio = false;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index 99b2d2deaceb..ed5e9ca738bf 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -131,8 +131,6 @@ static void loongson_default_data(struct pci_dev *pdev,
+ 		break;
+ 	default:
+ 		ld->multichan = 0;
+-		plat->tx_queues_to_use = 1;
+-		plat->rx_queues_to_use = 1;
+ 		break;
+ 	}
+ }
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 1d12835d14ce..c7763db011d6 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7576,6 +7576,10 @@ struct plat_stmmacenet_data *stmmac_plat_dat_alloc(struct device *dev)
+ 	plat_dat->multicast_filter_bins = HASH_TABLE_SIZE;
+ 	plat_dat->unicast_filter_entries = 1;
+ 
++	/* Set the mtl defaults */
++	plat_dat->tx_queues_to_use = 1;
++	plat_dat->rx_queues_to_use = 1;
++
+ 	return plat_dat;
+ }
+ EXPORT_SYMBOL_GPL(stmmac_plat_dat_alloc);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+index aea615e76dac..8c7188ff658b 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+@@ -28,10 +28,6 @@ static void common_default_data(struct plat_stmmacenet_data *plat)
+ 
+ 	plat->mdio_bus_data->needs_reset = true;
+ 
+-	/* Set default number of RX and TX queues to use */
+-	plat->tx_queues_to_use = 1;
+-	plat->rx_queues_to_use = 1;
+-
+ 	/* Disable Priority config by default */
+ 	plat->tx_queues_cfg[0].use_prio = false;
+ 	plat->rx_queues_cfg[0].use_prio = false;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 314cb3e720fd..e1e23ee0b48e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -137,13 +137,6 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
+ 	u8 queue = 0;
+ 	int ret = 0;
+ 
+-	/* For backwards-compatibility with device trees that don't have any
+-	 * snps,mtl-rx-config or snps,mtl-tx-config properties, we fall back
+-	 * to one RX and TX queues each.
+-	 */
+-	plat->rx_queues_to_use = 1;
+-	plat->tx_queues_to_use = 1;
+-
+ 	/* First Queue must always be in DCB mode. As MTL_QUEUE_DCB = 1 we need
+ 	 * to always set this, otherwise Queue will be classified as AVB
+ 	 * (because MTL_QUEUE_AVB = 0).
+@@ -162,9 +155,8 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
+ 	}
+ 
+ 	/* Processing RX queues common config */
+-	if (of_property_read_u32(rx_node, "snps,rx-queues-to-use",
+-				 &plat->rx_queues_to_use))
+-		plat->rx_queues_to_use = 1;
++	of_property_read_u32(rx_node, "snps,rx-queues-to-use",
++			     &plat->rx_queues_to_use);
+ 
+ 	if (of_property_read_bool(rx_node, "snps,rx-sched-sp"))
+ 		plat->rx_sched_algorithm = MTL_RX_ALGORITHM_SP;
+@@ -221,9 +213,8 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
+ 	}
+ 
+ 	/* Processing TX queues common config */
+-	if (of_property_read_u32(tx_node, "snps,tx-queues-to-use",
+-				 &plat->tx_queues_to_use))
+-		plat->tx_queues_to_use = 1;
++	of_property_read_u32(tx_node, "snps,tx-queues-to-use",
++			     &plat->tx_queues_to_use);
+ 
+ 	if (of_property_read_bool(tx_node, "snps,tx-sched-wrr"))
+ 		plat->tx_sched_algorithm = MTL_TX_ALGORITHM_WRR;
+-- 
+2.47.3
+
+From git@z Thu Jan  1 00:00:00 1970
+Subject: [PATCH 8/11] net: stmmac: setup default RX channel map in stmmac_plat_dat_alloc()
+From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Date: Fri, 14 Nov 2025 15:29:00 +0000
+Message-Id: <E1vJvjQ-0000000EVk6-05z7@rmk-PC.armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Chen Wang <unicorn_wang@outlook.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Inochi Amaoto <inochiama@gmail.com>, Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, sophgo@lists.linux.dev
+In-Reply-To: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+References: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+List-Id: <sophgo.lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Setup the default 1:1 RX channel map in stmmac_plat_dat_alloc() and
+remove 1:1 initialisations from platform glue drivers.
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c     | 1 -
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c     | 5 +++++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c      | 1 -
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 5 ++---
+ 4 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+index 55f97b2f4e04..1fd6faa0c70c 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+@@ -618,7 +618,6 @@ static int intel_mgbe_common_data(struct pci_dev *pdev,
+ 
+ 	for (i = 0; i < plat->rx_queues_to_use; i++) {
+ 		plat->rx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
+-		plat->rx_queues_cfg[i].chan = i;
+ 
+ 		/* Disable Priority config by default */
+ 		plat->rx_queues_cfg[i].use_prio = false;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index c7763db011d6..d08ff8f5ff15 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7558,6 +7558,7 @@ static void stmmac_unregister_devlink(struct stmmac_priv *priv)
+ struct plat_stmmacenet_data *stmmac_plat_dat_alloc(struct device *dev)
+ {
+ 	struct plat_stmmacenet_data *plat_dat;
++	int i;
+ 
+ 	plat_dat = devm_kzalloc(dev, sizeof(*plat_dat), GFP_KERNEL);
+ 	if (!plat_dat)
+@@ -7580,6 +7581,10 @@ struct plat_stmmacenet_data *stmmac_plat_dat_alloc(struct device *dev)
+ 	plat_dat->tx_queues_to_use = 1;
+ 	plat_dat->rx_queues_to_use = 1;
+ 
++	/* Setup the default RX queue channel map */
++	for (i = 0; i < ARRAY_SIZE(plat_dat->rx_queues_cfg); i++)
++		plat_dat->rx_queues_cfg[i].chan = i;
++
+ 	return plat_dat;
+ }
+ EXPORT_SYMBOL_GPL(stmmac_plat_dat_alloc);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+index 8c7188ff658b..ded44846f74a 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+@@ -86,7 +86,6 @@ static int snps_gmac5_default_data(struct pci_dev *pdev,
+ 		plat->rx_queues_cfg[i].use_prio = false;
+ 		plat->rx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
+ 		plat->rx_queues_cfg[i].pkt_route = 0x0;
+-		plat->rx_queues_cfg[i].chan = i;
+ 	}
+ 
+ 	plat->bus_id = 1;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index e1e23ee0b48e..7eb22511acf5 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -177,9 +177,8 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
+ 		else
+ 			plat->rx_queues_cfg[queue].mode_to_use = MTL_QUEUE_DCB;
+ 
+-		if (of_property_read_u32(q_node, "snps,map-to-dma-channel",
+-					 &plat->rx_queues_cfg[queue].chan))
+-			plat->rx_queues_cfg[queue].chan = queue;
++		of_property_read_u32(q_node, "snps,map-to-dma-channel",
++				     &plat->rx_queues_cfg[queue].chan);
+ 		/* TODO: Dynamic mapping to be included in the future */
+ 
+ 		if (of_property_read_u32(q_node, "snps,priority",
+-- 
+2.47.3
+
+From git@z Thu Jan  1 00:00:00 1970
+Subject: [PATCH 9/11] net: stmmac: remove unnecessary .use_prio queue initialisation
+From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Date: Fri, 14 Nov 2025 15:29:05 +0000
+Message-Id: <E1vJvjV-0000000EVkC-0WAV@rmk-PC.armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Chen Wang <unicorn_wang@outlook.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Inochi Amaoto <inochiama@gmail.com>, Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, sophgo@lists.linux.dev
+In-Reply-To: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+References: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+List-Id: <sophgo.lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Several drivers (see below) explicitly set the queue .use_prio
+configuration to false. However, as this structure is allocated using
+devm_kzalloc(), all members default to zero unless otherwise explicitly
+initialised. .use_prio isn't, so defaults to false. Remove these
+unnecessary initialisations, leaving stmmac_platform.c as the only
+file that .use_prio is set true.
+
+$ grep 'use_prio =' *.c
+dwmac-intel.c: plat->tx_queues_cfg[0].use_prio = false;
+dwmac-intel.c: plat->rx_queues_cfg[0].use_prio = false;
+dwmac-intel.c: plat->rx_queues_cfg[i].use_prio = false;
+dwmac-intel.c: plat->tx_queues_cfg[i].use_prio = false;
+dwmac-loongson.c: plat->tx_queues_cfg[0].use_prio = false;
+dwmac-loongson.c: plat->rx_queues_cfg[0].use_prio = false;
+stmmac_pci.c: plat->tx_queues_cfg[0].use_prio = false;
+stmmac_pci.c: plat->rx_queues_cfg[0].use_prio = false;
+stmmac_pci.c: plat->tx_queues_cfg[i].use_prio = false;
+stmmac_pci.c: plat->rx_queues_cfg[i].use_prio = false;
+stmmac_platform.c: plat->rx_queues_cfg[queue].use_prio = false;
+stmmac_platform.c: plat->rx_queues_cfg[queue].use_prio = true;
+stmmac_platform.c: plat->tx_queues_cfg[queue].use_prio = false;
+stmmac_platform.c: plat->tx_queues_cfg[queue].use_prio = true;
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c     | 9 ---------
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c  | 4 ----
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c      | 6 ------
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 2 --
+ 4 files changed, 21 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+index 1fd6faa0c70c..72f6acde544f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+@@ -570,10 +570,6 @@ static void common_default_data(struct plat_stmmacenet_data *plat)
+ 
+ 	plat->mdio_bus_data->needs_reset = true;
+ 
+-	/* Disable Priority config by default */
+-	plat->tx_queues_cfg[0].use_prio = false;
+-	plat->rx_queues_cfg[0].use_prio = false;
+-
+ 	/* Disable RX queues routing by default */
+ 	plat->rx_queues_cfg[0].pkt_route = 0x0;
+ }
+@@ -619,9 +615,6 @@ static int intel_mgbe_common_data(struct pci_dev *pdev,
+ 	for (i = 0; i < plat->rx_queues_to_use; i++) {
+ 		plat->rx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
+ 
+-		/* Disable Priority config by default */
+-		plat->rx_queues_cfg[i].use_prio = false;
+-
+ 		/* Disable RX queues routing by default */
+ 		plat->rx_queues_cfg[i].pkt_route = 0x0;
+ 	}
+@@ -629,8 +622,6 @@ static int intel_mgbe_common_data(struct pci_dev *pdev,
+ 	for (i = 0; i < plat->tx_queues_to_use; i++) {
+ 		plat->tx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
+ 
+-		/* Disable Priority config by default */
+-		plat->tx_queues_cfg[i].use_prio = false;
+ 		/* Default TX Q0 to use TSO and rest TXQ for TBS */
+ 		if (i > 0)
+ 			plat->tx_queues_cfg[i].tbs_en = 1;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index ed5e9ca738bf..c64a24bb060f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -98,10 +98,6 @@ static void loongson_default_data(struct pci_dev *pdev,
+ 	/* Increase the default value for multicast hash bins */
+ 	plat->multicast_filter_bins = 256;
+ 
+-	/* Disable Priority config by default */
+-	plat->tx_queues_cfg[0].use_prio = false;
+-	plat->rx_queues_cfg[0].use_prio = false;
+-
+ 	/* Disable RX queues routing by default */
+ 	plat->rx_queues_cfg[0].pkt_route = 0x0;
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+index ded44846f74a..2f45b7986903 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+@@ -28,10 +28,6 @@ static void common_default_data(struct plat_stmmacenet_data *plat)
+ 
+ 	plat->mdio_bus_data->needs_reset = true;
+ 
+-	/* Disable Priority config by default */
+-	plat->tx_queues_cfg[0].use_prio = false;
+-	plat->rx_queues_cfg[0].use_prio = false;
+-
+ 	/* Disable RX queues routing by default */
+ 	plat->rx_queues_cfg[0].pkt_route = 0x0;
+ }
+@@ -74,7 +70,6 @@ static int snps_gmac5_default_data(struct pci_dev *pdev,
+ 
+ 	plat->tx_sched_algorithm = MTL_TX_ALGORITHM_WRR;
+ 	for (i = 0; i < plat->tx_queues_to_use; i++) {
+-		plat->tx_queues_cfg[i].use_prio = false;
+ 		plat->tx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
+ 		plat->tx_queues_cfg[i].weight = 25;
+ 		if (i > 0)
+@@ -83,7 +78,6 @@ static int snps_gmac5_default_data(struct pci_dev *pdev,
+ 
+ 	plat->rx_sched_algorithm = MTL_RX_ALGORITHM_SP;
+ 	for (i = 0; i < plat->rx_queues_to_use; i++) {
+-		plat->rx_queues_cfg[i].use_prio = false;
+ 		plat->rx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
+ 		plat->rx_queues_cfg[i].pkt_route = 0x0;
+ 	}
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 7eb22511acf5..4750843cf102 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -184,7 +184,6 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
+ 		if (of_property_read_u32(q_node, "snps,priority",
+ 					&plat->rx_queues_cfg[queue].prio)) {
+ 			plat->rx_queues_cfg[queue].prio = 0;
+-			plat->rx_queues_cfg[queue].use_prio = false;
+ 		} else {
+ 			plat->rx_queues_cfg[queue].use_prio = true;
+ 		}
+@@ -261,7 +260,6 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
+ 		if (of_property_read_u32(q_node, "snps,priority",
+ 					&plat->tx_queues_cfg[queue].prio)) {
+ 			plat->tx_queues_cfg[queue].prio = 0;
+-			plat->tx_queues_cfg[queue].use_prio = false;
+ 		} else {
+ 			plat->tx_queues_cfg[queue].use_prio = true;
+ 		}
+-- 
+2.47.3
+
+From git@z Thu Jan  1 00:00:00 1970
+Subject: [PATCH 10/11] net: stmmac: remove unnecessary .prio queue initialisation
+From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Date: Fri, 14 Nov 2025 15:29:10 +0000
+Message-Id: <E1vJvja-0000000EVkI-0zUH@rmk-PC.armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Chen Wang <unicorn_wang@outlook.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Inochi Amaoto <inochiama@gmail.com>, Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, sophgo@lists.linux.dev
+In-Reply-To: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+References: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+List-Id: <sophgo.lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+stmmac_platform.c explicitly sets .prio to zero if the snps,priority
+property is not present in DT for the queue. However, as the struct
+is allocated using devm_kzalloc(), all members default to zero unless
+explicitly initialised, and of_property_read_u32() will not write to
+its argument if the property is not found. Thus, explicitly setting
+these to zero is unnecessary. Remove these.
+
+$ grep '\.prio =' *.c
+stmmac_platform.c: plat->rx_queues_cfg[queue].prio = 0;
+stmmac_platform.c: plat->tx_queues_cfg[queue].prio = 0;
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ .../net/ethernet/stmicro/stmmac/stmmac_platform.c  | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 4750843cf102..e769638586fe 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -181,12 +181,9 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
+ 				     &plat->rx_queues_cfg[queue].chan);
+ 		/* TODO: Dynamic mapping to be included in the future */
+ 
+-		if (of_property_read_u32(q_node, "snps,priority",
+-					&plat->rx_queues_cfg[queue].prio)) {
+-			plat->rx_queues_cfg[queue].prio = 0;
+-		} else {
++		if (!of_property_read_u32(q_node, "snps,priority",
++					  &plat->rx_queues_cfg[queue].prio))
+ 			plat->rx_queues_cfg[queue].use_prio = true;
+-		}
+ 
+ 		/* RX queue specific packet type routing */
+ 		if (of_property_read_bool(q_node, "snps,route-avcp"))
+@@ -257,12 +254,9 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
+ 			plat->tx_queues_cfg[queue].mode_to_use = MTL_QUEUE_DCB;
+ 		}
+ 
+-		if (of_property_read_u32(q_node, "snps,priority",
+-					&plat->tx_queues_cfg[queue].prio)) {
+-			plat->tx_queues_cfg[queue].prio = 0;
+-		} else {
++		if (!of_property_read_u32(q_node, "snps,priority",
++					  &plat->tx_queues_cfg[queue].prio))
+ 			plat->tx_queues_cfg[queue].use_prio = true;
+-		}
+ 
+ 		plat->tx_queues_cfg[queue].coe_unsupported =
+ 			of_property_read_bool(q_node, "snps,coe-unsupported");
+-- 
+2.47.3
+
+From git@z Thu Jan  1 00:00:00 1970
+Subject: [PATCH 11/11] net: stmmac: remove unnecessary .pkt_route queue initialisation
+From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Date: Fri, 14 Nov 2025 15:29:15 +0000
+Message-Id: <E1vJvjf-0000000EVkO-1ZaO@rmk-PC.armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Chen Wang <unicorn_wang@outlook.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Inochi Amaoto <inochiama@gmail.com>, Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, sophgo@lists.linux.dev
+In-Reply-To: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+References: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
+List-Id: <sophgo.lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+PCI drivers explicitly set .pkt_route to zero. However, as the struct
+is allocated using devm_kzalloc(), all members default to zero unless
+explicitly initialised. Thus, explicitly setting these to zero is
+unnecessary. Remove these. This leaves only stmmac_platform.c where
+this is explicitly initialised depending on DT properties.
+
+$ grep '\.pkt_route =' *.c
+dwmac-intel.c: plat->rx_queues_cfg[0].pkt_route = 0x0;
+dwmac-intel.c: plat->rx_queues_cfg[i].pkt_route = 0x0;
+dwmac-loongson.c: plat->rx_queues_cfg[0].pkt_route = 0x0;
+stmmac_main.c: if (priv->plat->rx_queues_cfg[queue].pkt_route == 0x0)
+stmmac_pci.c: plat->rx_queues_cfg[0].pkt_route = 0x0;
+stmmac_pci.c: plat->rx_queues_cfg[i].pkt_route = 0x0;
+stmmac_platform.c: plat->rx_queues_cfg[queue].pkt_route = PACKET_AVCPQ;
+stmmac_platform.c: plat->rx_queues_cfg[queue].pkt_route = PACKET_PTPQ;
+stmmac_platform.c: plat->rx_queues_cfg[queue].pkt_route = PACKET_DCBCPQ;
+stmmac_platform.c: plat->rx_queues_cfg[queue].pkt_route = PACKET_UPQ;
+stmmac_platform.c: plat->rx_queues_cfg[queue].pkt_route = PACKET_MCBCQ;
+stmmac_platform.c: plat->rx_queues_cfg[queue].pkt_route = 0x0;
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c     | 9 +--------
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c  | 3 ---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c      | 7 +------
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 2 --
+ 4 files changed, 2 insertions(+), 19 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+index 72f6acde544f..8938e7a59925 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+@@ -569,9 +569,6 @@ static void common_default_data(struct plat_stmmacenet_data *plat)
+ 	plat->force_sf_dma_mode = 1;
+ 
+ 	plat->mdio_bus_data->needs_reset = true;
+-
+-	/* Disable RX queues routing by default */
+-	plat->rx_queues_cfg[0].pkt_route = 0x0;
+ }
+ 
+ static struct phylink_pcs *intel_mgbe_select_pcs(struct stmmac_priv *priv,
+@@ -612,13 +609,9 @@ static int intel_mgbe_common_data(struct pci_dev *pdev,
+ 
+ 	plat->rx_sched_algorithm = MTL_RX_ALGORITHM_SP;
+ 
+-	for (i = 0; i < plat->rx_queues_to_use; i++) {
++	for (i = 0; i < plat->rx_queues_to_use; i++)
+ 		plat->rx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
+ 
+-		/* Disable RX queues routing by default */
+-		plat->rx_queues_cfg[i].pkt_route = 0x0;
+-	}
+-
+ 	for (i = 0; i < plat->tx_queues_to_use; i++) {
+ 		plat->tx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index c64a24bb060f..5f9472f47e35 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -98,9 +98,6 @@ static void loongson_default_data(struct pci_dev *pdev,
+ 	/* Increase the default value for multicast hash bins */
+ 	plat->multicast_filter_bins = 256;
+ 
+-	/* Disable RX queues routing by default */
+-	plat->rx_queues_cfg[0].pkt_route = 0x0;
+-
+ 	plat->clk_ref_rate = 125000000;
+ 	plat->clk_ptp_rate = 125000000;
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+index 2f45b7986903..2fd4660838bb 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+@@ -27,9 +27,6 @@ static void common_default_data(struct plat_stmmacenet_data *plat)
+ 	plat->force_sf_dma_mode = 1;
+ 
+ 	plat->mdio_bus_data->needs_reset = true;
+-
+-	/* Disable RX queues routing by default */
+-	plat->rx_queues_cfg[0].pkt_route = 0x0;
+ }
+ 
+ static int stmmac_default_data(struct pci_dev *pdev,
+@@ -77,10 +74,8 @@ static int snps_gmac5_default_data(struct pci_dev *pdev,
+ 	}
+ 
+ 	plat->rx_sched_algorithm = MTL_RX_ALGORITHM_SP;
+-	for (i = 0; i < plat->rx_queues_to_use; i++) {
++	for (i = 0; i < plat->rx_queues_to_use; i++)
+ 		plat->rx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
+-		plat->rx_queues_cfg[i].pkt_route = 0x0;
+-	}
+ 
+ 	plat->bus_id = 1;
+ 	plat->phy_interface = PHY_INTERFACE_MODE_GMII;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index e769638586fe..1fefa6c55db1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -196,8 +196,6 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
+ 			plat->rx_queues_cfg[queue].pkt_route = PACKET_UPQ;
+ 		else if (of_property_read_bool(q_node, "snps,route-multi-broad"))
+ 			plat->rx_queues_cfg[queue].pkt_route = PACKET_MCBCQ;
+-		else
+-			plat->rx_queues_cfg[queue].pkt_route = 0x0;
+ 
+ 		queue++;
+ 	}
+-- 
+2.47.3
+
