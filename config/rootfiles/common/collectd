@@ -151,7 +151,7 @@ usr/lib/collectd/rrdtool.so
 #usr/lib/collectd/sensors.la
 usr/lib/collectd/sensors.so
 #usr/lib/collectd/snmp_agent.la
-usr/lib/collectd/snmp_agent.so
+#usr/lib/collectd/snmp_agent.so
 #usr/lib/collectd/statsd.la
 usr/lib/collectd/statsd.so
 #usr/lib/collectd/swap.la
