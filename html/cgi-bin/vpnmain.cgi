@@ -2,7 +2,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2022  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -200,27 +200,6 @@ sub cleanssldatabase {
 	unlink ("${General::swroot}/certs/index.txt.old");
 	unlink ("${General::swroot}/certs/index.txt.attr.old");
 	unlink ("${General::swroot}/certs/serial.old");
-	unlink ("${General::swroot}/certs/01.pem");
-}
-sub newcleanssldatabase {
-	if (! -s "${General::swroot}/certs/serial" ) {
-		open(FILE, ">${General::swroot}/certs/serial");
-		print FILE "01";
-		close FILE;
-	}
-	if (! -s ">${General::swroot}/certs/index.txt") {
-		open(FILE, ">${General::swroot}/certs/index.txt");
-		close(FILE);
-	}
-	if (! -s ">${General::swroot}/certs/index.txt.attr") {
-		open(FILE, ">${General::swroot}/certs/index.txt.attr");
-		print FILE "unique_subject = yes";
-		close(FILE);
-	}
-	unlink ("${General::swroot}/certs/index.txt.old");
-	unlink ("${General::swroot}/certs/index.txt.attr.old");
-	unlink ("${General::swroot}/certs/serial.old");
-#	unlink ("${General::swroot}/certs/01.pem");		numbering evolves. Wrong place to delete
 }
 
 ###
@@ -233,7 +212,7 @@ sub callssl ($) {
 
 	if ($?) {
 		foreach my $line (split (/\n/, $retssl)) {
-			&General::log("ipsec", "$line") if (0); # 1 for verbose logging
+			&General::log("charon", "$line") if (0); # 1 for verbose logging
 			$ret .= '<br>' . &Header::escape($line);
 		}
 	}
@@ -244,26 +223,32 @@ sub callssl ($) {
 ### Obtain a CN from given cert
 ###
 sub getCNfromcert ($) {
-	#&General::log("ipsec", "Extracting name from $_[0]...");
-	my $temp = `/usr/bin/openssl x509 -text -in $_[0]`;
-	$temp =~ /Subject:.*CN\s*=\s*(.*)[\n]/;
-	$temp = $1;
-	$temp =~ s+/Email+, E+;
-	$temp =~ s/ ST = / S = /;
-	$temp =~ s/,//g;
-	$temp =~ s/\'//g;
+	#&General::log("charon", "Extracting name from $_[0]...");
+	my @output = &General::system_output("/usr/bin/openssl", "x509", "-text", "-in", "$_[0]");
+	my $temp;
+	foreach my $line (@output) {
+		$line =~ /Subject:.*CN\s*=\s*(.*)[\n]/;
+		$temp = $1;
+		$temp =~ s+/Email+, E+;
+		$temp =~ s/ ST = / S = /;
+		$temp =~ s/,//g;
+		$temp =~ s/\'//g;
+	}
 	return $temp;
 }
 ###
 ### Obtain Subject from given cert
 ###
 sub getsubjectfromcert ($) {
-	#&General::log("ipsec", "Extracting subject from $_[0]...");
-	my $temp = `/usr/bin/openssl x509 -text -in $_[0]`;
-	$temp =~ /Subject: (.*)[\n]/;
-	$temp = $1;
-	$temp =~ s+/Email+, E+;
-	$temp =~ s/ ST = / S = /;
+	#&General::log("charon", "Extracting subject from $_[0]...");
+	my @output = &General::system_output("/usr/bin/openssl", "x509", "-text", "-in", "$_[0]");
+	my $temp;
+	foreach my $line (@output) {
+		$line =~ /Subject: (.*)[\n]/;
+		$temp = $1;
+		$temp =~ s+/Email+, E+;
+		$temp =~ s/ ST = / S = /;
+	}
 	return $temp;
 }
 ###
@@ -483,7 +468,7 @@ sub writeipsecfiles {
 			$psk_line = ($lconfighash{$key}[7] ? $lconfighash{$key}[7] : $localside) . " " ;
 			$psk_line .= $lconfighash{$key}[9] ? $lconfighash{$key}[9] : $lconfighash{$key}[10]; #remoteid or remote address?
 			if ($lconfighash{$key}[40] eq 'YES') {
-				my $decoded_psk = MIME::Base64::decode_base64($lconfighash{$key}[5]);
+				my $decoded_psk = &MIME::Base64::decode_base64($lconfighash{$key}[5]);
 				$psk_line .= " : PSK '$decoded_psk'\n";
 			} else {
 				$psk_line .= " : PSK '$lconfighash{$key}[5]'\n";
@@ -644,8 +629,8 @@ END
 } elsif ($cgiparams{'ACTION'} eq $Lang::tr{'upload ca certificate'}) {
 	&General::readhasharray("${General::swroot}/vpn/caconfig", \%cahash);
 
-	if ($cgiparams{'CA_NAME'} !~ /^[a-zA-Z0-9]+$/) {
-		$errormessage = $Lang::tr{'name must only contain characters'};
+	if ($cgiparams{'CA_NAME'} !~ /^[a-zA-Z0-9 ]*$/) {
+		$errormessage = $Lang::tr{'ca name must only contain characters and spaces'};
 		goto UPLOADCA_ERROR;
 	}
 
@@ -883,8 +868,6 @@ END
 } elsif ($cgiparams{'ACTION'} eq $Lang::tr{'generate root/host certificates'} ||
 	$cgiparams{'ACTION'} eq $Lang::tr{'upload p12 file'}) {
 
-	&newcleanssldatabase();
-
 	if (-f "${General::swroot}/ca/cacert.pem") {
 		$errormessage = $Lang::tr{'valid root certificate already exists'};
 		goto ROOTCERT_SKIP;
@@ -906,7 +889,7 @@ END
 		}
 		$cgiparams{'ROOTCERT_COUNTRY'} = $vpnsettings{'ROOTCERT_COUNTRY'} if (!$cgiparams{'ROOTCERT_COUNTRY'});
 	} elsif ($cgiparams{'ACTION'} eq $Lang::tr{'upload p12 file'}) {
-		&General::log("ipsec", "Importing from p12...");
+		&General::log("charon", "Importing from p12...");
 
 		unless (ref ($cgiparams{'FH'})) {
 			$errormessage = $Lang::tr{'there was no file upload'};
@@ -921,7 +904,7 @@ END
 		}
 
 		# Extract the CA certificate from the file
-		&General::log("ipsec", "Extracting caroot from p12...");
+		&General::log("charon", "Extracting caroot from p12...");
 		if (open(STDIN, "-|")) {
 			my $opt = " pkcs12 -legacy -cacerts -nokeys";
 			$opt .= " -in $filename";
@@ -934,7 +917,7 @@ END
 
 		# Extract the Host certificate from the file
 		if (!$errormessage) {
-			&General::log("ipsec", "Extracting host cert from p12...");
+			&General::log("charon", "Extracting host cert from p12...");
 			if (open(STDIN, "-|")) {
 				my $opt = " pkcs12 -legacy -clcerts -nokeys";
 				$opt .= " -in $filename";
@@ -948,7 +931,7 @@ END
 
 		# Extract the Host key from the file
 		if (!$errormessage) {
-			&General::log("ipsec", "Extracting private key from p12...");
+			&General::log("charon", "Extracting private key from p12...");
 			if (open(STDIN, "-|")) {
 				my $opt = " pkcs12 -legacy -nocerts -nodes";
 				$opt .= " -in $filename";
@@ -961,21 +944,21 @@ END
 		}
 
 		if (!$errormessage) {
-			&General::log("ipsec", "Moving cacert...");
+			&General::log("charon", "Moving cacert...");
 			unless(move("/tmp/newcacert", "${General::swroot}/ca/cacert.pem")) {
 				$errormessage = "$Lang::tr{'certificate file move failed'}: $!";
 			}
 		}
 
 		if (!$errormessage) {
-			&General::log("ipsec", "Moving host cert...");
+			&General::log("charon", "Moving host cert...");
 			unless(move("/tmp/newhostcert", "${General::swroot}/certs/hostcert.pem")) {
 				$errormessage = "$Lang::tr{'certificate file move failed'}: $!";
 			}
 		}
 
 		if (!$errormessage) {
-			&General::log("ipsec", "Moving private key...");
+			&General::log("charon", "Moving private key...");
 			unless(move("/tmp/newhostkey", "${General::swroot}/certs/hostkey.pem")) {
 				$errormessage = "$Lang::tr{'certificate file move failed'}: $!";
 			}
@@ -997,8 +980,7 @@ END
 		# the private key for this CAROOT
 		# IPFire can only import certificates
 
-		&General::log("ipsec", "p12 import completed!");
-		&cleanssldatabase();
+		&General::log("charon", "p12 import completed!");
 		goto ROOTCERT_SUCCESS;
 
 	} elsif ($cgiparams{'ROOTCERT_COUNTRY'} ne '') {
@@ -1083,7 +1065,7 @@ END
 
 		# Create the CA certificate
 		if (!$errormessage) {
-			&General::log("ipsec", "Creating cacert...");
+			&General::log("charon", "Creating cacert...");
 			if (open(STDIN, "-|")) {
 				my $opt = " req -x509 -sha256 -nodes";
 				$opt .= " -days 3650";
@@ -1106,7 +1088,7 @@ END
 
 		# Create the Host certificate request
 		if (!$errormessage) {
-			&General::log("ipsec", "Creating host cert...");
+			&General::log("charon", "Creating host cert...");
 			if (open(STDIN, "-|")) {
 				my $opt = " req -sha256 -nodes";
 				$opt .= " -newkey rsa:4096";
@@ -1129,7 +1111,7 @@ END
 
 		# Sign the host certificate request
 		if (!$errormessage) {
-			&General::log("ipsec", "Self signing host cert...");
+			&General::log("charon", "Self signing host cert...");
 
 			#No easy way for specifying the contain of subjectAltName without writing a config file...
 			my ($fh, $v3extname) = tempfile ('/tmp/XXXXXXXX');
@@ -1156,7 +1138,7 @@ END
 
 		# Create an empty CRL
 		if (!$errormessage) {
-			&General::log("ipsec", "Creating emptycrl...");
+			&General::log("charon", "Creating emptycrl...");
 			my $opt = " ca -gencrl";
 			$opt .= " -out ${General::swroot}/crls/cacrl.pem";
 			$errormessage = &callssl ($opt);
@@ -1164,7 +1146,6 @@ END
 
 		# Successfully build CA / CERT!
 		if (!$errormessage) {
-			&cleanssldatabase();
 			goto ROOTCERT_SUCCESS;
 		}
 
@@ -1614,17 +1595,25 @@ END
 	&General::readhash("${General::swroot}/vpn/settings", \%vpnsettings);
 	&General::readhasharray("${General::swroot}/vpn/config", \%confighash);
 
-	if ($confighash{$cgiparams{'KEY'}}) {
-		unlink ("${General::swroot}/certs/$confighash{$cgiparams{'KEY'}}[1]cert.pem");
-		unlink ("${General::swroot}/certs/$confighash{$cgiparams{'KEY'}}[1].p12");
-		delete $confighash{$cgiparams{'KEY'}};
-		&General::writehasharray("${General::swroot}/vpn/config", \%confighash);
-		&writeipsecfiles();
-		&General::system('/usr/local/bin/ipsecctrl', 'D', $cgiparams{'KEY'}) if (&vpnenabled);
-	} else {
-		$errormessage = $Lang::tr{'invalid key'};
-	}
-	&General::firewall_reload();
+        if ($confighash{$cgiparams{'KEY'}}) {
+                # Revoke the removed certificate
+                if (!$errormessage) {
+                        &General::log("charon", "Revoking the removed client cert...");
+                        my $opt = " ca -revoke ${General::swroot}/certs/$confighash{$cgiparams{'KEY'}}[1]cert.pem";
+                        $errormessage = &callssl($opt);
+                        unlink ("${General::swroot}/certs/$confighash{$cgiparams{'KEY'}}[1]cert.pem");
+                        unlink ("${General::swroot}/certs/$confighash{$cgiparams{'KEY'}}[1].p12");
+                        delete $confighash{$cgiparams{'KEY'}};
+                        &General::writehasharray("${General::swroot}/vpn/config", \%confighash);
+                        &writeipsecfiles();
+                        &General::system('/usr/local/bin/ipsecctrl', 'D', $cgiparams{'KEY'}) if (&vpnenabled);
+                } else {
+                        goto VPNCONF_ERROR;
+                }
+        } else {
+                $errormessage = $Lang::tr{'invalid key'};
+        }
+        &General::firewall_reload();
 ###
 ### Choose between adding a host-net or net-net connection
 ###
@@ -1673,6 +1662,10 @@ END
 		$cgiparams{'TYPE'}				= $confighash{$cgiparams{'KEY'}}[3];
 		$cgiparams{'AUTH'}				= $confighash{$cgiparams{'KEY'}}[4];
 		$cgiparams{'PSK'}				= $confighash{$cgiparams{'KEY'}}[5];
+		# Decode the PSK if it is base64-encoded
+		if ($cgiparams{'PSK'} && $confighash{$cgiparams{'KEY'}}[40] eq 'YES') {
+			$cgiparams{'PSK'} = &MIME::Base64::decode_base64($cgiparams{'PSK'});
+		}
 		$cgiparams{'LOCAL'}				= $confighash{$cgiparams{'KEY'}}[6];
 		$cgiparams{'LOCAL_ID'}			= $confighash{$cgiparams{'KEY'}}[7];
 		my @local_subnets = split(",", $confighash{$cgiparams{'KEY'}}[8]);
@@ -1890,7 +1883,6 @@ END
 		}
 
 		if ($cgiparams{'AUTH'} eq 'psk') {
-			$cgiparams{'BASE_64'} = 'YES';
 			if (! length($cgiparams{'PSK'}) ) {
 				$errormessage = $Lang::tr{'pre-shared key is too short'};
 				goto VPNCONF_ERROR;
@@ -1918,7 +1910,7 @@ END
 		}
 
 		# Sign the certificate request
-		&General::log("ipsec", "Signing your cert $cgiparams{'NAME'}...");
+		&General::log("charon", "Signing your cert $cgiparams{'NAME'}...");
 		my $opt = " ca -md sha256 -days 825";
 		$opt .= " -batch -notext";
 		$opt .= " -in $filename";
@@ -1927,11 +1919,9 @@ END
 		if ( $errormessage = &callssl ($opt) ) {
 			unlink ($filename);
 			unlink ("${General::swroot}/certs/$cgiparams{'NAME'}cert.pem");
-			&cleanssldatabase();
 			goto VPNCONF_ERROR;
 		} else {
 			unlink ($filename);
-			&cleanssldatabase();
 		}
 
 		$cgiparams{'CERT_NAME'} = getCNfromcert ("${General::swroot}/certs/$cgiparams{'NAME'}cert.pem");
@@ -1940,7 +1930,7 @@ END
 			goto VPNCONF_ERROR;
 		}
 	} elsif ($cgiparams{'AUTH'} eq 'pkcs12') {
-		&General::log("ipsec", "Importing from p12...");
+		&General::log("charon", "Importing from p12...");
 
 		unless (ref ($cgiparams{'FH'})) {
 			$errormessage = $Lang::tr{'there was no file upload'};
@@ -1955,7 +1945,7 @@ END
 		}
 
 		# Extract the CA certificate from the file
-		&General::log("ipsec", "Extracting caroot from p12...");
+		&General::log("charon", "Extracting caroot from p12...");
 		if (open(STDIN, "-|")) {
 			my $opt = " pkcs12 -legacy -cacerts -nokeys";
 			$opt .= " -in $filename";
@@ -1968,7 +1958,7 @@ END
 
 		# Extract the Host certificate from the file
 		if (!$errormessage) {
-			&General::log("ipsec", "Extracting host cert from p12...");
+			&General::log("charon", "Extracting host cert from p12...");
 			if (open(STDIN, "-|")) {
 				my $opt = " pkcs12 -legacy -clcerts -nokeys";
 				$opt .= " -in $filename";
@@ -1981,7 +1971,7 @@ END
 		}
 
 		if (!$errormessage) {
-			&General::log("ipsec", "Moving cacert...");
+			&General::log("charon", "Moving cacert...");
 			#If CA have new subject, add it to our list of CA
 			my $casubject = &Header::cleanhtml(getsubjectfromcert ('/tmp/newcacert'));
 			my @names;
@@ -2015,7 +2005,7 @@ END
 			}
 		}
 		if (!$errormessage) {
-			&General::log("ipsec", "Moving host cert...");
+			&General::log("charon", "Moving host cert...");
 			unless(move("/tmp/newhostcert", "${General::swroot}/certs/$cgiparams{'NAME'}cert.pem")) {
 				$errormessage = "$Lang::tr{'certificate file move failed'}: $!";
 			}
@@ -2030,7 +2020,7 @@ END
 			unlink ("${General::swroot}/certs/$cgiparams{'NAME'}cert.pem");
 			goto VPNCONF_ERROR;
 		}
-		&General::log("ipsec", "p12 import completed!");
+		&General::log("charon", "p12 import completed!");
 	} elsif ($cgiparams{'AUTH'} eq 'certfile') {
 		if ($cgiparams{'KEY'}) {
 			$errormessage = $Lang::tr{'cant change certificates'};
@@ -2048,7 +2038,7 @@ END
 		}
 
 		# Verify the certificate has a valid CA and move it
-		&General::log("ipsec", "Validating imported cert against our known CA...");
+		&General::log("charon", "Validating imported cert against our known CA...");
 		my $validca = 1; #assume ok
 		my @test = &General::system_output("/usr/bin/openssl", "verify", "-CAfile", "${General::swroot}/ca/cacert.pem", "$filename");
 		if (! grep(/: OK/, @test)) {
@@ -2142,6 +2132,10 @@ END
 			$errormessage = $Lang::tr{'password too short'};
 			goto VPNCONF_ERROR;
 		}
+		if ($cgiparams{'CERT_PASS1'} =~ /["]/) {
+			$errormessage = $Lang::tr{'password has quotation mark'};
+			goto VPNCONF_ERROR;
+		}
 		if ($cgiparams{'CERT_PASS1'} ne $cgiparams{'CERT_PASS2'}) {
 			$errormessage = $Lang::tr{'passwords do not match'};
 			goto VPNCONF_ERROR;
@@ -2153,7 +2147,7 @@ END
 		(my $state = $cgiparams{'CERT_STATE'}) =~ s/^\s*$/\./;
 
 		# Create the Client certificate request
-		&General::log("ipsec", "Creating a cert...");
+		&General::log("charon", "Creating a cert...");
 
 		if (open(STDIN, "-|")) {
 			my $opt = " req -nodes";
@@ -2180,7 +2174,7 @@ END
 		}
 
 		# Sign the client certificate request
-		&General::log("ipsec", "Signing the cert $cgiparams{'NAME'}...");
+		&General::log("charon", "Signing the cert $cgiparams{'NAME'}...");
 
 		#No easy way for specifying the contain of subjectAltName without writing a config file...
 		my ($fh, $v3extname) = tempfile ('/tmp/XXXXXXXX');
@@ -2210,16 +2204,15 @@ END
 		} else {
 			unlink ($v3extname);
 			unlink ("${General::swroot}/certs/$cgiparams{'NAME'}req.pem");
-			&cleanssldatabase();
 		}
 
 		# Create the pkcs12 file
-		&General::log("ipsec", "Packing a pkcs12 file...");
+		&General::log("charon", "Packing a pkcs12 file...");
 		$opt = " pkcs12 -legacy -export";
 		$opt .= " -inkey ${General::swroot}/certs/$cgiparams{'NAME'}key.pem";
 		$opt .= " -in ${General::swroot}/certs/$cgiparams{'NAME'}cert.pem";
 		$opt .= " -name \"$cgiparams{'NAME'}\"";
-		$opt .= " -passout pass:$cgiparams{'CERT_PASS1'}";
+		$opt .= " -passout pass:\"$cgiparams{'CERT_PASS1'}\"";
 		$opt .= " -certfile ${General::swroot}/ca/cacert.pem";
 		$opt .= " -caname \"$vpnsettings{'ROOTCERT_ORGANIZATION'} CA\"";
 		$opt .= " -out ${General::swroot}/certs/$cgiparams{'NAME'}.p12";
@@ -2258,7 +2251,7 @@ END
 	my $key = $cgiparams{'KEY'};
 	if (! $key) {
 		$key = &General::findhasharraykey (\%confighash);
-		foreach my $i (0 .. 39) { $confighash{$key}[$i] = "";}
+		foreach my $i (0 .. 40) { $confighash{$key}[$i] = "";}
 	}
 	$confighash{$key}[0] = $cgiparams{'ENABLED'};
 	$confighash{$key}[1] = $cgiparams{'NAME'};
@@ -2268,13 +2261,10 @@ END
 	$confighash{$key}[3] = $cgiparams{'TYPE'};
 	if ($cgiparams{'AUTH'} eq 'psk') {
 		$confighash{$key}[4] = 'psk';
-		if ($cgiparams{'BASE_64'} eq 'YES') {
-			$confighash{$key}[5] = MIME::Base64::encode_base64($cgiparams{'PSK'}, "");
-			$confighash{$key}[40] = 'YES';
-		} else {
-			$confighash{$key}[5] = $cgiparams{'PSK'};
-			$confighash{$key}[40] = '';
-		}
+
+		# Always store the PSK base64-encoded, even if it wasn't base64 before
+		$confighash{$key}[5] = &MIME::Base64::encode_base64($cgiparams{'PSK'}, "");
+		$confighash{$key}[40] = 'YES';
 	} else {
 		$confighash{$key}[4] = 'cert';
 	}
@@ -2382,13 +2372,13 @@ END
 	$cgiparams{'REMOTE_ID'} = '';
 
 	#use default advanced value
-	$cgiparams{'IKE_ENCRYPTION'}	= 'chacha20poly1305|aes256gcm128|aes256gcm96|aes256gcm64|aes256|aes192gcm128|aes192gcm96|aes192gcm64|aes192|aes128gcm128|aes128gcm96|aes128gcm64|aes128'; #[18];
+	$cgiparams{'IKE_ENCRYPTION'}		= 'chacha20poly1305|aes256gcm128|aes256'; #[18];
 	$cgiparams{'IKE_INTEGRITY'}		= 'sha2_512|sha2_256'; #[19];
-	$cgiparams{'IKE_GROUPTYPE'}             = 'curve448|curve25519|e521|e384|4096|3072'; #[20];
+	$cgiparams{'IKE_GROUPTYPE'}             = 'x25519-ke1_mlkem1024|x25519-ke1_mlkem768|x25519-ke1_mlkem512|curve448|curve25519|e521|e384|4096|3072'; #[20];
 	$cgiparams{'IKE_LIFETIME'}		= '3'; #[16];
-	$cgiparams{'ESP_ENCRYPTION'}	= 'chacha20poly1305|aes256gcm128|aes256gcm96|aes256gcm64|aes256|aes192gcm128|aes192gcm96|aes192gcm64|aes192|aes128gcm128|aes128gcm96|aes128gcm64|aes128'; #[21];
+	$cgiparams{'ESP_ENCRYPTION'}		= 'chacha20poly1305|aes256gcm128|aes256'; #[21];
 	$cgiparams{'ESP_INTEGRITY'}		= 'sha2_512|sha2_256'; #[22];
-	$cgiparams{'ESP_GROUPTYPE'}             = 'curve448|curve25519|e521|e384|4096|3072'; #[23];
+	$cgiparams{'ESP_GROUPTYPE'}             = 'x25519-ke1_mlkem1024|x25519-ke1_mlkem768|x25519-ke1_mlkem512|curve448|curve25519|e521|e384|4096|3072'; #[23];
 	$cgiparams{'ESP_KEYLIFE'}		= '1'; #[17];
 	$cgiparams{'COMPRESSION'}		= 'off'; #[13];
 	$cgiparams{'ONLY_PROPOSED'}		= 'on'; #[24];
@@ -2769,7 +2759,7 @@ if(($cgiparams{'ACTION'} eq $Lang::tr{'advanced'}) ||
 			goto ADVANCED_ERROR;
 		}
 		foreach my $val (@temp) {
-			if ($val !~ /^(curve448|curve25519|e521|e384|e256|e224|e192|e512bp|e384bp|e256bp|e224bp|768|1024|1536|2048|3072|4096|6144|8192)$/) {
+			if ($val !~ /^(x25519-ke1_mlkem(1024|768|512)|curve448|curve25519|e521|e384|e256|e224|e192|e512bp|e384bp|e256bp|e224bp|768|1024|1536|2048|3072|4096|6144|8192)$/) {
 				$errormessage = $Lang::tr{'invalid input'};
 				goto ADVANCED_ERROR;
 			}
@@ -2810,7 +2800,7 @@ if(($cgiparams{'ACTION'} eq $Lang::tr{'advanced'}) ||
 			goto ADVANCED_ERROR;
 		}
 		foreach my $val (@temp) {
-			if ($val !~ /^(curve448|curve25519|e521|e384|e256|e224|e192|e512bp|e384bp|e256bp|e224bp|768|1024|1536|2048|3072|4096|6144|8192|none)$/) {
+			if ($val !~ /^(x25519-ke1_mlkem(1024|768|512)|curve448|curve25519|e521|e384|e256|e224|e192|e512bp|e384bp|e256bp|e224bp|768|1024|1536|2048|3072|4096|6144|8192|none)$/) {
 				$errormessage = $Lang::tr{'invalid input'};
 				goto ADVANCED_ERROR;
 			}
@@ -2950,6 +2940,9 @@ if(($cgiparams{'ACTION'} eq $Lang::tr{'advanced'}) ||
 	$checked{'IKE_INTEGRITY'}{'aesxcbc'} = '';
 	@temp = split('\|', $cgiparams{'IKE_INTEGRITY'});
 	foreach my $key (@temp) {$checked{'IKE_INTEGRITY'}{$key} = "selected='selected'"; }
+	$checked{'IKE_GROUPTYPE'}{'x25519-ke1_mlkem1024'} = '';
+	$checked{'IKE_GROUPTYPE'}{'x25519-ke1_mlkem768'} = '';
+	$checked{'IKE_GROUPTYPE'}{'x25519-ke1_mlkem512'} = '';
 	$checked{'IKE_GROUPTYPE'}{'curve448'} = '';
 	$checked{'IKE_GROUPTYPE'}{'curve25519'} = '';
 	$checked{'IKE_GROUPTYPE'}{'768'} = '';
@@ -2990,6 +2983,9 @@ if(($cgiparams{'ACTION'} eq $Lang::tr{'advanced'}) ||
 	$checked{'ESP_INTEGRITY'}{'aesxcbc'} = '';
 	@temp = split('\|', $cgiparams{'ESP_INTEGRITY'});
 	foreach my $key (@temp) {$checked{'ESP_INTEGRITY'}{$key} = "selected='selected'"; }
+	$checked{'ESP_GROUPTYPE'}{'x25519-ke1_mlkem1024'} = '';
+	$checked{'ESP_GROUPTYPE'}{'x25519-ke1_mlkem768'} = '';
+	$checked{'ESP_GROUPTYPE'}{'x25519-ke1_mlkem512'} = '';
 	$checked{'ESP_GROUPTYPE'}{'curve448'} = '';
 	$checked{'ESP_GROUPTYPE'}{'curve25519'} = '';
 	$checked{'ESP_GROUPTYPE'}{'768'} = '';
@@ -3155,6 +3151,9 @@ if(($cgiparams{'ACTION'} eq $Lang::tr{'advanced'}) ||
 			<td class='boldbase' width="15%">$Lang::tr{'grouptype'}</td>
 			<td class='boldbase'>
 				<select name='IKE_GROUPTYPE' multiple='multiple' size='6' style='width: 100%'>
+					<option value='x25519-ke1_mlkem1024' $checked{'IKE_GROUPTYPE'}{'x25519-ke1_mlkem1024'}>Curve 25519 x ML-KEM 1024 (256 bit)</option>
+					<option value='x25519-ke1_mlkem768' $checked{'IKE_GROUPTYPE'}{'x25519-ke1_mlkem768'}>Curve 25519 x ML-KEM 768 (192 bit)</option>
+					<option value='x25519-ke1_mlkem512' $checked{'IKE_GROUPTYPE'}{'x25519-ke1_mlkem512'}>Curve 25519 x ML-KEM 512 (128 bit)</option>
 					<option value='curve448' $checked{'IKE_GROUPTYPE'}{'curve448'}>Curve 448 (224 bit)</option>
 					<option value='curve25519' $checked{'IKE_GROUPTYPE'}{'curve25519'}>Curve 25519 (128 bit)</option>
 					<option value='e521' $checked{'IKE_GROUPTYPE'}{'e521'}>ECP-521 (NIST)</option>
@@ -3178,6 +3177,9 @@ if(($cgiparams{'ACTION'} eq $Lang::tr{'advanced'}) ||
 			</td>
 			<td class='boldbase'>
 				<select name='ESP_GROUPTYPE' multiple='multiple' size='6' style='width: 100%'>
+					<option value='x25519-ke1_mlkem1024' $checked{'ESP_GROUPTYPE'}{'x25519-ke1_mlkem1024'}>Curve 25519 x ML-KEM 1024 (256 bit)</option>
+					<option value='x25519-ke1_mlkem768' $checked{'ESP_GROUPTYPE'}{'x25519-ke1_mlkem768'}>Curve 25519 x ML-KEM 768 (192 bit)</option>
+					<option value='x25519-ke1_mlkem512' $checked{'ESP_GROUPTYPE'}{'x25519-ke1_mlkem512'}>Curve 25519 x ML-KEM 512 (128 bit)</option>
 					<option value='curve448' $checked{'ESP_GROUPTYPE'}{'curve448'}>Curve 448 (224 bit)</option>
 					<option value='curve25519' $checked{'ESP_GROUPTYPE'}{'curve25519'}>Curve 25519 (128 bit)</option>
 					<option value='e521' $checked{'ESP_GROUPTYPE'}{'e521'}>ECP-521 (NIST)</option>
@@ -3755,7 +3757,9 @@ sub make_algos($$$$$) {
 				if ($mode eq "ike") {
 					push(@algo, $int);
 
-					if ($grp =~ m/^e(.*)$/) {
+					if ($grp =~ m/^x25519-ke1_mlkem(\d+)$/) {
+						push(@algo, "$grp");
+					} elsif ($grp =~ m/^e(.*)$/) {
 						push(@algo, "ecp$1");
 					} elsif ($grp =~ m/curve(448|25519)/) {
 						push(@algo, "$grp");
@@ -3772,6 +3776,8 @@ sub make_algos($$$$$) {
 
 					if (!$pfs || $grp eq "none") {
 						# noop
+					} elsif ($grp =~ m/^x25519-ke1_mlkem(\d+)$/) {
+						push(@algo, "$grp");
 					} elsif ($grp =~ m/^e(.*)$/) {
 						push(@algo, "ecp$1");
 					} elsif ($grp =~ m/curve(448|25519)/) {
@@ -3811,7 +3817,7 @@ sub make_subnets($$) {
 sub regenerate_host_certificate() {
 	my $errormessage = "";
 
-	&General::log("ipsec", "Regenerating host certificate...");
+	&General::log("charon", "Regenerating host certificate...");
 
 	# Create a CSR based on the existing certificate
 	my $opt = " x509 -x509toreq -copy_extensions copyall";
@@ -3822,7 +3828,7 @@ sub regenerate_host_certificate() {
 
 	# Revoke the old certificate
 	if (!$errormessage) {
-		&General::log("ipsec", "Revoking the old host cert...");
+		&General::log("charon", "Revoking the old host cert...");
 
 		my $opt = " ca -revoke ${General::swroot}/certs/hostcert.pem";
 		$errormessage = &callssl($opt);
@@ -3830,7 +3836,7 @@ sub regenerate_host_certificate() {
 
 	# Sign the host certificate request
 	if (!$errormessage) {
-		&General::log("ipsec", "Self signing host cert...");
+		&General::log("charon", "Self signing host cert...");
 
 		my $opt = " ca -md sha256 -days 825";
 		$opt .= " -batch -notext";
