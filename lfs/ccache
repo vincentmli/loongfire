@@ -2,6 +2,7 @@
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
 # Copyright (C) 2007-2020  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2026 LoongFire Team  <vincent.mc.li@gmail.com>                #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -31,14 +32,6 @@ DL_FILE    = $(THISAPP).tar.xz
 DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)-tools
-
-# Only for TOOLCHAIN == 1 and BUILD_ARCH == loongarch64
-ifeq "$(TOOLCHAIN)" "1"
- ifeq "$(BUILD_ARCH)" "loongarch64"
-	CFLAGS += -Wl,--dynamic-linker=$(TOOLS_DIR)/lib64/ld-linux-loongarch-lp64d.so.1
-	LDFLAGS += -Wl,--dynamic-linker=$(TOOLS_DIR)/lib64/ld-linux-loongarch-lp64d.so.1
- endif
-endif
 
 ###############################################################################
 # Top-level Rules
