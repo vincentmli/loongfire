@@ -275,7 +275,6 @@ sub closepage () {
 	open(FILE, "</etc/system-release");
 	my $system_release = <FILE>;
 	$system_release =~ s/core/$Lang::tr{'core update'} /;
-	$system_release =~ s/IPFire/LoongFire/;
 	close(FILE);
 
 print <<END;
