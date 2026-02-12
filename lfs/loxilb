@@ -73,6 +73,10 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar zxf $(DIR_DL)/$(DL_FILE)
 	@rm -rf /opt/loxilb 
 
+ifeq "$(BUILD_ARCH)" "x86_64"
+	cp -rvf $(DIR_SRC)/src/patches/stubs-32.h /usr/include/gnu/
+endif
+
 	cd $(DIR_APP) && mkdir -p /opt/loxilb/dp 
 	cd $(DIR_APP) && make
 	cd $(DIR_APP)/loxilb-ebpf/kernel && cp -f *.o /opt/loxilb/
