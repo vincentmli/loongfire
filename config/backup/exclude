@@ -8,3 +8,4 @@ var/ipfire/proxy/calamaris/bin/*
 var/ipfire/qos/bin/qos.pl
 var/ipfire/suricata/oinkmaster.conf
 var/ipfire/urlfilter/blacklists/*/*.db
+var/ipfire/urlfilter/bin/*.pl
