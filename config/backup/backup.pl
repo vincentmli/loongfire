@@ -2,7 +2,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2024  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -74,6 +74,10 @@ make_backup() {
 
 restore_backup() {
 	local filename="${1}"
+
+	# stop collectd to remove the rrd ramdisk for restore and convert
+	# the rrd's
+	/etc/rc.d/init.d/collectd stop
 
 	# remove all openvpn certs to prevent old unusable
 	# certificates being left in directory after a restore
@@ -248,16 +252,61 @@ restore_backup() {
 			-out /etc/httpd/server.crt &>/dev/null
 	fi
 
-	# Remove any entry for ALIENVAULT or SPAMHAUS_EDROP from the ipblocklist modified file
+	# Remove any entry for ALIENVAULT, SPAMHAUS_EDROP or ABUSECH_BOTNETC2 from the ipblocklist modified file
 	# and the associated ipblocklist files from the /var/lib/ipblocklist directory
 	sed -i '/ALIENVAULT=/d' /var/ipfire/ipblocklist/modified
 	sed -i '/SPAMHAUS_EDROP=/d' /var/ipfire/ipblocklist/modified
+	sed -i '/ABUSECH_BOTNETC2=/d' /var/ipfire/ipblocklist/modified
 	if [ -e /var/lib/ipblocklist/ALIENVAULT.conf ]; then
 		rm /var/lib/ipblocklist/ALIENVAULT.conf
 	fi
 	if [ -e /var/lib/ipblocklist/SPAMHAUS_EDROP.conf ]; then
 		rm /var/lib/ipblocklist/SPAMHAUS_EDROP.conf
 	fi
+	if [ -e /var/lib/ipblocklist/ABUSECH_BOTNETC2.conf ]; then
+		rm /var/lib/ipblocklist/ABUSECH_BOTNETC2.conf
+	fi
+
+	# The collectd directory structure was changed but not all changes
+	# are done by the official migration script generator
+	for i in $(seq 0 63);
+	do
+		if [ -e /var/log/rrd/collectd/localhost/cpufreq/cpufreq-$i.rrd ]; then
+			mkdir -p /var/log/rrd/collectd/localhost/cpufreq-$i
+			mv -f /var/log/rrd/collectd/localhost/cpufreq/cpufreq-$i.rrd \
+				/var/log/rrd/collectd/localhost/cpufreq-$i/cpufreq.rrd
+		fi
+		if [ -e /var/log/rrd/collectd/localhost/thermal-thermal_zone$i/temperature-temperature.rrd ]; then
+			mv -f /var/log/rrd/collectd/localhost/thermal-thermal_zone$i/temperature-temperature.rrd \
+			/var/log/rrd/collectd/localhost/thermal-thermal_zone$i/temperature.rrd
+	fi
+	done
+
+	# Create collectd 4.x to 5.x migration script from rrd contents, run the script that
+	# was created and then remove the old interface directory if it is present as it will
+	# be empty after the migration has been carried out.
+	/var/ipfire/collectd-migrate-4-to-5.pl --indir /var/log/rrd/ > /tmp/rrd-migrate.sh
+	sh /tmp/rrd-migrate.sh >/dev/null 2>&1
+
+	# Run old collectd cleanup only if the interface dir exist to prevent cleanup of
+	# new devices if the user have reenabled it and restore a backup
+	if [ -d /var/log/rrd/collectd/localhost/interface ]; then
+		rm -rf \
+			/var/log/rrd/collectd/localhost/cpufreq \
+			/var/log/rrd/collectd/localhost/disk-loop* \
+			/var/log/rrd/collectd/localhost/disk-sg* \
+			/var/log/rrd/collectd/localhost/disk-sr* \
+			/var/log/rrd/collectd/localhost/disk-ram* \
+			/var/log/rrd/collectd/localhost/interface \
+			/var/log/rrd/collectd/localhost/iptables-filter-HOSTILE \
+			/var/log/rrd/collectd/localhost/iptables-filter-HOSTILE_DROP \
+			/var/log/rrd/collectd/localhost/processes* \
+			/var/log/rrd/collectd/localhost/thermal-cooling_device*
+	fi
+
+	# start collectd after restore
+	/etc/rc.d/init.d/collectd start
+
 	return 0
 }
 
