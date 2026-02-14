@@ -61,7 +61,7 @@
 'Captive voucher' => '优惠卷',
 'Captive vouchervalid' => '此优惠券的允许时间',
 'Captive vout' => '已发行凭证',
-'Captive wrong ext' => '上传的文件类型错误',
+'Captive wrong type' => '上传的文件类型错误',
 'Choose Rule' => '选择以下规则中的<u>一个</u>。',
 'Class' => 'Class',
 'Class was deleted' => '具有潜在子类的类别被删除',
