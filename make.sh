@@ -1980,7 +1980,7 @@ fi
 	lfsmake2 aws-cli
 	lfsmake2 oci-python-sdk
 	lfsmake2 oci-cli
-	lfsmake2 transmission
+	#lfsmake2 transmission
 	lfsmake2 mtr
 	#lfsmake2 minidlna
 	lfsmake2 acpid
