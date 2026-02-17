@@ -1793,6 +1793,7 @@ fi
 	lfsmake2 intltool
 	lfsmake2 libdaemon
 	lfsmake2 avahi
+	lfsmake2 libtalloc
 	lfsmake2 cifs-utils
 	lfsmake2 krb5
 	lfsmake2 rpcsvc-proto
@@ -2028,7 +2029,6 @@ fi
 	lfsmake2 libpciaccess
 	lfsmake2 libyajl
 	lfsmake2 libvirt
-	lfsmake2 libtalloc
 	lfsmake2 freeradius
 	lfsmake2 perl-common-sense
 	lfsmake2 perl-inotify2
