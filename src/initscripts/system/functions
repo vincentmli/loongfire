@@ -369,7 +369,7 @@ pidofproc()
 		for pid in ${lpids}
 		do
 			if [ "${pid}" -ne "$$" -a "${pid}" -ne "${PPID}" ]; then
-				kill -0 "${pid}" > /dev/null &&
+				kill -0 "${pid}" 2> /dev/null &&
 				pidlist="${pidlist} ${pid}"
 			fi
 			
@@ -620,7 +620,11 @@ killproc()
 	done
 
 	if [ -z "${killsig}" ];	then
-		pidofproc -s "${1}"
+		if [ -z "${pidfile}" ];	then
+			pidofproc -s "${1}"
+		else
+			pidofproc -s -p "${pidfile}" "${1}"
+		fi
 
 		# Program was terminated
 		if [ "$?" != "0" ]; then
@@ -899,7 +903,6 @@ readhash() {
 
 	local line
 	while read -r line; do
-
 		# Skip Blank Lines
 		if [[ ${line} =~ ^[[:space:]]*$ ]]; then
 			continue
@@ -910,30 +913,22 @@ readhash() {
 			continue
 		fi
 
-		# Skip lines without a =
-		if ! [[ ${line} =~ [^=]*=[^=]*$ ]]; then
+		# Check for a valid key followed by =
+		if ! [[ ${line} =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; then
 			echo "Invalid line '${line}'" >&2
 			continue
 		fi
 
-		local key="${line%=*}"
+		local key="${line%%=*}"
 		local val="${line#*=}"
 
-		# Skip lines with an invalid key
-		if ! [[ ${key} =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
-			echo "Invalid key '${key}'" >&2
-			continue
-		fi
-
-		# Skip lines with invalid values
-		if ! [[ ${val} =~ ^[\'][\ A-Za-z0-9=/,.:%_@#+-]*[\']$ ]] && ! [[ ${val} =~ ^[A-Za-z0-9=/,.:%_@#+-]*$ ]]; then
-			echo "Invalid value '${val}' for key '${key}'" >&2
-			continue
-		fi
-
 		# strip leading and trailing single quotes
-		val="${val#\'}"
-		val="${val%\'}"
+		case "${val}" in
+			\'*\')
+				val="${val#\'}"
+				val="${val%\'}"
+				;;
+		esac
 
 		printf -v "${array}[${key}]" "%s" "${val}"
 	done < "${file}"
