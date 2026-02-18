@@ -1797,6 +1797,7 @@ fi
 	lfsmake2 cifs-utils
 	lfsmake2 krb5
 	lfsmake2 rpcsvc-proto
+	lfsmake2 lmdb
 	lfsmake2 samba
 	lfsmake2 netatalk
 	lfsmake2 sudo
@@ -2044,7 +2045,6 @@ fi
 	#lfsmake2 shairport-sync
 	lfsmake2 libxxhash
 	lfsmake2 borgbackup
-	lfsmake2 lmdb
 	lfsmake2 spectre-meltdown-checker
 	lfsmake2 zabbix_agentd
 	lfsmake2 flashrom
