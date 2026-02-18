@@ -72,7 +72,9 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 
 	mkdir -p /lib/firmware
-	cd $(DIR_APP) && make install
+	cd $(DIR_APP) && make install || true
+
+	find /lib/firmware -xtype l -delete
 
 	# Hardlink any identical files
 	hardlink -c -vv /lib/firmware
