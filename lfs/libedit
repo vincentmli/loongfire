@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2024  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 20240517-3.1
+VER        = 20250104-3.1
 
 THISAPP    = libedit-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -40,7 +40,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 6326a428204c020864b47db938973a13afb3580f9bb4e7b4d3cb861743c75e1cee99b569cb2baad3e1c7d6dc6986af5282492b5dd9f421a8243bf1d583a87e15
+$(DL_FILE)_BLAKE2 = 21fe2971fa85e75d988b6c3ec2a8cb30afbb6f73f9f06ce8b3aed7f0edb47df576cac57e231073dcc430dec65c8a1043501fe069b84bae12f250047839f65d93
 
 install : $(TARGET)
 
@@ -73,13 +73,11 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar zxf $(DIR_DL)/$(DL_FILE)
-	cd $(DIR_APP) && ./configure	\
-		--prefix=/usr		\
-		--enable-static=no
-
+	cd $(DIR_APP) && ./configure \
+				--prefix=/usr \
+				--enable-static=no
 	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install
-
 	@rm -rf $(DIR_APP)
 	@$(POSTBUILD)
 
