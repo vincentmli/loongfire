@@ -1860,9 +1860,7 @@ fi
 	lfsmake2 spice
 	lfsmake2 sdl2
 	lfsmake2 libusbredir
-if [ "${BUILD_ARCH}" == "x86_64" ]; then
 	lfsmake2 libseccomp
-fi
 	lfsmake2 libslirp
 	lfsmake2 dtc
 	#lfsmake2 qemu

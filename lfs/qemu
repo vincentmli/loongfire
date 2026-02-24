@@ -37,7 +37,7 @@ TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = qemu
 PAK_VER    = 44
 
-DEPS       = alsa libusbredir spice libseccomp libslirp
+DEPS       = alsa libusbredir spice libslirp
 
 SERVICES   =
 
