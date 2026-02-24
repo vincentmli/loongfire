@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2023  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -24,20 +24,12 @@
 
 include Config
 
-SUMMARY    = D-Bus Message Bus System
-
-VER        = 1.14.10
+VER        = 1.16.2
 THISAPP    = dbus-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
 DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
-PROG       = dbus
-PAK_VER    = 11
-
-DEPS       =
-
-SERVICES   = messagebus
 
 ###############################################################################
 # Top-level Rules
@@ -47,7 +39,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = f605b0810dcde6a0753384927131e7f4675be737ad7506a51261717c2622e74b99ac33cc2c199b98e5aa6b9d7c68ef692b8ee9f684f6fdab8d06c6fa861a6f6b
+$(DL_FILE)_BLAKE2 = ddca8abdd5df70b24d51293a262cda3f9e69681b31ae8bb560a6286ca6f2dc0c420dc5322a61bb142a77b2b5f86bdafcc6bf84b0d78af9610af7a78763b8b8fb
 
 install : $(TARGET)
 
@@ -81,16 +73,19 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_SRC)/dbus*
 	cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
-	cd $(DIR_APP) && ./configure \
-				--prefix=/usr \
-				--sysconfdir=/etc \
-				--localstatedir=/var \
-				--disable-static
-	cd $(DIR_APP) && make $(MAKETUNING)
-	cd $(DIR_APP) && make install
+	cd $(DIR_APP) && meson setup \
+				-D prefix=/usr \
+				-D sysconfdir=/etc \
+				-D localstatedir=/var \
+				-D default_library=shared \
+				-D systemd=disabled \
+				builddir/
+	cd $(DIR_APP) && ninja -C builddir/ $(MAKETUNING)
+	cd $(DIR_APP) && ninja -C builddir/ install
 
-	#install initscripts
-	$(call INSTALL_INITSCRIPTS,$(SERVICES))
+	# Fix permissions of the launch helper
+	chown root:messagebus /usr/libexec/dbus-daemon-launch-helper
+	chmod 4750 /usr/libexec/dbus-daemon-launch-helper
 
 	@rm -rf $(DIR_SRC)/dbus*
 	@$(POSTBUILD)

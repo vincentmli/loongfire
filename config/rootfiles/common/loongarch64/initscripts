@@ -33,6 +33,7 @@ etc/rc.d/init.d/ipsec
 etc/rc.d/init.d/leds
 etc/rc.d/init.d/lldpd
 etc/rc.d/init.d/localnet
+etc/rc.d/init.d/messagebus
 etc/rc.d/init.d/loxilb
 etc/rc.d/init.d/modules
 etc/rc.d/init.d/mountfs
@@ -120,7 +121,7 @@ etc/rc.d/rc0.d/K78suricata
 etc/rc.d/rc0.d/K79leds
 etc/rc.d/rc0.d/K80network
 etc/rc.d/rc0.d/K82wlanclient
-#etc/rc.d/rc0.d/K85messagebus
+etc/rc.d/rc0.d/K85messagebus
 etc/rc.d/rc0.d/K86unbound
 etc/rc.d/rc0.d/K87acpid
 etc/rc.d/rc0.d/K90sysklogd
@@ -135,7 +136,7 @@ etc/rc.d/rc3.d/S10sysklogd
 etc/rc.d/rc3.d/S11unbound
 etc/rc.d/rc3.d/S12acpid
 #etc/rc.d/rc3.d/S15fireinfo
-#etc/rc.d/rc3.d/S15messagebus
+etc/rc.d/rc3.d/S15messagebus
 #etc/rc.d/rc3.d/S18cpufreq
 etc/rc.d/rc3.d/S19smartenabler
 etc/rc.d/rc3.d/S19wlanclient
@@ -171,7 +172,7 @@ etc/rc.d/rc6.d/K78suricata
 etc/rc.d/rc6.d/K79leds
 etc/rc.d/rc6.d/K80network
 etc/rc.d/rc6.d/K82wlanclient
-#etc/rc.d/rc6.d/K85messagebus
+etc/rc.d/rc6.d/K85messagebus
 etc/rc.d/rc6.d/K86unbound
 etc/rc.d/rc6.d/K87acpid
 etc/rc.d/rc6.d/K90sysklogd
