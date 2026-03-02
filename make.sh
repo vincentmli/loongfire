@@ -1663,7 +1663,7 @@ fi
 	lfsmake2 fireinfo
 	lfsmake2 libnet
 	lfsmake2 libnl-3
-	lfsmake2 libidn
+	lfsmake2 libidn2
 	lfsmake2 nasm
 	lfsmake2 libexif
 	lfsmake2 libjpeg
