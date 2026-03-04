@@ -36,7 +36,7 @@ TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = ffmpeg
 PAK_VER    = 17
 
-DEPS       = sdl2 lame libvorbis xvid
+DEPS       = sdl2 lame libvorbis
 
 SERVICES   =
 

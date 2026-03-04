@@ -1822,7 +1822,6 @@ fi
 	lfsmake2 lame
 	lfsmake2 soxr
 	lfsmake2 libshout
-	lfsmake2 xvid
 	lfsmake2 gnump3d
 	lfsmake2 rsync
 	lfsmake2 rpcbind
