@@ -14,6 +14,7 @@ usr/libexec/git-core/git-annotate
 usr/libexec/git-core/git-apply
 usr/libexec/git-core/git-archimport
 usr/libexec/git-core/git-archive
+usr/libexec/git-core/git-backfill
 usr/libexec/git-core/git-bisect
 usr/libexec/git-core/git-blame
 usr/libexec/git-core/git-branch
@@ -51,6 +52,7 @@ usr/libexec/git-core/git-diagnose
 usr/libexec/git-core/git-diff
 usr/libexec/git-core/git-diff-files
 usr/libexec/git-core/git-diff-index
+usr/libexec/git-core/git-diff-pairs
 usr/libexec/git-core/git-diff-tree
 usr/libexec/git-core/git-difftool
 usr/libexec/git-core/git-difftool--helper
@@ -203,12 +205,13 @@ usr/libexec/git-core/mergetools/smerge
 usr/libexec/git-core/mergetools/tkdiff
 usr/libexec/git-core/mergetools/tortoisemerge
 usr/libexec/git-core/mergetools/vimdiff
+usr/libexec/git-core/mergetools/vscode
 usr/libexec/git-core/mergetools/winmerge
 usr/libexec/git-core/mergetools/xxdiff
 usr/libexec/git-core/scalar
+usr/share/bash-completion/completions/git
 #usr/share/git-core
 #usr/share/git-core/templates
-usr/share/git-core/templates/branches
 usr/share/git-core/templates/description
 #usr/share/git-core/templates/hooks
 usr/share/git-core/templates/hooks/applypatch-msg.sample
@@ -302,6 +305,7 @@ usr/share/git-core/templates/info/exclude
 #usr/share/gitk/lib/msgs/pt_pt.msg
 #usr/share/gitk/lib/msgs/ru.msg
 #usr/share/gitk/lib/msgs/sv.msg
+#usr/share/gitk/lib/msgs/ta.msg
 #usr/share/gitk/lib/msgs/vi.msg
 #usr/share/gitk/lib/msgs/zh_cn.msg
 #usr/share/gitweb
@@ -317,6 +321,7 @@ usr/share/git-core/templates/info/exclude
 #usr/share/locale/el/LC_MESSAGES/git.mo
 #usr/share/locale/es/LC_MESSAGES/git.mo
 #usr/share/locale/fr/LC_MESSAGES/git.mo
+#usr/share/locale/ga/LC_MESSAGES/git.mo
 #usr/share/locale/id/LC_MESSAGES/git.mo
 #usr/share/locale/is/LC_MESSAGES/git.mo
 #usr/share/locale/it/LC_MESSAGES/git.mo
