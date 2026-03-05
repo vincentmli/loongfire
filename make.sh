@@ -1822,6 +1822,7 @@ fi
 	lfsmake2 soxr
 	lfsmake2 libshout
 	lfsmake2 gnump3d
+	lfsmake2 libxxhash
 	lfsmake2 rsync
 	lfsmake2 rpcbind
 	lfsmake2 keyutils
@@ -2038,7 +2039,6 @@ fi
 	lfsmake2 libplist
 	lfsmake2 nqptp
 	#lfsmake2 shairport-sync
-	lfsmake2 libxxhash
 	lfsmake2 borgbackup
 	lfsmake2 spectre-meltdown-checker
 	lfsmake2 zabbix_agentd
