@@ -2,7 +2,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2022  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -91,8 +91,6 @@ sub get_ipset_db_file($) {
 ##   nothing - On success
 ##   not_modified - In case the servers responds with "Not modified" (304)
 ##   dl_error - If the requested blocklist could not be downloaded.
-##   empty_list - The downloaded blocklist is empty, or the parser was not able to parse
-##                it correctly.
 #
 sub download_and_create_blocklist($) {
 	my ($list) = @_;
@@ -118,13 +116,15 @@ sub download_and_create_blocklist($) {
 	use LWP::UserAgent;
 
 	# Create a user agent for downloading the blacklist
+	# Define the User Agent string
 	# Limit the download size for safety
+	my $user_agent = &General::MakeUserAgent();
 	my $ua = LWP::UserAgent->new (
 		ssl_opts => {
 			SSL_ca_file     => '/etc/ssl/cert.pem',
 			verify_hostname => 1,
 		},
-
+		agent => $user_agent,
 		max_size => $max_dl_bytes,
 	);
 
@@ -222,13 +222,6 @@ sub download_and_create_blocklist($) {
 
 		# Push the address/network to the blocklist array.
 		push(@blocklist, $address);
-	}
-
-	# Check if the content could be parsed correctly and the blocklist
-	# contains at least one item.
-	unless(@blocklist) {
-		# No entries - exit and return "empty_list".
-		return "empty_list";
 	}
 
 	# Get amount of entries in the blocklist array.
