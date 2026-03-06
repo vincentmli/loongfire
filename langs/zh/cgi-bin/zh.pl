@@ -2265,6 +2265,8 @@
 'router ip' => '路由IP地址:',
 'routing' => '路由',
 'routing table entries' => '路由表条目',
+'rss' => '常驻内存集',
+'rss long' => '常驻内存集大小'
 'rsvd dst port overlap' => '目标端口范围与为IPFire保留的端口重叠:',
 'rsvd src port overlap' => '源端口范围与为IPFire保留的端口重叠:',
 'rules already up to date' => '规则已更新',
