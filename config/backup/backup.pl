@@ -257,9 +257,9 @@ restore_backup() {
 	sed -i '/ALIENVAULT=/d' /var/ipfire/ipblocklist/modified
 	sed -i '/SPAMHAUS_EDROP=/d' /var/ipfire/ipblocklist/modified
 	sed -i '/ABUSECH_BOTNETC2=/d' /var/ipfire/ipblocklist/modified
-        sed -i '/3CORESEC_SSH=/d' /var/ipfire/ipblocklist/modified
-        sed -i '/3CORESEC_SCAN=/d' /var/ipfire/ipblocklist/modified
-        sed -i '/3CORESEC_WEB=/d' /var/ipfire/ipblocklist/modified
+	sed -i '/3CORESEC_SSH=/d' /var/ipfire/ipblocklist/modified
+	sed -i '/3CORESEC_SCAN=/d' /var/ipfire/ipblocklist/modified
+	sed -i '/3CORESEC_WEB=/d' /var/ipfire/ipblocklist/modified
 	if [ -e /var/lib/ipblocklist/ALIENVAULT.conf ]; then
 		rm /var/lib/ipblocklist/ALIENVAULT.conf
 	fi
@@ -269,15 +269,15 @@ restore_backup() {
 	if [ -e /var/lib/ipblocklist/ABUSECH_BOTNETC2.conf ]; then
 		rm /var/lib/ipblocklist/ABUSECH_BOTNETC2.conf
 	fi
-        if [ -e /var/lib/ipblocklist/3CORESEC_SSH.conf ]; then
-                rm /var/lib/ipblocklist/3CORESEC_SSH.conf
-        fi
-        if [ -e /var/lib/ipblocklist/3CORESEC_SCAN.conf ]; then
-                rm /var/lib/ipblocklist/3CORESEC_SCAN.conf
-        fi
-        if [ -e /var/lib/ipblocklist/3CORESEC_WEB.conf ]; then
-                rm /var/lib/ipblocklist/3CORESEC_WEB.conf
-        fi
+	if [ -e /var/lib/ipblocklist/3CORESEC_SSH.conf ]; then
+		rm /var/lib/ipblocklist/3CORESEC_SSH.conf
+	fi
+	if [ -e /var/lib/ipblocklist/3CORESEC_SCAN.conf ]; then
+		rm /var/lib/ipblocklist/3CORESEC_SCAN.conf
+	fi
+	if [ -e /var/lib/ipblocklist/3CORESEC_WEB.conf ]; then
+		rm /var/lib/ipblocklist/3CORESEC_WEB.conf
+	fi
 
 	# The collectd directory structure was changed but not all changes
 	# are done by the official migration script generator
@@ -319,23 +319,36 @@ restore_backup() {
 	# start collectd after restore
 	/etc/rc.d/init.d/collectd start
 
-        # Check if ipsec hosctcert.pem serial number is 1 and if the serial file does not contain 02
-        # In this case set the serial file to 02 and empty the index.txt file
-        ARR=()
-        while IFS= read -r line; do
-                ARR+=("$line")
-        done <<< "$(openssl x509 -in /var/ipfire/certs/hostcert.pem -noout -text)"
+	# Check if ipsec hosctcert.pem serial number is 1 and if the serial file does not contain 02
+	# In this case set the serial file to 02 and empty the index.txt file
+	ARR=()
+	while IFS= read -r line; do
+		ARR+=("$line")
+	done <<< "$(openssl x509 -in /var/ipfire/certs/hostcert.pem -noout -text)"
        if [ $(echo ${ARR[3]} | sed -E 's,^[^0-9]*([0-9]+).*$,\1,') = 1 ] && \
-                        [ $(expr $(cat "/var/ipfire/certs/serial") + 0) != 2 ]; then
-                sed -i "s/.*/02/" /var/ipfire/certs/serial
-                sed -i 'd' /var/ipfire/certs/index.txt
+			[ $(expr $(cat "/var/ipfire/certs/serial") + 0) != 2 ]; then
+		sed -i "s/.*/02/" /var/ipfire/certs/serial
+		sed -i 'd' /var/ipfire/certs/index.txt
+	fi
+
+	# Update MLKEM to only be used in combination with x25519
+	if ! grep -q "x25519-ke1_mlkem" /var/ipfire/vpn/config; then
+		sed -i -e "s@mlkem@x25519-ke1_mlkem@g" /var/ipfire/vpn/config
+
+		# Regenerate /etc/ipsec.conf
+		sudo -u nobody /srv/web/ipfire/cgi-bin/vpnmain.cgi
+	fi
+
+        # Restart ipsec if enabled
+        # This will ensure that the restored certs and secrets etc are loaded and used
+        if [ $(grep -c "ENABLED=on" /var/ipfire/vpn/settings) -eq 1  ] ; then
+                /usr/local/bin/ipsecctrl S
         fi
 
-	# Restart ipsec if enabled
-	# This will ensure that the restored certs and secrets etc are loaded and used
-	if [ $(grep -c "ENABLED=on" /var/ipfire/vpn/settings) -eq 1  ] ; then
-		/usr/local/bin/ipsecctrl S
+	if [ -e /var/log/pakfire.log ]; then
+		rm /var/log/pakfire.log
 	fi
+
 
 	return 0
 }
