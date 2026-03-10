@@ -1490,6 +1490,7 @@
 'incoming overhead in bytes per second' => '入站开销',
 'incoming traffic in bytes per second' => 'Incoming Traffic',
 'incorrect password' => '密码错误',
+'indirect target selection' => '间接目标选择',
 'info' => '信息',
 'init string' => '提示:',
 'inodes' => '索引节点',
