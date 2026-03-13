@@ -86,7 +86,14 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	# Create messagebus group if it doesn't exist
 	@if ! grep -q "^messagebus:" /etc/group; then \
 		echo "Creating messagebus group..."; \
-		groupadd -g 50 messagebus; \
+		groupadd messagebus; \
+	fi
+
+	# Create messagebus user if it doesn't exist
+	@if ! grep -q "^messagebus:" /etc/passwd; then \
+		echo "Creating messagebus user..."; \
+		useradd -g messagebus -d /run/dbus -s /bin/false \
+		-c "D-Bus messagebus user" messagebus; \
 	fi
 
 	# Fix permissions of the launch helper
