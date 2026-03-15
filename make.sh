@@ -2023,7 +2023,6 @@ fi
 	lfsmake2 dmidecode
 	lfsmake2 mcelog
 	lfsmake2 libpciaccess
-	lfsmake2 libyajl
 	lfsmake2 libvirt
 	lfsmake2 freeradius
 	lfsmake2 perl-common-sense
