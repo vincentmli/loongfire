@@ -88,6 +88,8 @@ usr/bin/zdump
 #usr/include/bits/hwcap.h
 #usr/include/bits/in.h
 #usr/include/bits/indirect-return.h
+usr/include/bits/inet-fortified-decl.h
+usr/include/bits/inet-fortified.h
 #usr/include/bits/initspin.h
 #usr/include/bits/inotify.h
 #usr/include/bits/ioctl-types.h
@@ -105,6 +107,7 @@ usr/bin/zdump
 #usr/include/bits/long-double.h
 #usr/include/bits/math-vector.h
 #usr/include/bits/mathcalls-helper-functions.h
+usr/include/bits/mathcalls-macros.h
 #usr/include/bits/mathcalls-narrow.h
 #usr/include/bits/mathcalls.h
 #usr/include/bits/mathdef.h
@@ -202,6 +205,7 @@ usr/bin/zdump
 #usr/include/bits/termios-c_iflag.h
 #usr/include/bits/termios-c_lflag.h
 #usr/include/bits/termios-c_oflag.h
+usr/include/bits/termios-cbaud.h
 #usr/include/bits/termios-misc.h
 #usr/include/bits/termios-struct.h
 #usr/include/bits/termios-tcflow.h
@@ -506,7 +510,6 @@ usr/bin/zdump
 #usr/include/sysexits.h
 #usr/include/syslog.h
 #usr/include/tar.h
-#usr/include/termio.h
 #usr/include/termios.h
 #usr/include/tgmath.h
 #usr/include/thread_db.h
@@ -8439,6 +8442,7 @@ usr/lib/locale
 #usr/share/info/libc.info-18
 #usr/share/info/libc.info-19
 #usr/share/info/libc.info-2
+usr/share/info/libc.info-20
 #usr/share/info/libc.info-3
 #usr/share/info/libc.info-4
 #usr/share/info/libc.info-5
