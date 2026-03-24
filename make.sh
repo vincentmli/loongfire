@@ -1538,6 +1538,8 @@ build_system() {
 	lfsmake2 apr
 	lfsmake2 aprutil
 	lfsmake2 unbound
+	lfsmake2 libtasn1
+	lfsmake2 libunistring
 	lfsmake2 gnutls
 	lfsmake2 libuv
 	lfsmake2 liburcu
@@ -1657,7 +1659,6 @@ fi
 	lfsmake2 mandoc
 	lfsmake2 efivar
 	lfsmake2 efibootmgr
-	lfsmake2 libtasn1
 	lfsmake2 p11-kit
 	lfsmake2 ca-certificates
 	lfsmake2 fireinfo
