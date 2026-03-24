@@ -2194,6 +2194,8 @@
 'qos enter bandwidths' => '您需要输入下行带宽和上行带宽!',
 'qos graphs' => 'Qos图表',
 'qos warning' => '规则<strong>必须</ strong>保存，否则将被丢弃!',
+'qr code' => '二维码',
+'quality of service' => '服务质量',
 'quick control' => '快速控制',
 'quick playlist' => '快速播放列表',
 'ram' => 'RAM',

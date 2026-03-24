@@ -2235,6 +2235,7 @@
 'qos graphs' => 'Qos Graphs',
 'qos warning' => 'The rule <strong>must</strong> be saved, otherwise it will be discarded!',
 'qr code' => 'QR Code',
+'quality of service' => 'Quality of Service',
 'quick control' => 'Quick Control',
 'quick playlist' => 'Quick Playlist',
 'ram' => 'RAM',
