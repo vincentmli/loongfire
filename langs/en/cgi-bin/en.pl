@@ -1830,6 +1830,7 @@
 'mbmon temp in' => 'Temperature in',
 'mbmon value' => 'Value',
 'mbmon volt' => 'Voltage',
+'mdstat' => 'Mdstat',
 'meaning' => 'meaning',
 'media' => 'Media',
 'media information' => 'Media information',

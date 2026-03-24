@@ -1784,6 +1784,7 @@
 'mbmon temp in' => 'Temperature in',
 'mbmon value' => '值',
 'mbmon volt' => 'Voltage',
+'mdstat' => '磁盘阵列',
 'meaning' => 'meaning',
 'media' => '硬盘状态',
 'media information' => '硬盘信息',
