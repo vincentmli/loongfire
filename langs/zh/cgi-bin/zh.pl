@@ -2049,6 +2049,8 @@
 'ovpn on red' => 'OpenVPN on RED:',
 'ovpn port in root range' => '端口号为1024或更高。',
 'ovpn reneg sec' => '会话密钥有效期:',
+'ovpn roadwarrior server' => 'OpenVPN 漫游客户端服务器',
+'ovpn roadwarrior settings' => '漫游客户端设置',
 'ovpn routes push' => '路由（每行一条）。 例如： 192.168.10.0/255.255.255.0 192.168.20.0/24',
 'ovpn routes push options' => '路由推送选项',
 'ovpn rw connection log' => 'OpenVPN Roadwarrior连接日志',
