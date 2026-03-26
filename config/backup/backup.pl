@@ -349,6 +349,25 @@ restore_backup() {
 		rm /var/log/pakfire.log
 	fi
 
+	# Update the OpenVPN configuration, update the RW log entry in collectd.vpn
+	# if it is the old name and restart the openvpn daemons
+	sudo -u nobody /srv/web/ipfire/cgi-bin/ovpnmain.cgi
+	if grep -q "/var/run/ovpnserver.log" /var/ipfire/ovpn/collectd.vpn; then
+		sed -i 's|"/var/run/ovpnserver.log"|"/var/run/openvpn-rw.log"|' /var/ipfire/ovpn/collectd.vpn
+	fi
+	/etc/init.d/openvpn-n2n restart
+	/etc/init.d/openvpn-rw restart
+
+	#
+	# Core Update 198
+	#
+
+	# Add the suricata user to the mail group
+	usermod -a -G mail suricata
+
+	# Change ownership & permissions of auth.conf
+	chmod 640 /var/ipfire/dma/auth.conf
+	chown nobody:mail /var/ipfire/dma/auth.conf
 
 	return 0
 }
