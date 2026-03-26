@@ -73,6 +73,7 @@ etc/rc.d/init.d/networking/red.up/99-fireinfo
 etc/rc.d/init.d/networking/red.up/99-pakfire-update
 etc/rc.d/init.d/networking/wpa_supplicant.exe
 etc/rc.d/init.d/ntp
+etc/rc.d/init.d/openvpn-n2n
 etc/rc.d/init.d/openvpn-rw
 etc/rc.d/init.d/pakfire
 etc/rc.d/init.d/partresize
@@ -108,6 +109,7 @@ etc/rc.d/rc0.d/K01grub-btrfsd
 #etc/rc.d/rc0.d/K01vdradmin
 etc/rc.d/rc0.d/K08fcron
 etc/rc.d/rc0.d/K10openvpn-rw
+etc/rc.d/rc0.d/K11openvpn-n2n
 etc/rc.d/rc0.d/K09lldpd
 etc/rc.d/rc0.d/K28apache
 etc/rc.d/rc0.d/K30sshd
@@ -145,6 +147,7 @@ etc/rc.d/rc3.d/S24cyrus-sasl
 etc/rc.d/rc3.d/S30sshd
 etc/rc.d/rc3.d/S32apache
 etc/rc.d/rc3.d/S40fcron
+etc/rc.d/rc3.d/S51openvpn-n2n
 etc/rc.d/rc3.d/S50openvpn-rw
 etc/rc.d/rc3.d/S41lldpd
 etc/rc.d/rc3.d/S98rc.local
@@ -157,6 +160,7 @@ etc/rc.d/rc6.d/K01grub-btrfsd
 #etc/rc.d/rc6.d/K01vdradmin
 etc/rc.d/rc6.d/K08fcron
 etc/rc.d/rc6.d/K10openvpn-rw
+etc/rc.d/rc6.d/K11openvpn-n2n
 etc/rc.d/rc6.d/K09lldpd
 etc/rc.d/rc6.d/K28apache
 etc/rc.d/rc6.d/K30sshd
