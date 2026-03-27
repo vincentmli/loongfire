@@ -143,12 +143,32 @@ my $col="";
 sub iscertlegacy
 {
 	my $file=$_[0];
-	my @certinfo = &General::system_output("/usr/bin/openssl", "pkcs12", "-info", "-nodes",
-	"-in", "$file.p12", "-noout", "-passin", "pass:''");
-	if (index ($certinfo[0], "MAC: sha1") != -1) {
-		return 1;
-	}
-	return 0;
+	my @openssl_cmd = ("/usr/bin/openssl", "pkcs12", "-info", "-nodes",
+	"-in", "$file.p12", "-noout", "-passin", "pass:");
+	my $ret;
+
+	# Execute the openssl command.
+	$ret = &General::safe_system(@openssl_cmd);
+
+	# Early exit if the openssl return code is zero and we do not have a
+	# lecacy certificate.
+	return 0 if ($ret eq "0");
+
+	# In case we got an return code of one, retry with enabled legacy option.
+	#
+	# Add option to enable legacy ciphers to the openssl command.
+	push(@openssl_cmd, "-legacy");
+
+	# Re-execute the openssl command with legacy option.
+	$ret = &General::safe_system(@openssl_cmd);
+
+	# Exit and return 1 if the return code of the openssl command is zero
+	# with enabled legay option, which indicates a legacy certificate.
+	return 1 if ($ret eq "0");
+
+	# If we got here, the openssl command was not able to detect
+	# which kind of certificate is used.
+	return undef;
 }
 
 sub is_cert_rfc3280_compliant($) {
