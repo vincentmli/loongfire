@@ -1846,7 +1846,9 @@ fi
 	lfsmake2 dvb-firmwares
 	lfsmake2 zd1211-firmware
 	lfsmake2 rpi-firmware
+if [ "${BUILD_ARCH}" != "loongarch64" ]; then
 	lfsmake2 intel-microcode
+fi
 	lfsmake2 pcengines-apu-firmware
 	lfsmake2 elinks
 	lfsmake2 igmpproxy
