@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2024  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -25,6 +25,8 @@
 include Config
 
 VER        = 8.6.14
+# Do not update to tcl9 without careful checking as expect and maybe other packages
+# in the toolchain are incomaptible
 
 THISAPP    = tcl$(VER)
 DL_FILE    = $(THISAPP)-src.tar.gz
@@ -78,8 +80,8 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	cd $(DIR_APP)/unix && ./configure --prefix=$(PREFIX)
 	cd $(DIR_APP)/unix && make $(MAKETUNING)
 	cd $(DIR_APP)/unix && make install
-ifneq "$(ROOT)" ""
 	cd $(DIR_APP)/unix && make install-private-headers
+ifneq "$(ROOT)" ""
 	ln -sf tclsh8.6 $(TOOLS_DIR)/bin/tclsh
 else
 	ln -sf tclsh8.6 /usr/bin/tclsh
