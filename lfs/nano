@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2024  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 8.2
+VER        = 8.7.1
 
 THISAPP    = nano-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
@@ -40,7 +40,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 08e078f8f5acc8d70ad50a0a402d06a12bcf836c8161f803e2b674375abaa16d663000f02cd1fa1e0b4aad2f127a85ee3b2f60d725a761ab375ae00c905408fd
+$(DL_FILE)_BLAKE2 = 25c73945c385c6615ad547cad65d6b7edc0098d5310951d09bd91991c93ef09ef2f58a5dec8a00a17c0326a64bce18a1819d2073af94a8afcf43df747843da3b
 
 install : $(TARGET)
 
@@ -74,13 +74,12 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 	cd $(DIR_APP) && ./configure \
-		--prefix=/usr \
-		--sysconfdir=/etc/nano \
-		--enable-color \
-		--enable-multibuffer \
-		--enable-nanorc \
-		--disable-nls
-
+				--prefix=/usr \
+				--sysconfdir=/etc/nano \
+				--enable-color \
+				--enable-multibuffer \
+				--enable-nanorc \
+				--disable-nls
 	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install
 	cd $(DIR_APP) && install -v -m644 -D doc/sample.nanorc /etc/nano/sample.nanorc
