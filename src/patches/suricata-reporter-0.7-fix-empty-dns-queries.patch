@@ -1,0 +1,39 @@
+From 15c53ed2cf4545d94cc11220295278bcdeba5000 Mon Sep 17 00:00:00 2001
+From: Michael Tremer <michael.tremer@ipfire.org>
+Date: Mon, 9 Mar 2026 11:48:51 +0000
+Subject: [PATCH] generator: Fix crash if no further DNS queries info exists
+
+Signed-off-by: Michael Tremer <michael.tremer@ipfire.org>
+---
+ src/suricata-report-generator.in | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/src/suricata-report-generator.in b/src/suricata-report-generator.in
+index e4b4db9..e08005a 100644
+--- a/src/suricata-report-generator.in
++++ b/src/suricata-report-generator.in
+@@ -631,13 +631,14 @@ class ReportGenerator(object):
+ 				line = []
+ 
+ 				# Append all queries
+-				for query in json.loads(row.dns_queries):
+-					line.append(
+-						"%s: %s" % (_("Query"), "%(rrname)s (%(rrtype)s)" % query),
+-					)
+-
+-				# Append the line to the signature
+-				signature.append(" - ".join(line))
++				if row.dns_queries:
++					for query in json.loads(row.dns_queries):
++						line.append(
++							"%s: %s" % (_("Query"), "%(rrname)s (%(rrtype)s)" % query),
++						)
++
++					# Append the line to the signature
++					signature.append(" - ".join(line))
+ 
+ 			# HTTP
+ 			elif row.app_protocol == "http":
+-- 
+2.47.3
+
