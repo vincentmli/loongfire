@@ -42,7 +42,6 @@ ifeq "$(ROOT)" ""
   CONFIGURE_ARGS = \
 	--prefix=/usr \
 	--enable-shared \
-	--disable-ipv6 \
 	--with-system-expat \
 	--with-system-ffi \
 	--with-ensurepip \
@@ -51,7 +50,6 @@ else
   TARGET = $(DIR_INFO)/$(THISAPP)-tools
   CONFIGURE_ARGS = \
 	--prefix=$(TOOLS_DIR) \
-	--disable-ipv6 \
 	--without-ensurepip
 endif
 
@@ -112,6 +110,11 @@ ifneq "$(ROOT)" ""
 	cd $(TOOLS_DIR)/lib/python3.10 && find . | grep -E "(/__pycache__|/test/)" | xargs rm -rf
 else
 	cd /usr/lib/python3.10 && find . | grep -E "(/test/)" | xargs rm -rf
+endif
+
+	# Remove the bundled setuptools directories
+ifeq "$(ROOT)" ""
+	rm -rfv /usr/lib/python3.10/site-packages/setuptools*
 endif
 
 	@rm -rf $(DIR_APP)
