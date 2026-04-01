@@ -1976,6 +1976,7 @@ fi
 	lfsmake2 python3-exceptiongroup
 	lfsmake2 python3-trio
 	lfsmake2 python3-pyfuse3
+	lfsmake2 python3-reportlab
 	lfsmake2 aws-cli
 	lfsmake2 oci-python-sdk
 	lfsmake2 oci-cli
