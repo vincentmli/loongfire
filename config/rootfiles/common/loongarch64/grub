@@ -1,4 +1,3 @@
-usr/bin/grub-mount
 usr/bin/grub-protect
 usr/lib/grub/loongarch64-efi/asn1.mod
 usr/lib/grub/loongarch64-efi/asn1.module
@@ -117,8 +116,6 @@ usr/lib/grub/loongarch64-efi/cbfs.mod
 usr/lib/grub/loongarch64-efi/cbfs.module
 usr/lib/grub/loongarch64-efi/chain.mod
 usr/lib/grub/loongarch64-efi/chain.module
-usr/lib/grub/loongarch64-efi/cmdline_cat_test.mod
-usr/lib/grub/loongarch64-efi/cmdline_cat_test.module
 usr/lib/grub/loongarch64-efi/cmp.mod
 usr/lib/grub/loongarch64-efi/cmp.module
 usr/lib/grub/loongarch64-efi/cmp_test.mod
@@ -250,8 +247,6 @@ usr/lib/grub/loongarch64-efi/gfxterm.mod
 usr/lib/grub/loongarch64-efi/gfxterm.module
 usr/lib/grub/loongarch64-efi/gfxterm_background.mod
 usr/lib/grub/loongarch64-efi/gfxterm_background.module
-usr/lib/grub/loongarch64-efi/gfxterm_menu.mod
-usr/lib/grub/loongarch64-efi/gfxterm_menu.module
 usr/lib/grub/loongarch64-efi/gptsync.mod
 usr/lib/grub/loongarch64-efi/gptsync.module
 usr/lib/grub/loongarch64-efi/gzio.mod
