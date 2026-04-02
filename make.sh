@@ -1516,6 +1516,7 @@ build_system() {
 	lfsmake2 sqlite
 	lfsmake2 python3
 	lfsmake2 python3-wheel
+	lfsmake2 python3-packaging
 	lfsmake2 python3-setuptools
 	lfsmake2 python3-MarkupSafe
 	lfsmake2 python3-Jinja2
@@ -1933,7 +1934,6 @@ fi
 	lfsmake2 python3-install
 	lfsmake2 python3-urllib3
 	lfsmake2 python3-flit
-	lfsmake2 python3-packaging
 	lfsmake2 python3-typing-extensions
 	lfsmake2 python3-semantic-version
 	lfsmake2 python3-setuptools-scm
