@@ -77,6 +77,7 @@ usr/bin/locale
 #usr/include/bits/error-ldbl.h
 #usr/include/bits/error.h
 #usr/include/bits/eventfd.h
+#usr/include/bits/fcntl-linux-fortify.h
 #usr/include/bits/fcntl-linux.h
 #usr/include/bits/fcntl.h
 #usr/include/bits/fcntl2.h
@@ -125,6 +126,7 @@ usr/bin/locale
 #usr/include/bits/mqueue2.h
 #usr/include/bits/msq.h
 #usr/include/bits/netdb.h
+#usr/include/bits/openat2.h
 #usr/include/bits/param.h
 #usr/include/bits/platform
 #usr/include/bits/platform/features.h
@@ -240,6 +242,7 @@ usr/bin/locale
 #usr/include/bits/types/idtype_t.h
 #usr/include/bits/types/locale_t.h
 #usr/include/bits/types/mbstate_t.h
+#usr/include/bits/types/once_flag.h
 #usr/include/bits/types/res_state.h
 #usr/include/bits/types/sig_atomic_t.h
 #usr/include/bits/types/sigevent_t.h
@@ -823,7 +826,7 @@ usr/lib/gconv
 #usr/lib/libc_nonshared.a
 #usr/lib/libdl.a
 #usr/lib/libg.a
-#usr/lib/libm-2.42.a
+#usr/lib/libm-2.43.a
 #usr/lib/libm.a
 #usr/lib/libm.so
 #usr/lib/libmcheck.a
@@ -2967,6 +2970,20 @@ usr/lib/locale
 #usr/lib/locale/en_SC.utf8/LC_PAPER
 #usr/lib/locale/en_SC.utf8/LC_TELEPHONE
 #usr/lib/locale/en_SC.utf8/LC_TIME
+#usr/lib/locale/en_SE.utf8
+#usr/lib/locale/en_SE.utf8/LC_ADDRESS
+#usr/lib/locale/en_SE.utf8/LC_COLLATE
+#usr/lib/locale/en_SE.utf8/LC_CTYPE
+#usr/lib/locale/en_SE.utf8/LC_IDENTIFICATION
+#usr/lib/locale/en_SE.utf8/LC_MEASUREMENT
+#usr/lib/locale/en_SE.utf8/LC_MESSAGES
+#usr/lib/locale/en_SE.utf8/LC_MESSAGES/SYS_LC_MESSAGES
+#usr/lib/locale/en_SE.utf8/LC_MONETARY
+#usr/lib/locale/en_SE.utf8/LC_NAME
+#usr/lib/locale/en_SE.utf8/LC_NUMERIC
+#usr/lib/locale/en_SE.utf8/LC_PAPER
+#usr/lib/locale/en_SE.utf8/LC_TELEPHONE
+#usr/lib/locale/en_SE.utf8/LC_TIME
 #usr/lib/locale/en_SG
 #usr/lib/locale/en_SG.utf8
 #usr/lib/locale/en_SG.utf8/LC_ADDRESS
@@ -8184,6 +8201,7 @@ usr/lib/locale
 #usr/share/i18n/locales/en_NZ
 #usr/share/i18n/locales/en_PH
 #usr/share/i18n/locales/en_SC
+#usr/share/i18n/locales/en_SE
 #usr/share/i18n/locales/en_SG
 #usr/share/i18n/locales/en_US
 #usr/share/i18n/locales/en_ZA
