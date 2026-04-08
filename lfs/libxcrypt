@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 4.5.1
+VER        = 4.5.2
 
 THISAPP    = libxcrypt-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
@@ -47,7 +47,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = d21b2ed29b8fdc1ca99e64651e984c859a988064d1ca7e9c87e1c808b451307c56400dd802112bbe732c71f6468b55db5847cc5e4184771baf44f9c5cad0d1dc
+$(DL_FILE)_BLAKE2 = 5954d3b77c5cc0f9e75e47a0f6c3dbbb6e09130875e9047b31cc069f835cf379f13995e16184e69d7b75f228e8d29bc98e4dffa77d95d70628f6847d652c07ea
 
 install : $(TARGET)
 
@@ -77,6 +77,7 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
+	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/libxcrypt-4.5.1-174c24d6e87aeae631bc0a7bb1ba983cf8def4de.patch
 	cd $(DIR_APP) && autoreconf -vfi
 	cd $(DIR_APP) && \
 		./configure \
