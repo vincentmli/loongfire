@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 0.26
+VER        = 1.0
 
 THISAPP    = gettext-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
@@ -56,7 +56,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = b182e5fdb9fc46868dc39b512ef300c54c8e77a766f2d2de69289f84966d4205f494b3ecedfb30c6df581947172411ae7eb4ccc0bb1f180b67dd8a83803832a8
+$(DL_FILE)_BLAKE2 = 052bd847c8cdb963437613583256e430b52e27e5ebe29a04df6ac549552ab0f85a1e637b991ebb57e82805fb6d2d23f37c4b70d7f711dc086f57a3a32ba3f00e
 
 install : $(TARGET)
 
@@ -87,6 +87,10 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 	$(UPDATE_AUTOMAKE)
+
+	cd $(DIR_APP) && find . -name string.in.h | xargs sed -i 's/^\(_GL_EXTERN_C void \*\)memchr (/\1(memchr) (/'
+	cd $(DIR_APP) && find . -name wchar.in.h | xargs sed -i 's/^\(_GL_EXTERN_C wchar_t \*\)wmemchr (/\1(wmemchr) (/'
+	cd $(DIR_APP) && find . -name stdlib.in.h | xargs sed -i 's/^\(_GL_EXTERN_C void \*\)bsearch (/\1(bsearch) (/'
 
 	cd $(DIR_APP) && ./configure $(EXTRA_CONFIG)
 	cd $(DIR_APP) && make $(MAKETUNING)
