@@ -91,7 +91,6 @@ usr/bin/tty
 usr/bin/unexpand
 usr/bin/uniq
 usr/bin/unlink
-usr/bin/uptime
 usr/bin/users
 usr/bin/vdir
 usr/bin/wc
@@ -108,6 +107,9 @@ usr/sbin/chroot
 #usr/share/locale/af/LC_MESSAGES/coreutils.mo
 #usr/share/locale/af/LC_TIME
 #usr/share/locale/af/LC_TIME/coreutils.mo
+#usr/share/locale/ar/LC_MESSAGES/coreutils.mo
+#usr/share/locale/ar/LC_TIME
+#usr/share/locale/ar/LC_TIME/coreutils.mo
 #usr/share/locale/be/LC_MESSAGES/coreutils.mo
 #usr/share/locale/be/LC_TIME
 #usr/share/locale/be/LC_TIME/coreutils.mo
@@ -346,7 +348,6 @@ usr/sbin/chroot
 #usr/share/man/man1/unexpand.1
 #usr/share/man/man1/uniq.1
 #usr/share/man/man1/unlink.1
-#usr/share/man/man1/uptime.1
 #usr/share/man/man1/users.1
 #usr/share/man/man1/vdir.1
 #usr/share/man/man1/wc.1
