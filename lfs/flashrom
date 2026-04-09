@@ -82,6 +82,7 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
+	cd $(DIR_APP) && sed -i 's/param_pos = strstr/param_pos = (char *)strstr/' flashrom.c
 	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install PREFIX=/usr
 	@rm -rf $(DIR_APP)
