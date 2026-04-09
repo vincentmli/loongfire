@@ -1,0 +1,13 @@
+diff --git a/filan.c b/filan.c
+index 101940a..85db9b4 100644
+--- a/filan.c
++++ b/filan.c
+@@ -1105,7 +1105,7 @@ const char *getfiletypestring(int st_mode) {
+ }
+ 
+ static int printtime(FILE *outfile, time_t time) {
+-   const char *s;
++   char *s;
+ 
+    if (filan_rawoutput) {
+       fprintf(outfile, "\t"F_time, time);
