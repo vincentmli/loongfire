@@ -1,0 +1,40 @@
+From 711bda1441561bfd2eb6d45fe0bc789535c1f1a8 Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Cristian=20Rodr=C3=ADguez?= <cristian@rodriguez.im>
+Date: Sat, 22 Nov 2025 10:41:08 -0300
+Subject: [PATCH] lsfd: fix bsearch macro usage with glibc C23
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+C23 requires bsearch to be a const preserving macro, build now fails
+with
+
+../lsfd-cmd/lsfd.c:1879:75: error: macro âbsearchâ passed 6 arguments, but takes just 5
+ 1879 |                                     nfds, sizeof(struct pollfd), pollfdcmp))
+      |                                                                           ^
+In file included from ../include/c.h:17,
+                 from ../lsfd-cmd/lsfd.c:48:
+/usr/include/stdlib.h:987:10: note: macro âbsearchâ defined here
+  987 | # define bsearch(KEY, BASE, NMEMB, SIZE, COMPAR)                        \
+
+  add parenthesis around expression to fix it.
+---
+ lsfd-cmd/lsfd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lsfd-cmd/lsfd.c b/lsfd-cmd/lsfd.c
+index 335594144..4da86c602 100644
+--- a/lsfd-cmd/lsfd.c
++++ b/lsfd-cmd/lsfd.c
+@@ -1875,7 +1875,7 @@ static void mark_poll_fds_as_multiplexed(char *buf,
+ 		struct file *file = list_entry(f, struct file, files);
+ 		if (is_opened_file(file) && !file->multiplexed) {
+ 			int fd = file->association;
+-			if (bsearch(&(struct pollfd){.fd = fd,}, local.iov_base,
++			if (bsearch((&(struct pollfd){.fd = fd,}), local.iov_base,
+ 				    nfds, sizeof(struct pollfd), pollfdcmp))
+ 				file->multiplexed = 1;
+ 		}
+-- 
+2.47.3
+

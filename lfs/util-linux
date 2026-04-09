@@ -74,6 +74,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 	$(UPDATE_AUTOMAKE)
+	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/util-linux-2.41.2-FTBFS-bsearch.patch
 	cd $(DIR_APP) && ./configure \
 				--docdir=/usr/share/doc/util-linux \
 				--disable-chfn-chsh \
