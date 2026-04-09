@@ -81,6 +81,7 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
+	$(UPDATE_AUTOMAKE)
 	cd $(DIR_APP) && sed -i 's/\(slash = \)strchr/\1(char *)strchr/' src/lib/fs/path.c
 	cd $(DIR_APP) && sed -i '/#define SYS_SECCOMP/d' src/lib/sandbox/sandbox.h
 	cd $(DIR_APP) && \
