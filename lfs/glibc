@@ -69,8 +69,7 @@ EXTRA_CONFIG += \
 
 ifeq "$(BUILD_ARCH)" "x86_64"
 	EXTRA_CONFIG += \
-		--enable-cet \
-		--enable-sframe
+		--enable-cet
 endif
 
 ifeq "$(BUILD_ARCH)" "aarch64"
