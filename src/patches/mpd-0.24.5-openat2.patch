@@ -1,0 +1,60 @@
+From 8caeedac3ed17491cd77240211ed13be80072a15 Mon Sep 17 00:00:00 2001
+From: Max Kellermann <max.kellermann@gmail.com>
+Date: Mon, 26 Jan 2026 14:18:53 +0100
+Subject: [PATCH] system/linux: detect native openat2() support at configure
+ time
+
+The Linux man-pages notes about openat2(): "glibc provides no wrapper
+for openat2(), necessitating the use of syscall(2)"
+
+.. but glibc 2.43 finally added a wrapper which caused a conflict with
+our existing definition.
+
+Closes https://github.com/MusicPlayerDaemon/MPD/issues/2417
+---
+ src/system/linux/meson.build |  6 +++++-
+ src/system/linux/openat2.h   | 11 ++++++++++-
+
+diff --git a/src/system/linux/meson.build b/src/system/linux/meson.build
+index 36a98f2127..4a0d6267ad 100644
+--- a/src/system/linux/meson.build
++++ b/src/system/linux/meson.build
+@@ -1,7 +1,11 @@
+ system_linux_features = configuration_data()
+ 
+ if host_machine.system() == 'linux'
+-  system_linux_features.set('HAVE_OPENAT2', compiler.has_header('linux/openat2.h'))
++  have_native_openat2 = compiler.has_header_symbol('fcntl.h', 'openat2')
++  # openat2() support was added to glibc 2.43
++  system_linux_features.set('HAVE_NATIVE_OPENAT2', have_native_openat2)
++  # if not provided by the C library, we roll our own using syscall()
++  system_linux_features.set('HAVE_OPENAT2', have_native_openat2 or compiler.has_header('linux/openat2.h'))
+ endif
+ 
+ configure_file(output: 'Features.h', configuration: system_linux_features)
+diff --git a/src/system/linux/openat2.h b/src/system/linux/openat2.h
+index fdf3820983..807df97cb3 100644
+--- a/src/system/linux/openat2.h
++++ b/src/system/linux/openat2.h
+@@ -4,7 +4,14 @@
+ 
+ #pragma once
+ 
+-#include <fcntl.h> // for O_*
++#include "system/linux/Features.h" // for HAVE_NATIVE_OPENAT2
++
++#include <fcntl.h>
++
++#ifndef HAVE_NATIVE_OPENAT2
++/* if the C library does not provide an openat2() wrappper, we roll
++   our own */
++
+ #include <linux/openat2.h> // for RESOLVE_*
+ #include <sys/syscall.h>
+ #include <unistd.h>
+@@ -15,3 +22,5 @@ openat2(int dirfd, const char *pathname,
+ {
+ 	return syscall(__NR_openat2, dirfd, pathname, how, size);
+ }
++
++#endif // !HAVE_NATIVE_OPENAT2
