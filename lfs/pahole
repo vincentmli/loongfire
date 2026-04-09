@@ -71,6 +71,19 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar zxf $(DIR_DL)/$(DL_FILE)
 
+	cd $(DIR_APP)/lib/bpf/src && sed -i -e '8181s/char \*res;/const char *res;/' -e '11986s/char \*next_path;/const char *next_path;/' libbpf.c
+	# Fix btf_encoder.c by casting the bsearch return value
+	cd $(DIR_APP) && sed -i '1827s/target = bsearch/target = (struct btf_func *) bsearch/' btf_encoder.c
+
+	cd $(DIR_APP) && sed -i \
+		-e '2451s/strchr/(char *) strchr/' \
+		-e '2922s/strchr/(char *) strchr/' \
+		-e '2927s/strchr/(char *) strchr/' \
+		-e '3082s/strchr/(char *) strchr/' \
+		-e '3112s/strchr/(char *) strchr/' \
+		-e '2932s/char \*args = args_open/char *args = (char *) args_open/' \
+		pahole.c
+
 	cd $(DIR_APP) && mkdir build 
 	cd $(DIR_APP)/build && cmake -D__LIB=lib -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_C_FLAGS="-O2" -DCMAKE_CXX_FLAGS="-O2" ..
 	cd $(DIR_APP)/build && make && make install
