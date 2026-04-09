@@ -1539,7 +1539,7 @@ build_system() {
 	lfsmake2 udev
 	lfsmake2 libusb
 	lfsmake2 mdadm
-	lfsmake2 dracut
+	lfsmake2 dracut-ng
 	lfsmake2 lvm2
 	lfsmake2 multipath-tools
 	lfsmake2 glib
