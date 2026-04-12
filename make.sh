@@ -1823,7 +1823,9 @@ fi
 	lfsmake2 chkconfig
 	lfsmake2 postfix
 	lfsmake2 fetchmail
-	#lfsmake2 clamav
+if [ "${BUILD_ARCH}" != "loongarch64" ]; then
+	lfsmake2 clamav
+fi
 	lfsmake2 perl-NetAddr-IP
 	lfsmake2 dma
 	lfsmake2 alsa
