@@ -24,7 +24,7 @@ use strict;
 #use warnings;
 
 use Sort::Naturally;
-use CGI::Carp 'fatalsToBrowser';
+#use CGI::Carp 'fatalsToBrowser';
 no warnings 'uninitialized';
 require '/var/ipfire/general-functions.pl';
 require '/var/ipfire/network-functions.pl';

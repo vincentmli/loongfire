@@ -21,7 +21,7 @@
 
 use strict;
 use URI::Escape;
-use CGI::Carp qw(fatalsToBrowser);
+#use CGI::Carp qw(fatalsToBrowser);
 
 require '/var/ipfire/general-functions.pl';
 
