@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2024  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -26,7 +26,7 @@ include Config
 
 SUMMARY    = Webfrontend for Music Player Daemon
 
-VER        = 18.0.0
+VER        = 22.1.1
 
 THISAPP    = myMPD-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -34,7 +34,7 @@ DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = mympd
-PAK_VER    = 7
+PAK_VER    = 16
 
 DEPS       = mpd libmpdclient
 
@@ -48,7 +48,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = b599c3dd621bd6d3cc3259f6015f86b69b81724390272db6e05228092fe5b75a5c74191285318dc07938fe75d4b57dd902aa9fb58518b71ae39371496e9e5aca
+$(DL_FILE)_BLAKE2 = a64c9691e552c63fcdaf7cbca71a33d812293477f5676ffeb63fb1b7d230d69f3c4f6efdd188afa2a596543644bb3920d12e00f59fd3f5ebce1f04a6a4d01dda
 
 install : $(TARGET)
 
@@ -87,7 +87,12 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 
 	cd $(DIR_APP) && mkdir -p build
 	cd $(DIR_APP)/build && cmake -Wno-dev \
-		-DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
+					-D CMAKE_INSTALL_PREFIX=/usr \
+					-D MYMPD_DOC=OFF \
+					-D MYMPD_ENABLE_SYSTEMD=OFF \
+					-D MYMPD_MANPAGES=OFF \
+					-D MYMPD_STARTUP_SCRIPT=OFF \
+					-D CMAKE_BUILD_TYPE=Release ..
 	cd $(DIR_APP)/build && make $(MAKETUNING)
 	cd $(DIR_APP)/build && make install
 
@@ -95,6 +100,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	mkdir -p /var/lib/mympd/config
 	echo false > /var/lib/mympd/config/http
 	echo 8800  > /var/lib/mympd/config/ssl_port
+	echo 2  > /var/lib/mympd/config/loglevel
 	mkdir -p /var/lib/mympd/state
 	echo /var/mp3 > /var/lib/mympd/state/music_directory
 	chown nobody:nobody -R /var/lib/mympd
