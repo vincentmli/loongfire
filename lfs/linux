@@ -25,10 +25,10 @@
 
 include Config
 
-VER         = 6.18.13
+VER         = 7.0
 
 THISAPP    = linux-$(VER)
-DL_FILE    = linux-$(VER).tar.xz
+DL_FILE    = linux-$(VER).tar.gz
 DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 
@@ -76,7 +76,7 @@ objects = \
 
 $(DL_FILE) = $(URL_IPFIRE)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 1b97badce04dcc6a9e674a646e1eec5b2fa31a442856af748de730946113b2549d31ccf24417d0702142bdbde6636d874db7dd6f274f513f973c97e0866a3c34
+$(DL_FILE)_BLAKE2 = f237eecaa4293e9520755199437902d81843b2d8f1b90b7fbdaab0f0b9b745f660cfb5c425310d35238c3cb5437bbe48685eabd3a76cb6b1c81eb39b08212999
 
 install : $(TARGET)
 
@@ -109,6 +109,13 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
+
+	# Conditionally apply SUBLEVEL removal patch if kernel release is x.y like 7.0
+	DOT_COUNT=$$(echo $(VER) | tr -cd '.' | wc -c); \
+	if [ "$$DOT_COUNT" = "1" ]; then \
+		echo "Applying SUBLEVEL removal for VER=$(VER)"; \
+		sed -i 's/^SUBLEVEL = [0-9]\+/SUBLEVEL =/' $(DIR_APP)/Makefile; \
+	fi
 
 	# Layer7-patch
 	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/linux-6.6.26-layer7.patch
@@ -143,11 +150,11 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	# cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/LoongArch-BPF-Disable-bpf-trampoline-kernel-module-f.patch
 
 	# Patch 6.18.4 for yt6801
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/007-stmmac-replace-has_xxxx-with-core_type.patch
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/20251114_linux_net_stmmac_clean_up_plat_dat_allocation_initialisation.mbx
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/20251119_linux_net_stmmac_simplify_axi_blen_handling.mbx
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/v5_20251124_ziyao_unify_platform_suspend_resume_routines_for_pci_dwmac_glue.mbx
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/v6_20260109_me_add_dwmac_glue_driver_for_motorcomm_yt6801.mbx
+	# cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/007-stmmac-replace-has_xxxx-with-core_type.patch
+	# cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/20251114_linux_net_stmmac_clean_up_plat_dat_allocation_initialisation.mbx
+	# cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/20251119_linux_net_stmmac_simplify_axi_blen_handling.mbx
+	# cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/v5_20251124_ziyao_unify_platform_suspend_resume_routines_for_pci_dwmac_glue.mbx
+	# cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/v6_20260109_me_add_dwmac_glue_driver_for_motorcomm_yt6801.mbx
 
 ifeq "$(BUILD_ARCH)" "aarch64"
 	# Apply Arm kernel patches.
