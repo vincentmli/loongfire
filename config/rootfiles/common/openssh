@@ -8,7 +8,7 @@ etc/ssh/ssh_config
 #etc/ssh/ssh_host_rsa_key
 #etc/ssh/ssh_host_rsa_key.pub
 etc/ssh/sshd_config
-#etc/ssh/sshd_config.d
+etc/ssh/sshd_config.d
 usr/bin/scp
 usr/bin/sftp
 usr/bin/ssh
@@ -21,6 +21,7 @@ usr/lib/openssh/sftp-server
 usr/lib/openssh/ssh-keysign
 usr/lib/openssh/ssh-pkcs11-helper
 usr/lib/openssh/ssh-sk-helper
+usr/lib/openssh/sshd-auth
 usr/lib/openssh/sshd-session
 usr/sbin/sshd
 #usr/share/man/man1/scp.1
