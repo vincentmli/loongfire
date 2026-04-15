@@ -7,6 +7,7 @@
 # $Id: autoupdate.pl,v 1.1 2007/03/14 00:00:00 marco.s Exp $
 #
 use strict;
+use File::Path;
 
 require "/var/ipfire/general-functions.pl";
 
@@ -115,14 +116,15 @@ unless ($blacklist_url eq '')
 
 			system("/usr/bin/squidGuard -d -c $target/update.conf -C all");
 
+			&cleanupdbdir();
 			system("cp -r $target/blacklists/* $dbdir");
 
-			system("chown -R nobody.nobody $dbdir");
+			system("chown -R nobody:nobody $dbdir");
 
 			&setpermissions ($dbdir);
 
 			system("touch $updflagfile");
-			system("chown nobody.nobody $updflagfile");
+			system("chown nobody:nobody $updflagfile");
 
 			system("/etc/init.d/squid restart");
 
@@ -214,3 +216,30 @@ sub setpermissions
 }
 
 # -------------------------------------------------------------------
+
+sub cleanupdbdir {
+	# Open the database directory and do a directory listing.
+	opendir(DIR, "$dbdir") or die "Cannot open $dbdir. $!\n";
+
+	# Loop through the directory.
+	while (my $item = readdir(DIR)) {
+		# Skip . and ..
+		next if ($item eq ".");
+		next if ($item eq "..");
+
+		# Keep custom lists
+		next if ($item eq "custom");
+
+		# Generate absolute path.
+		my $abs_path = "$dbdir/$item";
+
+		# Skip anything which is not a directory.
+		next unless (-d "$abs_path");
+
+		# Remove the directory and the content.
+		&File::Path::remove_tree($abs_path);
+	}
+
+	# Close directory handle.
+	closedir(DIR);
+}
