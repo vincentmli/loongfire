@@ -83,19 +83,6 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	cd $(DIR_APP) && ninja -C builddir/ $(MAKETUNING)
 	cd $(DIR_APP) && ninja -C builddir/ install
 
-	# Create messagebus group if it doesn't exist
-	@if ! grep -q "^messagebus:" /etc/group; then \
-		echo "Creating messagebus group..."; \
-		groupadd messagebus; \
-	fi
-
-	# Create messagebus user if it doesn't exist
-	@if ! grep -q "^messagebus:" /etc/passwd; then \
-		echo "Creating messagebus user..."; \
-		useradd -g messagebus -d /run/dbus -s /bin/false \
-		-c "D-Bus messagebus user" messagebus; \
-	fi
-
 	# Fix permissions of the launch helper
 	chown root:messagebus /usr/libexec/dbus-daemon-launch-helper
 	chmod 4750 /usr/libexec/dbus-daemon-launch-helper
