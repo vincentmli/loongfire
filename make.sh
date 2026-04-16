@@ -1725,6 +1725,8 @@ fi
 	lfsmake2 perl-Try-Tiny
 	lfsmake2 perl-HTTP-Message
 	lfsmake2 perl-HTTP-Date
+	lfsmake2 libksba
+	lfsmake2 npth
 	lfsmake2 gnupg
 	lfsmake2 hdparm
 	lfsmake2 whatmask
