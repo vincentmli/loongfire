@@ -1807,6 +1807,7 @@
 'memory' => 'Memory',
 'memory information' => '内存信息',
 'memory usage per' => 'Memory Usage per',
+'messagebus' => 'D-Bus 守护程序',
 'messages' => 'Messages',
 'messages logging' => 'Logsettings for /var/log/messages',
 'method' => 'Method:',
