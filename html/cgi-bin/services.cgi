@@ -2,7 +2,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2005-2021  IPFire Team                                        #
+# Copyright (C) 2005-2025  IPFire Team                                        #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -114,12 +114,18 @@ $querry[1] = 'hour' unless defined $querry[1];
 		# OpenVPN Roadwarrior
 		$Lang::tr{'ovpn roadwarrior server'} => {
 			"process" => "openvpn",
-			"pidfile" => "/var/run/openvpn.pid",
+			"pidfile" => "/var/run/openvpn-rw.pid",
 		},
 
 		# LLDPD
-                $Lang::tr{'lldp'} => {
-                        "process" => "lldpd",
+		$Lang::tr{'lldp'} => {
+			"process" => "lldpd",
+		},
+
+		# DBus
+		$Lang::tr{'messagebus'} => {
+			"process" => "dbus-daemon",
+			"pidfile" => "/var/run/dbus/pid",
 		}
 	});
 
@@ -210,7 +216,7 @@ sub isautorun (@) {
 sub isrunningaddon (@) {
 	my ($pak, $service) = @_;
 
-	my $status = "<td class='status is-stopped'>$Lang::tr{'stopped'}</td><td colspan='2'></td>";
+	my $status = "<td class='status is-stopped is-fixed'>$Lang::tr{'stopped'}</td><td colspan='2'></td>";
 	my $testcmd = '';
 	my $exename;
 
@@ -239,7 +245,7 @@ sub isrunningaddon (@) {
 		$status .="<td align='right'>$memory</td>";
 	}else{
 		$status = "<td align='center' width='16%' colspan=2><a href='services.cgi?$pak!start!$service'><img alt='$Lang::tr{'start'}' title='$Lang::tr{'start'}' src='/images/go-up.png' border='0' /></a></td>";
-		$status .= "<td class='status is-stopped'>$Lang::tr{'stopped'}</td><td colspan='2'></td>";
+		$status .= "<td class='status is-stopped is-fixed'>$Lang::tr{'stopped'}</td><td colspan='2'></td>";
 	}
 	return $status;
 }
