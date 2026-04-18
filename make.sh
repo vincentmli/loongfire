@@ -2087,6 +2087,8 @@ fi
 	lfsmake2 btrfs-progs
 	lfsmake2 inotify-tools
 	lfsmake2 grub-btrfs
+	lfsmake2 libmicrohttpd
+	lfsmake2 fort-validator
 	lfsmake2 pahole
 	lfsmake2 libbpf
 	lfsmake2 llvm-project
