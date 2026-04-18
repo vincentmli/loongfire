@@ -1823,7 +1823,7 @@ fi
 	lfsmake2 smartmontools
 	lfsmake2 htop
 	lfsmake2 chkconfig
-	lfsmake2 postfix
+	#lfsmake2 postfix
 	lfsmake2 fetchmail
 if [ "${BUILD_ARCH}" != "loongarch64" ]; then
 	lfsmake2 clamav
