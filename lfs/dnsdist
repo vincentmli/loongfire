@@ -83,6 +83,13 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
+
+	# HACK: Create dummy systemctl to satisfy configure check
+	# IPFire builds udev from systemd source but not full systemd
+	# This allows dnsdist to pass the systemctl check without needing full systemd
+	echo '#!/bin/bash' > /usr/bin/systemctl
+	chmod +x /usr/bin/systemctl
+
 	cd $(DIR_APP) && patch -Np3 < $(DIR_SRC)/src/patches/dnsdist-2.0.2-dnsdist-xsk.patch
 	cd $(DIR_APP) && patch -Np3 < $(DIR_SRC)/src/patches/dnsdist-2.0.2-vloginfo.patch
 	cd $(DIR_APP) && ./configure \
@@ -109,6 +116,9 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
         # Install xsk AF_XDP configuration
 	install -v -m 644 $(DIR_SRC)/config/dnsdist/dnsdist-xsk.conf \
 		/etc/dnsdist-xsk.conf
+
+	# Clean up dummy systemctl to keep system clean
+	rm -f /usr/bin/systemctl
 
 	@rm -rf $(DIR_APP)
 	@$(POSTBUILD)
