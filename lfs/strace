@@ -26,7 +26,7 @@ include Config
 
 SUMMARY    = A utility to trace the system calls of a program
 
-VER        = 6.18
+VER        = 6.19
 SUP_ARCHES = x86_64 aarch64 loongarch64
 
 THISAPP    = strace-$(VER)
@@ -49,7 +49,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = ba9798496102c2c1d2310d9dea746d9517d58c2e9ad7e630beee294806d24a617c8a8950d0e118d6190b61ab17f5d8020d02b0a56c4740df62104dd2906206c0
+$(DL_FILE)_BLAKE2 = f46ff7788bfebef06af467cac1554fa2bfdb44397f635f04bd039ad6cf8b2339eece99a4d9cbfa2c747eb243a750e6efa446d550a83a2746c178e6a4857270db
 
 install : $(TARGET)
 
@@ -84,7 +84,8 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 	cd $(DIR_APP) && ./configure \
 				--prefix=/usr \
-				--enable-mpers=check
+				--enable-mpers=check \
+				--disable-io-uring
 	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install
 	@rm -rf $(DIR_APP)
