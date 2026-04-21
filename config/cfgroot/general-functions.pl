@@ -26,6 +26,10 @@ $General::noipprefix = 'noipg-';
 require "${General::swroot}/network-functions.pl";
 require "${General::swroot}/wireguard-functions.pl";
 
+# Load the main settings file
+our %mainsettings = ();
+&readhash("${General::swroot}/main/settings", \%mainsettings);
+
 # This function executes a shell command without forking a shell or do any other
 # Perl-voodoo before it. It deprecates the "system" command and is the only way
 # to call shell commands.
@@ -62,12 +66,12 @@ sub system_output($) {
 		die "Could not execute @command: $!";
 	}
 
-	waitpid($pid, 0);
-
 	while (<OUTPUT>) {
 		push(@output, $_);
 	}
 	close(OUTPUT);
+
+	waitpid($pid, 0);
 
 	return @output;
 }
@@ -754,21 +758,6 @@ sub validhostname
 	return 1;
 }
 
-sub validccdname
-{
-	# Checks a ccdname for letters, numbers and spaces
-        my $ccdname = $_[0];
-
-	# ccdname should be at least one character in length
-	# but no more than 63 characters
-	if (length ($ccdname) < 1 || length ($ccdname) > 63) {
-		return 0;}
-	# Only valid characters are a-z, A-Z, 0-9, space and -
-	if ($ccdname !~ /^[a-zA-Z0-9 -]*$/) {
-		return 0;}
-	return 1;
-}
-
 sub validdomainname
 {
 	my $part;
@@ -877,10 +866,10 @@ sub validportrange # used to check a port range
 
 # Checks for a valid country code
 sub validcc($) {
-        my $cc = shift;
+	my $cc = shift;
 
-        # Must contain of exactly two uppercase characters, or must be A1, A2, or A3
-        return ($cc =~ m/^([A-Z]{2}|A[123])$/);
+	# Must contain of exactly two uppercase characters, or must be A1, A2, or A3
+	return ($cc =~ m/^([A-Z]{2}|A[123])$/);
 }
 
 sub IpInSubnet {
@@ -1069,11 +1058,9 @@ sub GetCoreUpdateVersion() {
 	my $core_update;
 
 	open(FILE, "/opt/pakfire/db/core/mine");
-	while (<FILE>) {
-		$core_update = $_;
-		last;
-	}
+	$core_update = <FILE>;
 	close(FILE);
+	chomp($core_update);
 
 	return $core_update;
 }
