@@ -1708,7 +1708,6 @@ fi
 	lfsmake2 xorriso
 	lfsmake2 dosfstools
 	lfsmake2 exfatprogs
-	lfsmake2 reiserfsprogs
 	lfsmake2 xfsprogs
 	lfsmake2 sysfsutils
 	lfsmake2 fuse
