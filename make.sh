@@ -2206,7 +2206,20 @@ check_rootfiles_for_arch() {
 	# A list of files that are not scanned
 	# because they probably cause some false positives.
 	local excluded_files=(
+		abseil-cpp
+		cmake
+		gdb
+		liburcu
+		ovmf
 		qemu
+		rust-crc32fast
+		rust-memchr
+		rust-libc
+		rust-libc-0.2.108
+		rust-linux-raw-sys
+		rust-ppv-lite86
+		rust-rustix
+		xfsprogs
 	)
 
 	# Exclude any architecture-specific directories
