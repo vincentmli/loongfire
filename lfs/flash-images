@@ -158,6 +158,12 @@ endif
 
 	chroot $(MNThdd) /usr/bin/perl -e "require '/var/ipfire/lang.pl'; &Lang::BuildCacheLang"
 
+	# Run the filesystem cleanup script
+	chroot $(MNThdd) /usr/local/bin/filesystem-cleanup > $(DIR_TMP)/cleanup.log
+
+	# Check if any files have been deleted
+	[ -s "$(DIR_TMP)/cleanup.log" ]
+
 	# Create /etc/fstab
 	printf "$(FSTAB_FMT)" "$$(blkid -o value -s UUID $(PART_BOOT))" "/boot" \
 		"auto" "defaults,nodev,noexec,nosuid" 1 2 >  $(MNThdd)/etc/fstab
