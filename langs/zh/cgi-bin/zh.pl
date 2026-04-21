@@ -1626,6 +1626,7 @@
 'ip basic info' => '基本IP信息',
 'ip info' => 'IP信息',
 'ip info for' => 'IP information for',
+'ipfire dbl' => 'IPFire DBL 域名拦截列表',
 'ipfire has now rebooted' => 'IPFire现在正在重启。',
 'ipfire has now shutdown' => 'IPFire现在关机。',
 'ipfire side' => 'IPFire端:',

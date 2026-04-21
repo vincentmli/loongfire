@@ -1666,6 +1666,7 @@
 'ipblocklist iptables blocking' => 'Blocking uses iptables/ipset. Firewall reload required when changing blocklists.',
 'ipblocklist log option' => 'Logging option is not available when XDP acceleration is enabled. XDP blocks packets at network driver level before they reach iptables logging chain.',
 'ipblocklist xdp notice' => 'XDP acceleration is active (no firewall reload needed).',
+'ipfire dbl' => 'IPFire DBL domain blocklists',
 'ipfire has now rebooted' => 'IPFire is rebooting now.',
 'ipfire has now shutdown' => 'IPFire is shutting down now.',
 'ipfire side' => 'IPFire side:',
