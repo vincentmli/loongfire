@@ -2227,7 +2227,7 @@ sub _validate_mail_address($) {
 
 	# Split the string of mail addresses into single pieces and
 	# store them into the temporary array.
-	@temp = split(/\,/, $address);
+	@temp = split(/[,;]/, $address);
 
 	# Loop through the array of mail addresses.
 	foreach my $addr (@temp) {
