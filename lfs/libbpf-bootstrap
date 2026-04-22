@@ -73,6 +73,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar zxf $(DIR_DL)/$(DL_FILE)
 
 	cd $(DIR_APP)/examples/c && make $(MAKETUNING)
-	cd $(DIR_APP)/examples/c && cp -vf kprobe ksyscall profile netqtop wg_handshake /usr/bin/
+	cd $(DIR_APP)/examples/c && cp -vf bootstrap kprobe ksyscall profile netqtop wg_handshake /usr/bin/ 2>/dev/null || true
+
 	@rm -rf $(DIR_APP)
 	@$(POSTBUILD)
