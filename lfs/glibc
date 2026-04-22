@@ -39,14 +39,16 @@ ifeq "$(ROOT)" ""
 	--build=$(BUILDTARGET) \
 	--prefix=/usr \
 	--libexecdir=/usr/lib/glibc \
-	--enable-stack-protector=strong
+	--enable-stack-protector=strong \
+	--disable-werror
 else
   TARGET = $(DIR_INFO)/$(THISAPP)-tools
   EXTRA_CONFIG = \
 	--host=$(CROSSTARGET) \
 	--build=$(BUILDTARGET) \
 	--prefix=$(TOOLS_DIR) \
-	--with-headers=$(TOOLS_DIR)/include
+	--with-headers=$(TOOLS_DIR)/include \
+	--disable-werror
 endif
 
 ifeq "$(BUILD_ARCH)" "aarch64"
