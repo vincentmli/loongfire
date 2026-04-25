@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2024  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -24,13 +24,17 @@
 
 include Config
 
-VER        = 3.3.4
+VER        = 4.0.1
 
 THISAPP    = ruby-$(VER)
-DL_FILE    = $(THISAPP).tar.xz
+DL_FILE    = $(THISAPP).tar.gz
 DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
+
+# https://www.ruby-lang.org/en/downloads/
+
+CFLAGS += -DRUBY_FUNCTION_NAME_STRING=__FUNCTION__
 
 ###############################################################################
 # Top-level Rules
@@ -40,7 +44,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = e10b81ad7838e3d443ce0b12b8372faebb001f00a32dc0fa1f5e37c46baae99ea714e7f2a8741f0294255312030e844f32fc5d1c3695545cf8303e85b3255f21
+$(DL_FILE)_BLAKE2 = 60bef76ccc0a8d9437b3560720d8abe0ea113bb8a2c02171d780c66f75fd533b4bacdcdc1acbd02d080b4e1e2fb323da7c6f40571f87c2e9a870eb427a513184
 
 install : $(TARGET)
 
