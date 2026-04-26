@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 6.17.0
+VER        = 6.18.0
 #          https://www.kernel.org/pub/linux/utils/fs/xfs/xfsprogs/
 
 THISAPP    = xfsprogs-$(VER)
@@ -47,7 +47,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = e841526add6c17d036a709c1fafe879a50ba7d568008865eac8d166182be5514d8abc94b8facbe113aa6106ac394ea01049b6a555ebd280ee1cd5d64fff1b5da
+$(DL_FILE)_BLAKE2 = 225cb49a39a2539e48513985d72602c0c067f73597e3fe1d9d4062989ed98c3a0b2c85bb9d465c60acefce3243a7e2320808727e6ce527fbc35216bde235144e
 
 install : $(TARGET)
 
