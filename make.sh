@@ -1615,6 +1615,7 @@ if [ "${BUILD_ARCH}" != "loongarch64" ]; then
 	lfsmake2 rust-itoa
 	lfsmake2 rust-ryu
 	lfsmake2 rust-serde_json
+	lfsmake2 rust-synstructure
 	lfsmake2 rust-log
 	lfsmake2 rust-semver
 	lfsmake2 rust-autocfg
