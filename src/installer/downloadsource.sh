@@ -2,7 +2,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2022  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -35,7 +35,7 @@ URL="${2}"
 OUTPUT_DIR="${OUTPUT%/*}"
 
 mkdir -p "${OUTPUT_DIR}"
-if ! mount -t tmpfs none "${OUTPUT_DIR}" -o size=512M; then
+if ! mount -t tmpfs none "${OUTPUT_DIR}" -o size=1024M; then
 	echo "Could not mount tmpfs to ${OUTPUT_DIR}" >&2
 	exit 1
 fi
