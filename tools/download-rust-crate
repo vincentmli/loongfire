@@ -2,7 +2,7 @@
 
 set -o pipefail
 
-RUST_TEMPLATE="lfs/rust-rand"
+RUST_TEMPLATE="lfs/rust-syn"
 
 fetch_latest_version() {
 	local name="${1}"
