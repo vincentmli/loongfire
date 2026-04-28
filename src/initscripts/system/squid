@@ -52,16 +52,16 @@ transparent() {
 			if [ "$CONN_TYPE" != "net" ]; then
 				continue
 			fi
-		iptables -t nat -A SQUID -i $1 -p tcp -d `echo "$LINE" | awk -F, '{ print $13 }'` --dport 80 -j RETURN
+		iptables --wait -t nat -A SQUID -i $1 -p tcp -d `echo "$LINE" | awk -F, '{ print $13 }'` --dport 80 -j RETURN
 		done < $FILE
 
 		if [ "$RED_TYPE" == "STATIC" ]; then
-			iptables -t nat -A SQUID -i $1 -p tcp -d $RED_NETADDRESS/$RED_NETMASK --dport 80 -j RETURN
+			iptables --wait -t nat -A SQUID -i $1 -p tcp -d $RED_NETADDRESS/$RED_NETMASK --dport 80 -j RETURN
 		fi
 
-		iptables -t nat -A SQUID -i $1 -p tcp -d $LOCALIP --dport 80 -j RETURN
+		iptables --wait -t nat -A SQUID -i $1 -p tcp -d $LOCALIP --dport 80 -j RETURN
 
-		iptables -t nat -A SQUID -i $1 -p tcp --dport 80 -j REDIRECT --to-port "${TRANSPARENT_PORT}"
+		iptables --wait -t nat -A SQUID -i $1 -p tcp --dport 80 -j REDIRECT --to-port "${TRANSPARENT_PORT}"
 }
 
 case "$1" in
@@ -111,7 +111,7 @@ case "$1" in
 		;;
 
 	stop)
-		iptables -t nat -F SQUID
+		iptables --wait -t nat -F SQUID
 
 		if [ -e /var/run/squid.pid ]; then
 			boot_mesg -n "Stopping Squid Proxy Server (this may take up to a few minutes)..."
