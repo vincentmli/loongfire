@@ -3,7 +3,7 @@ bin/ps
 #lib/libproc2.la
 #lib/libproc2.so
 lib/libproc2.so.1
-lib/libproc2.so.1.0.0
+lib/libproc2.so.1.0.1
 #lib/pkgconfig
 #lib/pkgconfig/libproc2.pc
 sbin/sysctl
@@ -18,6 +18,7 @@ usr/bin/pidwait
 #usr/bin/slabtop
 #usr/bin/tload
 usr/bin/top
+usr/bin/uptime
 usr/bin/vmstat
 usr/bin/w
 usr/bin/watch
@@ -52,13 +53,13 @@ usr/bin/watch
 #usr/share/man/man1/pgrep.1
 #usr/share/man/man1/pidof.1
 #usr/share/man/man1/pidwait.1
-#usr/share/man/man1/pkill.1
 #usr/share/man/man1/pmap.1
 #usr/share/man/man1/ps.1
 #usr/share/man/man1/pwdx.1
 #usr/share/man/man1/slabtop.1
 #usr/share/man/man1/tload.1
 #usr/share/man/man1/top.1
+#usr/share/man/man1/uptime.1
 #usr/share/man/man1/w.1
 #usr/share/man/man1/watch.1
 #usr/share/man/man3/procps.3
