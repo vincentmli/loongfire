@@ -596,6 +596,18 @@ if ($cgiparams{'RULESET'} eq $Lang::tr{'ids apply'}) {
 		if (&_validate_mail_address($cgiparams{'EMAIL_RECIPIENTS'})) {
 			$errormessage = "$cgiparams{'EMAIL_RECIPIENTS'} - $Lang::tr{'ids invalid mail address'}";
 		}
+
+		if (&_validate_mail_address($cgiparams{'EMAIL_RECIPIENTS_REPORT_DAILY'})) {
+			$errormessage = "$Lang::tr{'ids invalid mail address'}: $cgiparams{'EMAIL_RECIPIENTS_REPORT_DAILY'}";
+		}
+
+		if (&_validate_mail_address($cgiparams{'EMAIL_RECIPIENTS_REPORT_WEEKLY'})) {
+			$errormessage = "$Lang::tr{'ids invalid mail address'}: $cgiparams{'EMAIL_RECIPIENTS_REPORT_WEEKLY'}";
+		}
+
+		if (&_validate_mail_address($cgiparams{'EMAIL_RECIPIENTS_REPORT_MONTHLY'})) {
+			$errormessage = "$Lang::tr{'ids invalid mail address'}: $cgiparams{'EMAIL_RECIPIENTS_REPORT_MONTHLY'}";
+		}
 	}
 
 	# Go on if there are no error messages.
@@ -1053,6 +1065,12 @@ sub show_mainpage() {
 	my $email_sender = $idssettings{'EMAIL_SENDER'};
 	my $email_recipients = $idssettings{'EMAIL_RECIPIENTS'};
 
+	my %email_recipients_reports = (
+		"DAILY" => $idssettings{'EMAIL_RECIPIENTS_REPORT_DAILY'},
+		"WEEKLY" => $idssettings{'EMAIL_RECIPIENTS_REPORT_WEEKLY'},
+		"MONTHLY" => $idssettings{'EMAIL_RECIPIENTS_REPORT_MONTHLY'},
+	);
+
 	# Set form values to cgiparams state in error case.
 	if ($errormessage) {
 		$checked{'ENABLE_IDS'}{$cgiparams{'ENABLE_IDS'}} = "checked='checked'";
@@ -1063,6 +1081,12 @@ sub show_mainpage() {
 
 		$email_sender = $cgiparams{'EMAIL_SENDER'};
 		$email_recipients = $cgiparams{'EMAIL_RECIPIENTS'};
+
+		%email_recipients_reports = (
+			"DAILY" => $cgiparams{'EMAIL_RECIPIENTS_REPORT_DAILY'},
+			"WEEKLY" => $cgiparams{'EMAIL_RECIPIENTS_REPORT_WEEKLY'},
+			"MONTHLY" => $cgiparams{'EMAIL_RECIPIENTS_REPORT_MONTHLY'},
+		);
 	}
 
 	# Draw current state of the IDS
@@ -1209,49 +1233,107 @@ print <<END
 						</select>
 					</td>
 				</tr>
+			</table>
 
-				<tr>
-					<td colspan="2">&nbsp;</td>
-				</tr>
+			<h6>
+				$Lang::tr{'ids reports daily'}
+			</h6>
 
+			<table class="form">
 				<tr>
 					<td>
 						<label for="ENABLE_REPORT_DAILY">
-							$Lang::tr{'ids reports daily'}
+							$Lang::tr{'enable'}
 						</label>
 					</td>
 
 					<td>
-						<input type='checkbox' name='ENABLE_REPORT_DAILY' id="ENABLE_REPORT_DAILY" $checked{'ENABLE_REPORT_DAILY'}{'on'}>
+						<input type='checkbox' name='ENABLE_REPORT_DAILY'
+							id="ENABLE_REPORT_DAILY" $checked{'ENABLE_REPORT_DAILY'}{'on'}>
 					</td>
 				</tr>
 
+				<tr>
+					<td>
+						<label for="EMAIL_RECIPIENTS_REPORT_DAILY">
+							$Lang::tr{'ids email recipients'}
+						</label>
+					</td>
+
+					<td>
+						<input type="text" name="EMAIL_RECIPIENTS_REPORT_DAILY"
+							value="$email_recipients_reports{'DAILY'}">
+					</td>
+				</tr>
+			</table>
+
+			<h6>
+				$Lang::tr{'ids reports weekly'}
+			</h6>
+
+			<table class="form">
 				<tr>
 					<td>
 						<label for="ENABLE_REPORT_WEEKLY">
-							$Lang::tr{'ids reports weekly'}
+							$Lang::tr{'enable'}
 						</label>
 					</td>
 
 					<td>
-						<input type='checkbox' name='ENABLE_REPORT_WEEKLY' id="ENABLE_REPORT_WEEKLY" $checked{'ENABLE_REPORT_WEEKLY'}{'on'}>
+						<input type='checkbox' name='ENABLE_REPORT_WEEKLY'
+							id="ENABLE_REPORT_WEEKLY" $checked{'ENABLE_REPORT_WEEKLY'}{'on'}>
 					</td>
 				</tr>
 
 				<tr>
 					<td>
-						<label for="ENABLE_REPORT_MONTHLY">
-							$Lang::tr{'ids reports monthly'}
+						<label for="EMAIL_RECIPIENTS_REPORT_WEEKLY">
+							$Lang::tr{'ids email recipients'}
 						</label>
 					</td>
 
 					<td>
-						<input type='checkbox' name='ENABLE_REPORT_MONTHLY' id="ENABLE_REPORT_MONTHLY" $checked{'ENABLE_REPORT_MONTHLY'}{'on'}>
+						<input type="text" name="EMAIL_RECIPIENTS_REPORT_WEEKLY"
+							value="$email_recipients_reports{'WEEKLY'}">
+					</td>
+				</tr>
+			</table>
+
+			<h6>
+				$Lang::tr{'ids reports monthly'}
+			</h6>
+
+			<table class="form">
+				<tr>
+					<td>
+						<label for="ENABLE_REPORT_MONTHLY">
+							$Lang::tr{'enable'}
+						</label>
+					</td>
+
+					<td>
+						<input type='checkbox' name='ENABLE_REPORT_MONTHLY'
+							id="ENABLE_REPORT_MONTHLY" $checked{'ENABLE_REPORT_MONTHLY'}{'on'}>
 					</td>
 				</tr>
 
+				<tr>
+					<td>
+						<label for="EMAIL_RECIPIENTS_REPORT_MONTHLY">
+							$Lang::tr{'ids email recipients'}
+						</label>
+					</td>
+
+					<td>
+						<input type="text" name="EMAIL_RECIPIENTS_REPORT_MONTHLY"
+							value="$email_recipients_reports{'MONTHLY'}">
+					</td>
+				</tr>
+			</table>
+
+			<table class="form">
 				<tr class="action">
-					<td colspan="2">
+					<td>
 						<input type='submit' name='IDS' value='$Lang::tr{'save'}' />
 					</td>
 				</tr>
@@ -1424,7 +1506,7 @@ END
 			my $col = "";
 
 			# Loop through all entries of the hash.
-			foreach my $key (sort { $ignored{$a}[0] <=> $ignored{$b}[0] } keys %ignored)  {
+			foreach my $key (sort { $a <=> $b } keys %ignored)  {
 				# Assign data array positions to some nice variable names.
 				my $address = $ignored{$key}[0];
 				my $remark = $ignored{$key}[1];
