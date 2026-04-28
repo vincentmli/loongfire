@@ -1829,4 +1829,109 @@ sub generate_report_generator_config() {
 	close(FILE);
 }
 
+#
+## Function to get the provider handle by a given rule sid.
+#
+sub get_provider_by_sid ($) {
+	my ($sid) = @_;
+
+	# Get all known ruleset providers.
+	my @ruleset_providers = &get_ruleset_providers();
+
+	# Temporary hash to store found ranges.
+	my %tmphash = ();
+	my @tmparray;
+
+	# Loop through the array of known providers.
+	foreach my $provider (@ruleset_providers) {
+		# Skip provider if no sid range is specified.
+		next unless ($IDS::Ruleset::Providers{$provider}{"sid_range"});
+
+		# Grab and the dereference the sid range.
+		my @sid_range = @{ $IDS::Ruleset::Providers{$provider}{"sid_range"} };
+
+		# Check if the given sid is in the range of the current processed provider.
+		next unless (&is_sid_in_range($sid, \@sid_range));
+
+		# Assign some nice human-readable values.
+		my $start = $sid_range[0];
+		my $end = $sid_range[1];
+
+		# Calculate the sid range.
+		my $range = $end - $start;
+
+		# Assign the found provider and it's range to the temporary hash.
+		$tmphash{$range} = $provider;
+	}
+
+	# Sort the ranges of the found providers and store them in a temporary
+	# array - This is neccessary in case more than one range has been found.
+	@tmparray = sort (keys %tmphash);
+
+	# Return if nothing has been found.
+	return unless(@tmparray);
+
+	# The first element of the temporary array contains our smalles sid range
+	# which the given sid has to belong - grab the stored handle.
+	my $handle = $tmphash{$tmparray[0]};
+
+	# Return the obtained handle.
+	return $handle;
+}
+
+#
+## Function to check if a given single sid is in a given range.
+#
+sub is_sid_in_range($\@) {
+	my ($sid, $range_ref) = @_;
+
+	# Deref the array ref and assig to array.
+	my @range = @{ $range_ref };
+
+	# Assign some nice human-readable values.
+	my $range_start = $range[0];
+	my $range_stop = $range[1];
+
+	# Early exit in case the range has been passed the
+	# wrong way around.
+	return undef if ($range_start > $range_stop);
+
+	# Return if the given sid is lower than the start one.
+	return if ($sid < $range_start);
+
+	# Return if the given sid is higher than the max range.
+	return if ($sid > $range_stop);
+
+	# Return True if the given sid is lower or equals the max range.
+	return 1 if ($sid <= $range_stop);
+
+	# If we got here, something strange happend.
+	return undef;
+}
+
+#
+## Function to get the sid info url in case it is defined
+#
+sub get_sid_info_url($) {
+	my ($sid) = @_;
+
+	# Call function to get the provider for this rule id.
+	my $provider = &get_provider_by_sid($sid);
+
+	# Exit if no provder could be determined.
+	return unless($provider);
+
+	# Exit if no info URL is known for the provider.
+	return unless($IDS::Ruleset::Providers{$provider}{"sid_info_url"});
+
+	# Grab the URL for the given provider.
+	my $info_url = $IDS::Ruleset::Providers{$provider}{"sid_info_url"};
+
+	# Replace the <sid> placeholder with the given sid.
+	$info_url =~ s/\<sid\>/$sid/g;
+
+	# Return the URL.
+	return $info_url;
+}
+
 1;
