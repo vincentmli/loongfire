@@ -11,7 +11,7 @@ usr/bin/fusermount3
 #usr/include/fuse3/fuse_opt.h
 #usr/include/fuse3/libfuse_config.h
 #usr/lib/libfuse3.so
-usr/lib/libfuse3.so.3.17.4
+usr/lib/libfuse3.so.3.18.1
 usr/lib/libfuse3.so.4
 #usr/lib/pkgconfig/fuse3.pc
 usr/lib/udev/rules.d/99-fuse3.rules
