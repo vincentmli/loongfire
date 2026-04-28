@@ -3250,7 +3250,7 @@
 'wlanap link dhcp' => '无线局域网DHCP配置',
 'wlanap link wireless' => '活动的无线局域网客户端',
 'wlanap management frame protection' => '管理框架保护（802.11w）',
-'wlanap neighbor scan' => '邻居扫描',
+'wlanap neighbor scan' => '禁用邻居扫描',
 'wlanap neighbor scan warning' => '警告！ 禁用可能违反监管规则!',
 'wlanap no interface' => '所选接口不是无线局域网卡!',
 'wlanap none' => 'none',

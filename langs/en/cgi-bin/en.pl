@@ -3236,7 +3236,7 @@
 'wlanap link dhcp' => 'Wireless LAN DHCP configuration',
 'wlanap link wireless' => 'Activate wireless lan clients',
 'wlanap management frame protection' => 'Management Frame Protection (802.11w)',
-'wlanap neighbor scan' => 'Neighborhood Scan',
+'wlanap neighbor scan' => 'Disable Neighborhood Scan',
 'wlanap neighbor scan warning' => 'Warning: Disabling may violate regulatory rules',
 'wlanap no interface' => 'Selected interface is not a wirless lan card!',
 'wlanap none' => 'none',
