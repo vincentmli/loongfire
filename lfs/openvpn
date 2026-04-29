@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 2.6.17
+VER        = 2.6.19
 
 THISAPP    = openvpn-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -40,7 +40,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = a5cff9bf4de85b647bd0cef808586b2cd29694ad0134ae6e4b3f74251c2ce0908cf86cbc041768f7fbc495e3ad5c5dbb9c491fe351b99da330dd2390142b353e
+$(DL_FILE)_BLAKE2 = 4eabecd3be43c7a45dbf2fb92236f568d5273978b18d5068200277771a5f6cad5fd3cc138232812c7f2e3c9a7812e73ca63c362ec942f361401c0712dc7d8498
 
 install : $(TARGET)
 
