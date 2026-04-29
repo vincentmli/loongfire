@@ -70,6 +70,11 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
+
+	# Apply unbound RPZ ZONEMD fix.
+	# Fix should be included in one of the following versions
+	cd $(DIR_APP) && patch -Np1 -i $(DIR_SRC)/src/patches/unbound-rpz-ignore-zonemd.patch
+
 	cd $(DIR_APP) && \
 		./configure \
 			--prefix=/usr \
@@ -113,6 +118,10 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	# Ship ICANN's certificates to validate DNS trust anchors
 	install -v -m 644 $(DIR_SRC)/config/unbound/icannbundle.pem \
 		/etc/unbound/icannbundle.pem
+
+	# Install the cache directory
+	-mkdir -pv /var/cache/unbound
+	chown nobody:nobody /var/cache/unbound
 
 	@rm -rf $(DIR_APP)
 	@$(POSTBUILD)

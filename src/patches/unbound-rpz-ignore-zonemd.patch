@@ -1,0 +1,21 @@
+Subject: [PATCH] RPZ: ignore ZONEMD records to prevent root priming failure
+
+RPZ zones with apex ZONEMD RR (type 63) create phantom QNAME trigger for root
+zone (.) after strip_dname_origin(), breaking DNSSEC priming:
+"rpz: applied [dbl-ads] . rpz-local-data . DNSKEY IN"
+
+Fixes: https://github.com/NLnetLabs/unbound/issues/1404
+Tested-on: unbound-1.24.2
+
+diff -Nur unbound-1.24.2.orig/services/rpz.c unbound-1.24.2/services/rpz.c
+--- unbound-1.24.2.orig/services/rpz.c	2025-11-26 10:16:06.000000000 +0000
++++ unbound-1.24.2/services/rpz.c	2026-02-16 10:00:46.973582336 +0000
+@@ -160,6 +160,7 @@
+ 		case LDNS_RR_TYPE_NSEC:
+ 		case LDNS_RR_TYPE_NSEC3:
+ 		case LDNS_RR_TYPE_NSEC3PARAM:
++		case LDNS_RR_TYPE_ZONEMD:
+ 			return 1;
+ 		default:
+ 			break;
+
