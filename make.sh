@@ -1395,6 +1395,7 @@ build_toolchain() {
 	lfsmake1 binutils			PASS=2
 	lfsmake1 gcc			PASS=2
 	lfsmake1 zstd
+	lfsmake1 oneTBB
 	lfsmake1 blake3
 	lfsmake1 ccache
 	lfsmake1 tcl
