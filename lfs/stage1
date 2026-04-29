@@ -55,4 +55,15 @@ ifeq "$(BUILD_ARCH)" "riscv64"
 	ln -svf . $(TOOLS_DIR)/lib/lp64d
 endif
 
+	# Write a cmake toolchain file so cmake knows we're targeting $(BUILD_ARCH)
+	-mkdir -pv $(TOOLS_DIR)/share/cmake
+	echo "set(CMAKE_SYSTEM_NAME      Linux)" > \
+		$(TOOLS_DIR)/share/cmake/toolchain.cmake
+	echo "set(CMAKE_SYSTEM_PROCESSOR $(BUILD_ARCH))" >> \
+		$(TOOLS_DIR)/share/cmake/toolchain.cmake
+	echo "set(CMAKE_C_COMPILER       $(TOOLS_DIR)/bin/cc)"  >> \
+		$(TOOLS_DIR)/share/cmake/toolchain.cmake
+	echo "set(CMAKE_CXX_COMPILER     $(TOOLS_DIR)/bin/c++)" >> \
+		$(TOOLS_DIR)/share/cmake/toolchain.cmake
+
 	@$(POSTBUILD)

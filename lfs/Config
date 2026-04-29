@@ -136,6 +136,14 @@ ifeq "$(BUILD_ARCH)" "loongarch64"
 	GRUB_ARCH = $(BUILD_ARCH)
 endif
 
+CMAKE = cmake
+
+# In the toolchain, we might be cross-compiling and need cmake to know
+ifeq "$(TOOLCHAIN)" "1"
+        CMAKE += \
+                -D CMAKE_TOOLCHAIN_FILE=$(TOOLS_DIR)/share/cmake/toolchain.cmake
+endif
+
 # Go
 export GOARCH
 export GOOS   = linux
