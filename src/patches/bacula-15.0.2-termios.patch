@@ -1,0 +1,10 @@
+--- bacula-15.0.2/src/console/conio.c~	2026-02-17 10:06:57.225175638 +0000
++++ bacula-15.0.2/src/console/conio.c	2026-02-17 10:07:44.116581037 +0000
+@@ -55,6 +55,7 @@
+ #ifdef HAVE_CONIO
+ 
+ #include <curses.h>
++#include <termios.h>
+ #include <term.h>
+ 
+ #ifdef HAVE_SUN_OS
