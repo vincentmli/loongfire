@@ -58,7 +58,7 @@ if [ "${previous}" != "N" ]; then
 		if [ "${runlevel}" != "0" ] && [ "${runlevel}" != "6" ]; then
 			if [ ! -f ${prev_start} ] && [ ! -f ${sysinit_start} ]; then
 				boot_mesg -n "WARNING:\n\n${i} can't be" ${WARNING}
-				boot_mesg -n " executed because it was not"
+				boot_mesg -n " executed because it was"
 				boot_mesg -n " not started in the previous"
 				boot_mesg -n " runlevel (${previous})."
 				boot_mesg "" ${NORMAL}
