@@ -1397,6 +1397,7 @@ build_toolchain() {
 	lfsmake1 zstd
 	lfsmake1 oneTBB
 	lfsmake1 blake3
+	lfsmake1 fmt
 	lfsmake1 ccache
 	lfsmake1 tcl
 	lfsmake1 expect
