@@ -1896,7 +1896,6 @@ fi
 	lfsmake2 fireperf
 	lfsmake2 iperf
 	lfsmake2 iperf3
-	lfsmake2 7zip
 	lfsmake2 lynis
 	lfsmake2 sshfs
 	lfsmake2 utfcpp
