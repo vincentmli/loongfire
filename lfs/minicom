@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2023  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -26,15 +26,15 @@ include Config
 
 SUMMARY    = A Terminal Program
 
-VER        = 2.9
+VER        = 2.11
 
 THISAPP    = minicom-$(VER)
-DL_FILE    = $(THISAPP).tar.gz
+DL_FILE    = $(THISAPP).tar.bz2
 DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = minicom
-PAK_VER    = 3
+PAK_VER    = 4
 
 DEPS       =
 
@@ -50,7 +50,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 4c17f235d770ff9b4719c0ce9d3dfdb01603986d08cec245b1bfba5addbea597032bb06fc73c585886e035915dec990f37e9690b58d0a80a3e6faf8675485f96
+$(DL_FILE)_BLAKE2 = f86d9efc7512a9322dd40b767513a424cf692283690d56a344275450d520df3022312320405177daeb80fa22669ebf55ea5b0476aee99d9ff1fd7eb4d5520e98
 
 install : $(TARGET)
 
@@ -82,11 +82,10 @@ $(subst %,%_BLAKE2,$(objects)) :
 
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
-	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar zxf $(DIR_DL)/$(DL_FILE)
+	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 	$(UPDATE_AUTOMAKE)
-	cd $(DIR_APP) && \
-		./configure \
-			--prefix=/usr
+	cd $(DIR_APP) && ./configure \
+				--prefix=/usr
 	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install
 	@rm -rf $(DIR_APP)
