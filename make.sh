@@ -1505,7 +1505,7 @@ build_system() {
 	lfsmake2 --enable-toolchain e2fsprogs
 	lfsmake2 --enable-toolchain jq
 
-        # From here, build without having the toolchain available
+	# From here, build without having the toolchain available
 	lfsmake2 configroot
 	lfsmake2 initscripts
 	lfsmake2 backup
@@ -1513,6 +1513,29 @@ build_system() {
 	lfsmake2 openssl
 	lfsmake2 popt
 	lfsmake2 libedit
+	lfsmake2 expat
+	lfsmake2 libffi
+	lfsmake2 gdbm
+	lfsmake2 sqlite
+	lfsmake2 python3
+	lfsmake2 python3-wheel
+	lfsmake2 python3-toml
+	lfsmake2 python3-setuptools
+	lfsmake2 python3-pyproject2setuppy
+	lfsmake2 python3-packaging
+	lfsmake2 python3-pep517
+	lfsmake2 python3-build
+	lfsmake2 python3-install
+	lfsmake2 python3-urllib3
+	lfsmake2 python3-charset-normalizer
+	lfsmake2 python3-idna
+	lfsmake2 python3-certifi
+	lfsmake2 python3-requests
+	lfsmake2 python3-docutils
+	lfsmake2 python3-flit
+	lfsmake2 python3-more_itertools
+	lfsmake2 ninja
+	lfsmake2 meson
 	lfsmake2 pam
 	lfsmake2 libcap
 	lfsmake2 libcap-ng
@@ -1538,7 +1561,6 @@ build_system() {
 	lfsmake2 iproute2
 	lfsmake2 screen
 	lfsmake2 elfutils
-	lfsmake2 expat
 	lfsmake2 libconfig
 	lfsmake2 curl
 	lfsmake2 libarchive
@@ -1546,28 +1568,6 @@ build_system() {
 	lfsmake2 json-c
 	lfsmake2 tcl
 	lfsmake2 expect
-	lfsmake2 libffi
-	lfsmake2 gdbm
-	lfsmake2 sqlite
-	lfsmake2 python3
-	lfsmake2 python3-wheel
-	lfsmake2 python3-toml
-	lfsmake2 python3-setuptools
-	lfsmake2 python3-pyproject2setuppy
-	lfsmake2 python3-packaging
-	lfsmake2 python3-pep517
-	lfsmake2 python3-build
-	lfsmake2 python3-install
-	lfsmake2 python3-urllib3
-	lfsmake2 python3-charset-normalizer
-	lfsmake2 python3-idna
-	lfsmake2 python3-certifi
-	lfsmake2 python3-requests
-	lfsmake2 python3-docutils
-	lfsmake2 python3-flit
-        lfsmake2 python3-more_itertools
-	lfsmake2 ninja
-	lfsmake2 meson
 	lfsmake2 python3-MarkupSafe
 	lfsmake2 python3-Jinja2
 	lfsmake2 kmod
