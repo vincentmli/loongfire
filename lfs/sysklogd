@@ -24,16 +24,13 @@
 
 include Config
 
-VER        = 1.5.1
+VER        = 2.7.2
 
 THISAPP    = sysklogd-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
 DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
-
-# Fix build with GCC 15
-CFLAGS += -std=gnu17
 
 ###############################################################################
 # Top-level Rules
@@ -43,7 +40,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = c40bd8d5769f7d3d4141d602c74ac41e05a140743d18c4923d9368da7ba193ccb89a6837173994f0b7a9c290cc23f64513040434d7ab8df81b5d09b73b0263ad
+$(DL_FILE)_BLAKE2 = 6a42e049140ab64c5658b7fc112ee33b39481ebe78079271fe6fd7ad44976d3a6e861a4c42a8958599bc83c096e2d7e09cb0c447ffd46e4844c8cfdab13dace2
 
 install : $(TARGET)
 
@@ -73,14 +70,17 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar zxf $(DIR_DL)/$(DL_FILE)
-
-	# Compile fix
-	cd $(DIR_APP) && sed -i "s/union wait/int/" syslogd.c
-
-	cd $(DIR_APP) && make $(MAKETUNING) RPM_OPT_FLAGS="$(CFLAGS)"
+	cd $(DIR_APP) && ./configure \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--localstatedir=/var \
+		--without-logger \
+		--without-systemd \
+		--disable-static
+	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install
-	touch /var/log/{dhcpcd.log,messages,kern.log}
-	chmod 664 /var/log/{dhcpcd.log,messages,kern.log}
-	chown 0:105 /var/log/{dhcpcd.log,messages,kern.log}
+	touch /var/log/{dhcpcd.log,messages}
+	chmod 664 /var/log/{dhcpcd.log,messages}
+	chown 0:105 /var/log/{dhcpcd.log,messages}
 	@rm -rf $(DIR_APP)
 	@$(POSTBUILD)
