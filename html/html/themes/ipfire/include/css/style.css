@@ -373,11 +373,16 @@ table.form tr td:first-child {
 	width: 25%;
 }
 
+table.form tr td {
+	vertical-align: top;
+}
+
 table.form tr td input[type=text],
 table.form tr td input[type=number],
 table.form tr td select,
 table.form tr td textarea {
 	width: 100%;
+	box-sizing: border-box;
 }
 
 table.form tr.header td {

@@ -21,18 +21,23 @@
                                 'title' => "$Lang::tr{'intrusion detection system'}",
 				'enabled' => 1,
                                 };
-	$subfirewall->{'50.ipblocklist'} = {'caption' => $Lang::tr{'ipblocklist'},
+	$subfirewall->{'50.dnsbl'} = {'caption' => $Lang::tr{'dnsbl dns firewall'},
+                                'uri' => '/cgi-bin/dnsbl.cgi',
+                                'title' => "$Lang::tr{'dnsbl dns firewall'}",
+				'enabled' => 1,
+                                };
+	$subfirewall->{'60.ipblocklist'} = {'caption' => $Lang::tr{'ipblocklist'},
 				'uri' => '/cgi-bin/ipblocklist.cgi',
 				'title' => "$Lang::tr{'ipblocklist'}",
 				'enabled' => 1,
 				};
-    $subfirewall->{'60.locationblock'} = {
+    $subfirewall->{'70.locationblock'} = {
 				'caption' => $Lang::tr{'locationblock'},
 				'uri' => '/cgi-bin/location-block.cgi',
 				'title' => $Lang::tr{'locationblock'},
 				'enabled' => 1,
 				};
-    $subfirewall->{'70.wireless'} = {
+    $subfirewall->{'80.wireless'} = {
 				'caption' => $Lang::tr{'blue access'},
 				'uri' => '/cgi-bin/wireless.cgi',
 				'title' => "$Lang::tr{'blue access'}",
