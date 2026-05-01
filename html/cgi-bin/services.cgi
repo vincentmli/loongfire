@@ -81,11 +81,6 @@ $querry[1] = 'hour' unless defined $querry[1];
 			"process" => "syslogd",
 		},
 
-		# Kernel Logger
-		$Lang::tr{'kernel logging server'} => {
-			"process" => "klogd",
-		},
-
 		# Time Server
 		$Lang::tr{'ntp server'} => {
 			"process" => "ntpd",
