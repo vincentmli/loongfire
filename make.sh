@@ -2084,8 +2084,9 @@ fi
 	lfsmake2 loxicmd
 	lfsmake2 wireguard-tools
 	lfsmake2 arpwatch
-	lfsmake2 lldpd
 	lfsmake2 suricata-reporter
+	lfsmake2 lldpd
+	lfsmake2 perl-Net-LibIDN2
 
 	lfsmake2 linux
 	lfsmake2 loxilb
