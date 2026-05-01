@@ -21,13 +21,13 @@
 
 . /etc/sysconfig/rc
 . ${rc_functions}
+. /etc/init.d/networking/functions.network
 
 # Cache any local zones for 60 seconds
 LOCAL_TTL=60
 
 # Load configuration
 eval $(/usr/local/bin/readhash /var/ipfire/dns/settings)
-eval $(/usr/local/bin/readhash /var/ipfire/ethernet/settings)
 
 ip_address_revptr() {
 	local addr=${1}
@@ -214,6 +214,233 @@ write_forward_conf() {
 	) > /etc/unbound/forward.conf
 }
 
+write_dnsbl_zones() {
+	# Attributes from dnsbl.json
+	local name
+	local zone
+	local primary
+
+	# Attributes from the settings
+	local _zone
+	local enabled
+	local comment
+	local enabled_zones
+	local custom_acl
+	local rest
+
+	# Nothing to do if there is no configuration
+	if [ ! -r "/var/ipfire/dns/dnsbl" ]; then
+		return 0
+	fi
+
+	# Collect all networks
+	local -A networks=()
+
+	while IFS=$'\t' read -r name zone primary; do
+		while IFS=$',' read -r _zone enabled comment enabled_zones custom_acls rest; do
+			# Skip if we are looking at the wrong list
+			[ "${zone}" = "${_zone}" ] || continue
+
+			# We are done if the list is not enabled
+			[ "${enabled}" = "on" ] || break
+
+			# Write the zone
+			if ! write_dnsbl_zone "${zone}" "${primary}"; then
+				return 1
+			fi
+
+			# Nothing more to do if there are no ACLs set
+			if [ -z "${enabled_zones}" -a -z "${custom_acls}" ]; then
+				continue
+			fi
+
+			# Limit to specific zones
+			if [ -n "${enabled_zones}" ]; then
+				IFS='|' read -r -a enabled_zones <<< "${enabled_zones}"
+
+				if ! add_dnsbl_acl "${zone}" "${enabled_zones[@]}"; then
+					return 1
+				fi
+			fi
+
+			# Add any custom ACL
+			if [ -n "${custom_acls}" ]; then
+				IFS='|' read -r -a custom_acls <<< "${custom_acls}"
+
+				local custom_acl
+				for custom_acl in ${custom_acls[@]}; do
+					networks["${custom_acl}"]+=" ${zone}"
+				done
+			fi
+		done < /var/ipfire/dns/dnsbl
+	done <<< "$(jq -r '.[] | [.name, .zone, .primary] | @tsv' /var/ipfire/dns/dnsbl.json)"
+
+	# Emit all ACLs
+	if [ -n "${networks[*]}" ]; then
+		local network
+
+		echo "# Write the ACL"
+		echo "server:"
+
+		for network in "${!networks[@]}"; do
+			echo "	access-control-tag: ${network} \"${networks[${network}]:1}\""
+		done
+	fi
+
+	return 0
+}
+
+write_custom_zone() {
+	local domain
+	local status
+	local rest
+
+	# Do nothing if there are no domains on the list
+	if [ ! -s "/var/ipfire/dns/custom_domains" ]; then
+		return 0
+	fi
+
+	# Create the origin
+	echo "\$ORIGIN _custom.rpz.local."
+
+	# Add all domains
+	while IFS=$',' read -r domain status rest; do
+		local policy
+
+		# Check status
+		case "${status}" in
+			allowed)
+				policy="rpz-passthru."
+				;;
+			blocked)
+				policy="."
+				;;
+
+			# Ignore anything else
+			*)
+				continue
+				;;
+		esac
+
+		echo "${domain} CNAME ${policy}"
+		echo "*.${domain} CNAME ${policy}"
+	done < /var/ipfire/dns/custom_domains
+}
+
+write_dnsbl_zone() {
+	local name="${1}"
+	local primary="${2}"
+
+	cat <<EOF
+server:
+	define-tag: "${name}"
+
+# Request Policy Zone ${zone}
+rpz:
+	# The name of the RPZ authority zone
+	name: ${zone}
+	primary: ${primary}
+
+	# Cache the content and refresh automatically
+	zonefile: /var/cache/unbound/${zone}.zone
+
+	# Log all matches
+	rpz-log: yes
+	rpz-log-name: ${zone}
+
+EOF
+
+	# If any ACLs are defined, add the tag
+	if [ -n "${enabled_zones}" -o -n "${custom_acls}" ]; then
+		echo "	# Tags"
+		echo "	tags: ${zone}"
+		echo
+	fi
+
+	return 0
+}
+
+add_dnsbl_acl() {
+	local tag="${1}"
+	shift
+
+	local zone
+	for zone in $@; do
+		case "${zone}" in
+			GREEN)
+				# Check if the zone is configured
+				if [ -z "${GREEN_NETADDRESS}" -o -z "${GREEN_NETMASK}" ]; then
+					continue
+				fi
+
+				# Convert the netmask to prefix
+				local prefix="$(network_get_prefix "${GREEN_NETMASK}")"
+
+				local network="${GREEN_NETADDRESS}/${prefix}"
+				;;
+			BLUE)
+				# Check if the zone is configured
+				if [ -z "${BLUE_NETADDRESS}" -o -z "${BLUE_NETMASK}" ]; then
+					continue
+				fi
+
+				# Convert the netmask to prefix
+				local prefix="$(network_get_prefix "${BLUE_NETMASK}")"
+
+				local network="${BLUE_NETADDRESS}/${prefix}"
+				;;
+			ORANGE)
+				# Check if the zone is configured
+				if [ -z "${ORANGE_NETADDRESS}" -o -z "${ORANGE_NETMASK}" ]; then
+					continue
+				fi
+
+				# Convert the netmask to prefix
+				local prefix="$(network_get_prefix "${ORANGE_NETMASK}")"
+
+				local network="${ORANGE_NETADDRESS}/${prefix}"
+				;;
+
+			# Skip any unknown zones
+			*)
+				continue
+				;;
+		esac
+
+		# Append to the network slot
+		networks["${network}"]+=" ${tag}"
+	done
+}
+
+write_dnsbl_conf() {
+	# Write our custom zone
+	write_custom_zone > /etc/unbound/custom.zone
+
+	(
+		# Write the header
+		config_header
+
+		# Add the custom RPZ zone
+		if [ -s "/etc/unbound/custom.zone" ]; then
+			cat <<EOF
+# Custom RPZ zone
+rpz:
+	name: _custom.rpz.local
+	zonefile: /etc/unbound/custom.zone
+
+	# Log all matches
+	rpz-log: yes
+	rpz-log-name: custom
+
+EOF
+		fi
+
+		# Write all zones
+		write_dnsbl_zones
+	) > /etc/unbound/dnsbl.conf
+
+}
+
 write_tuning_conf() {
 	# https://www.unbound.net/documentation/howto_optimise.html
 
@@ -315,256 +542,439 @@ resolve() {
 	return ${found}
 }
 
-# Sets up Safe Search for various search engines
-update_safe_search() {
-	local google_tlds=(
-		google.ad
-		google.ae
-		google.al
-		google.am
-		google.as
-		google.at
-		google.az
-		google.ba
-		google.be
-		google.bf
-		google.bg
-		google.bi
-		google.bj
-		google.bs
-		google.bt
-		google.by
-		google.ca
-		google.cat
-		google.cd
-		google.cf
-		google.cg
-		google.ch
-		google.ci
-		google.cl
-		google.cm
-		google.cn
-		google.co.ao
-		google.co.bw
-		google.co.ck
-		google.co.cr
-		google.co.id
-		google.co.il
-		google.co.in
-		google.co.jp
-		google.co.ke
-		google.co.kr
-		google.co.ls
-		google.com
-		google.co.ma
-		google.com.af
-		google.com.ag
-		google.com.ai
-		google.com.ar
-		google.com.au
-		google.com.bd
-		google.com.bh
-		google.com.bn
-		google.com.bo
-		google.com.br
-		google.com.bz
-		google.com.co
-		google.com.cu
-		google.com.cy
-		google.com.do
-		google.com.ec
-		google.com.eg
-		google.com.et
-		google.com.fj
-		google.com.gh
-		google.com.gi
-		google.com.gt
-		google.com.hk
-		google.com.jm
-		google.com.kh
-		google.com.kw
-		google.com.lb
-		google.com.ly
-		google.com.mm
-		google.com.mt
-		google.com.mx
-		google.com.my
-		google.com.na
-		google.com.nf
-		google.com.ng
-		google.com.ni
-		google.com.np
-		google.com.om
-		google.com.pa
-		google.com.pe
-		google.com.pg
-		google.com.ph
-		google.com.pk
-		google.com.pr
-		google.com.py
-		google.com.qa
-		google.com.sa
-		google.com.sb
-		google.com.sg
-		google.com.sl
-		google.com.sv
-		google.com.tj
-		google.com.tr
-		google.com.tw
-		google.com.ua
-		google.com.uy
-		google.com.vc
-		google.com.vn
-		google.co.mz
-		google.co.nz
-		google.co.th
-		google.co.tz
-		google.co.ug
-		google.co.uk
-		google.co.uz
-		google.co.ve
-		google.co.vi
-		google.co.za
-		google.co.zm
-		google.co.zw
-		google.cv
-		google.cz
-		google.de
-		google.dj
-		google.dk
-		google.dm
-		google.dz
-		google.ee
-		google.es
-		google.fi
-		google.fm
-		google.fr
-		google.ga
-		google.ge
-		google.gg
-		google.gl
-		google.gm
-		google.gp
-		google.gr
-		google.gy
-		google.hn
-		google.hr
-		google.ht
-		google.hu
-		google.ie
-		google.im
-		google.iq
-		google.is
-		google.it
-		google.je
-		google.jo
-		google.kg
-		google.ki
-		google.kz
-		google.la
-		google.li
-		google.lk
-		google.lt
-		google.lu
-		google.lv
-		google.md
-		google.me
-		google.mg
-		google.mk
-		google.ml
-		google.mn
-		google.ms
-		google.mu
-		google.mv
-		google.mw
-		google.ne
-		google.nl
-		google.no
-		google.nr
-		google.nu
-		google.pl
-		google.pn
-		google.ps
-		google.pt
-		google.ro
-		google.rs
-		google.ru
-		google.rw
-		google.sc
-		google.se
-		google.sh
-		google.si
-		google.sk
-		google.sm
-		google.sn
-		google.so
-		google.sr
-		google.st
-		google.td
-		google.tg
-		google.tk
-		google.tl
-		google.tm
-		google.tn
-		google.to
-		google.tt
-		google.vg
-		google.vu
-		google.ws
-	)
+write_safesearch_conf() {
+	local -A domains=(
+		# Google
+		[google.ac]="forcesafesearch.google.com"
+		[www.google.ac]="forcesafesearch.google.com"
+		[google.ad]="forcesafesearch.google.com"
+		[www.google.ad]="forcesafesearch.google.com"
+		[google.ae]="forcesafesearch.google.com"
+		[www.google.ae]="forcesafesearch.google.com"
+		[google.al]="forcesafesearch.google.com"
+		[www.google.al]="forcesafesearch.google.com"
+		[google.am]="forcesafesearch.google.com"
+		[www.google.am]="forcesafesearch.google.com"
+		[google.as]="forcesafesearch.google.com"
+		[www.google.as]="forcesafesearch.google.com"
+		[google.at]="forcesafesearch.google.com"
+		[www.google.at]="forcesafesearch.google.com"
+		[google.az]="forcesafesearch.google.com"
+		[www.google.az]="forcesafesearch.google.com"
+		[google.ba]="forcesafesearch.google.com"
+		[www.google.ba]="forcesafesearch.google.com"
+		[google.be]="forcesafesearch.google.com"
+		[www.google.be]="forcesafesearch.google.com"
+		[google.bf]="forcesafesearch.google.com"
+		[www.google.bf]="forcesafesearch.google.com"
+		[google.bg]="forcesafesearch.google.com"
+		[www.google.bg]="forcesafesearch.google.com"
+		[google.bi]="forcesafesearch.google.com"
+		[www.google.bi]="forcesafesearch.google.com"
+		[google.bj]="forcesafesearch.google.com"
+		[www.google.bj]="forcesafesearch.google.com"
+		[google.bs]="forcesafesearch.google.com"
+		[www.google.bs]="forcesafesearch.google.com"
+		[google.bt]="forcesafesearch.google.com"
+		[www.google.bt]="forcesafesearch.google.com"
+		[google.by]="forcesafesearch.google.com"
+		[www.google.by]="forcesafesearch.google.com"
+		[google.ca]="forcesafesearch.google.com"
+		[www.google.ca]="forcesafesearch.google.com"
+		[google.cd]="forcesafesearch.google.com"
+		[www.google.cd]="forcesafesearch.google.com"
+		[google.cf]="forcesafesearch.google.com"
+		[www.google.cf]="forcesafesearch.google.com"
+		[google.cg]="forcesafesearch.google.com"
+		[www.google.cg]="forcesafesearch.google.com"
+		[google.ch]="forcesafesearch.google.com"
+		[www.google.ch]="forcesafesearch.google.com"
+		[google.ci]="forcesafesearch.google.com"
+		[www.google.ci]="forcesafesearch.google.com"
+		[google.cl]="forcesafesearch.google.com"
+		[www.google.cl]="forcesafesearch.google.com"
+		[google.cm]="forcesafesearch.google.com"
+		[www.google.cm]="forcesafesearch.google.com"
+		[google.co.ao]="forcesafesearch.google.com"
+		[www.google.co.ao]="forcesafesearch.google.com"
+		[google.co.bw]="forcesafesearch.google.com"
+		[www.google.co.bw]="forcesafesearch.google.com"
+		[google.co.ck]="forcesafesearch.google.com"
+		[www.google.co.ck]="forcesafesearch.google.com"
+		[google.co.cr]="forcesafesearch.google.com"
+		[www.google.co.cr]="forcesafesearch.google.com"
+		[google.co.id]="forcesafesearch.google.com"
+		[www.google.co.id]="forcesafesearch.google.com"
+		[google.co.il]="forcesafesearch.google.com"
+		[www.google.co.il]="forcesafesearch.google.com"
+		[google.co.in]="forcesafesearch.google.com"
+		[www.google.co.in]="forcesafesearch.google.com"
+		[google.co.jp]="forcesafesearch.google.com"
+		[www.google.co.jp]="forcesafesearch.google.com"
+		[google.co.ke]="forcesafesearch.google.com"
+		[www.google.co.ke]="forcesafesearch.google.com"
+		[google.co.kr]="forcesafesearch.google.com"
+		[www.google.co.kr]="forcesafesearch.google.com"
+		[google.co.ls]="forcesafesearch.google.com"
+		[www.google.co.ls]="forcesafesearch.google.com"
+		[google.co.ma]="forcesafesearch.google.com"
+		[www.google.co.ma]="forcesafesearch.google.com"
+		[google.co.mz]="forcesafesearch.google.com"
+		[www.google.co.mz]="forcesafesearch.google.com"
+		[google.co.nz]="forcesafesearch.google.com"
+		[www.google.co.nz]="forcesafesearch.google.com"
+		[google.co.th]="forcesafesearch.google.com"
+		[www.google.co.th]="forcesafesearch.google.com"
+		[google.co.tz]="forcesafesearch.google.com"
+		[www.google.co.tz]="forcesafesearch.google.com"
+		[google.co.ug]="forcesafesearch.google.com"
+		[www.google.co.ug]="forcesafesearch.google.com"
+		[google.co.uk]="forcesafesearch.google.com"
+		[www.google.co.uk]="forcesafesearch.google.com"
+		[google.co.uz]="forcesafesearch.google.com"
+		[www.google.co.uz]="forcesafesearch.google.com"
+		[google.co.ve]="forcesafesearch.google.com"
+		[www.google.co.ve]="forcesafesearch.google.com"
+		[google.co.vi]="forcesafesearch.google.com"
+		[www.google.co.vi]="forcesafesearch.google.com"
+		[google.co.za]="forcesafesearch.google.com"
+		[www.google.co.za]="forcesafesearch.google.com"
+		[google.co.zm]="forcesafesearch.google.com"
+		[www.google.co.zm]="forcesafesearch.google.com"
+		[google.co.zw]="forcesafesearch.google.com"
+		[www.google.co.zw]="forcesafesearch.google.com"
+		[google.com]="forcesafesearch.google.com"
+		[www.google.com]="forcesafesearch.google.com"
+		[google.com.af]="forcesafesearch.google.com"
+		[www.google.com.af]="forcesafesearch.google.com"
+		[google.com.ag]="forcesafesearch.google.com"
+		[www.google.com.ag]="forcesafesearch.google.com"
+		[google.com.ai]="forcesafesearch.google.com"
+		[www.google.com.ai]="forcesafesearch.google.com"
+		[google.com.ar]="forcesafesearch.google.com"
+		[www.google.com.ar]="forcesafesearch.google.com"
+		[google.com.au]="forcesafesearch.google.com"
+		[www.google.com.au]="forcesafesearch.google.com"
+		[google.com.bd]="forcesafesearch.google.com"
+		[www.google.com.bd]="forcesafesearch.google.com"
+		[google.com.bh]="forcesafesearch.google.com"
+		[www.google.com.bh]="forcesafesearch.google.com"
+		[google.com.bn]="forcesafesearch.google.com"
+		[www.google.com.bn]="forcesafesearch.google.com"
+		[google.com.bo]="forcesafesearch.google.com"
+		[www.google.com.bo]="forcesafesearch.google.com"
+		[google.com.br]="forcesafesearch.google.com"
+		[www.google.com.br]="forcesafesearch.google.com"
+		[google.com.bz]="forcesafesearch.google.com"
+		[www.google.com.bz]="forcesafesearch.google.com"
+		[google.com.co]="forcesafesearch.google.com"
+		[www.google.com.co]="forcesafesearch.google.com"
+		[google.com.cu]="forcesafesearch.google.com"
+		[www.google.com.cu]="forcesafesearch.google.com"
+		[google.com.cy]="forcesafesearch.google.com"
+		[www.google.com.cy]="forcesafesearch.google.com"
+		[google.com.do]="forcesafesearch.google.com"
+		[www.google.com.do]="forcesafesearch.google.com"
+		[google.com.ec]="forcesafesearch.google.com"
+		[www.google.com.ec]="forcesafesearch.google.com"
+		[google.com.eg]="forcesafesearch.google.com"
+		[www.google.com.eg]="forcesafesearch.google.com"
+		[google.com.et]="forcesafesearch.google.com"
+		[www.google.com.et]="forcesafesearch.google.com"
+		[google.com.fj]="forcesafesearch.google.com"
+		[www.google.com.fj]="forcesafesearch.google.com"
+		[google.com.gh]="forcesafesearch.google.com"
+		[www.google.com.gh]="forcesafesearch.google.com"
+		[google.com.gi]="forcesafesearch.google.com"
+		[www.google.com.gi]="forcesafesearch.google.com"
+		[google.com.gt]="forcesafesearch.google.com"
+		[www.google.com.gt]="forcesafesearch.google.com"
+		[google.com.hk]="forcesafesearch.google.com"
+		[www.google.com.hk]="forcesafesearch.google.com"
+		[google.com.jm]="forcesafesearch.google.com"
+		[www.google.com.jm]="forcesafesearch.google.com"
+		[google.com.kh]="forcesafesearch.google.com"
+		[www.google.com.kh]="forcesafesearch.google.com"
+		[google.com.kw]="forcesafesearch.google.com"
+		[www.google.com.kw]="forcesafesearch.google.com"
+		[google.com.lb]="forcesafesearch.google.com"
+		[www.google.com.lb]="forcesafesearch.google.com"
+		[google.com.ly]="forcesafesearch.google.com"
+		[www.google.com.ly]="forcesafesearch.google.com"
+		[google.com.mm]="forcesafesearch.google.com"
+		[www.google.com.mm]="forcesafesearch.google.com"
+		[google.com.mt]="forcesafesearch.google.com"
+		[www.google.com.mt]="forcesafesearch.google.com"
+		[google.com.mx]="forcesafesearch.google.com"
+		[www.google.com.mx]="forcesafesearch.google.com"
+		[google.com.my]="forcesafesearch.google.com"
+		[www.google.com.my]="forcesafesearch.google.com"
+		[google.com.na]="forcesafesearch.google.com"
+		[www.google.com.na]="forcesafesearch.google.com"
+		[google.com.ng]="forcesafesearch.google.com"
+		[www.google.com.ng]="forcesafesearch.google.com"
+		[google.ng]="forcesafesearch.google.com"
+		[www.google.ng]="forcesafesearch.google.com"
+		[google.com.nf]="forcesafesearch.google.com"
+		[www.google.com.nf]="forcesafesearch.google.com"
+		[google.com.ni]="forcesafesearch.google.com"
+		[www.google.com.ni]="forcesafesearch.google.com"
+		[google.com.np]="forcesafesearch.google.com"
+		[www.google.com.np]="forcesafesearch.google.com"
+		[google.com.om]="forcesafesearch.google.com"
+		[www.google.com.om]="forcesafesearch.google.com"
+		[google.com.pa]="forcesafesearch.google.com"
+		[www.google.com.pa]="forcesafesearch.google.com"
+		[google.com.pe]="forcesafesearch.google.com"
+		[www.google.com.pe]="forcesafesearch.google.com"
+		[google.com.pg]="forcesafesearch.google.com"
+		[www.google.com.pg]="forcesafesearch.google.com"
+		[google.com.ph]="forcesafesearch.google.com"
+		[www.google.com.ph]="forcesafesearch.google.com"
+		[google.com.pk]="forcesafesearch.google.com"
+		[www.google.com.pk]="forcesafesearch.google.com"
+		[google.com.pr]="forcesafesearch.google.com"
+		[www.google.com.pr]="forcesafesearch.google.com"
+		[google.com.py]="forcesafesearch.google.com"
+		[www.google.com.py]="forcesafesearch.google.com"
+		[google.com.qa]="forcesafesearch.google.com"
+		[www.google.com.qa]="forcesafesearch.google.com"
+		[google.com.sa]="forcesafesearch.google.com"
+		[www.google.com.sa]="forcesafesearch.google.com"
+		[google.com.sb]="forcesafesearch.google.com"
+		[www.google.com.sb]="forcesafesearch.google.com"
+		[google.com.sg]="forcesafesearch.google.com"
+		[www.google.com.sg]="forcesafesearch.google.com"
+		[google.com.sl]="forcesafesearch.google.com"
+		[www.google.com.sl]="forcesafesearch.google.com"
+		[google.com.sv]="forcesafesearch.google.com"
+		[www.google.com.sv]="forcesafesearch.google.com"
+		[google.com.tj]="forcesafesearch.google.com"
+		[www.google.com.tj]="forcesafesearch.google.com"
+		[google.com.tr]="forcesafesearch.google.com"
+		[www.google.com.tr]="forcesafesearch.google.com"
+		[google.com.tw]="forcesafesearch.google.com"
+		[www.google.com.tw]="forcesafesearch.google.com"
+		[google.com.ua]="forcesafesearch.google.com"
+		[www.google.com.ua]="forcesafesearch.google.com"
+		[google.com.uy]="forcesafesearch.google.com"
+		[www.google.com.uy]="forcesafesearch.google.com"
+		[google.com.vc]="forcesafesearch.google.com"
+		[www.google.com.vc]="forcesafesearch.google.com"
+		[google.com.vn]="forcesafesearch.google.com"
+		[www.google.com.vn]="forcesafesearch.google.com"
+		[google.cat]="forcesafesearch.google.com"
+		[www.google.cat]="forcesafesearch.google.com"
+		[google.cn]="forcesafesearch.google.com"
+		[www.google.cn]="forcesafesearch.google.com"
+		[google.cv]="forcesafesearch.google.com"
+		[www.google.cv]="forcesafesearch.google.com"
+		[google.cz]="forcesafesearch.google.com"
+		[www.google.cz]="forcesafesearch.google.com"
+		[google.de]="forcesafesearch.google.com"
+		[www.google.de]="forcesafesearch.google.com"
+		[google.dj]="forcesafesearch.google.com"
+		[www.google.dj]="forcesafesearch.google.com"
+		[google.dk]="forcesafesearch.google.com"
+		[www.google.dk]="forcesafesearch.google.com"
+		[google.dm]="forcesafesearch.google.com"
+		[www.google.dm]="forcesafesearch.google.com"
+		[google.dz]="forcesafesearch.google.com"
+		[www.google.dz]="forcesafesearch.google.com"
+		[google.ee]="forcesafesearch.google.com"
+		[www.google.ee]="forcesafesearch.google.com"
+		[google.es]="forcesafesearch.google.com"
+		[www.google.es]="forcesafesearch.google.com"
+		[google.fi]="forcesafesearch.google.com"
+		[www.google.fi]="forcesafesearch.google.com"
+		[google.fm]="forcesafesearch.google.com"
+		[www.google.fm]="forcesafesearch.google.com"
+		[google.fr]="forcesafesearch.google.com"
+		[www.google.fr]="forcesafesearch.google.com"
+		[google.ga]="forcesafesearch.google.com"
+		[www.google.ga]="forcesafesearch.google.com"
+		[google.ge]="forcesafesearch.google.com"
+		[www.google.ge]="forcesafesearch.google.com"
+		[google.gg]="forcesafesearch.google.com"
+		[www.google.gg]="forcesafesearch.google.com"
+		[google.gl]="forcesafesearch.google.com"
+		[www.google.gl]="forcesafesearch.google.com"
+		[google.gm]="forcesafesearch.google.com"
+		[www.google.gm]="forcesafesearch.google.com"
+		[google.gp]="forcesafesearch.google.com"
+		[www.google.gp]="forcesafesearch.google.com"
+		[google.gr]="forcesafesearch.google.com"
+		[www.google.gr]="forcesafesearch.google.com"
+		[google.gy]="forcesafesearch.google.com"
+		[www.google.gy]="forcesafesearch.google.com"
+		[google.hn]="forcesafesearch.google.com"
+		[www.google.hn]="forcesafesearch.google.com"
+		[google.hr]="forcesafesearch.google.com"
+		[www.google.hr]="forcesafesearch.google.com"
+		[google.ht]="forcesafesearch.google.com"
+		[www.google.ht]="forcesafesearch.google.com"
+		[google.hu]="forcesafesearch.google.com"
+		[www.google.hu]="forcesafesearch.google.com"
+		[google.ie]="forcesafesearch.google.com"
+		[www.google.ie]="forcesafesearch.google.com"
+		[google.im]="forcesafesearch.google.com"
+		[www.google.im]="forcesafesearch.google.com"
+		[google.iq]="forcesafesearch.google.com"
+		[www.google.iq]="forcesafesearch.google.com"
+		[google.is]="forcesafesearch.google.com"
+		[www.google.is]="forcesafesearch.google.com"
+		[google.it]="forcesafesearch.google.com"
+		[www.google.it]="forcesafesearch.google.com"
+		[google.je]="forcesafesearch.google.com"
+		[www.google.je]="forcesafesearch.google.com"
+		[google.jo]="forcesafesearch.google.com"
+		[www.google.jo]="forcesafesearch.google.com"
+		[google.kg]="forcesafesearch.google.com"
+		[www.google.kg]="forcesafesearch.google.com"
+		[google.ki]="forcesafesearch.google.com"
+		[www.google.ki]="forcesafesearch.google.com"
+		[google.kz]="forcesafesearch.google.com"
+		[www.google.kz]="forcesafesearch.google.com"
+		[google.la]="forcesafesearch.google.com"
+		[www.google.la]="forcesafesearch.google.com"
+		[google.li]="forcesafesearch.google.com"
+		[www.google.li]="forcesafesearch.google.com"
+		[google.lk]="forcesafesearch.google.com"
+		[www.google.lk]="forcesafesearch.google.com"
+		[google.lt]="forcesafesearch.google.com"
+		[www.google.lt]="forcesafesearch.google.com"
+		[google.lu]="forcesafesearch.google.com"
+		[www.google.lu]="forcesafesearch.google.com"
+		[google.lv]="forcesafesearch.google.com"
+		[www.google.lv]="forcesafesearch.google.com"
+		[google.md]="forcesafesearch.google.com"
+		[www.google.md]="forcesafesearch.google.com"
+		[google.me]="forcesafesearch.google.com"
+		[www.google.me]="forcesafesearch.google.com"
+		[google.mg]="forcesafesearch.google.com"
+		[www.google.mg]="forcesafesearch.google.com"
+		[google.mk]="forcesafesearch.google.com"
+		[www.google.mk]="forcesafesearch.google.com"
+		[google.ml]="forcesafesearch.google.com"
+		[www.google.ml]="forcesafesearch.google.com"
+		[google.mn]="forcesafesearch.google.com"
+		[www.google.mn]="forcesafesearch.google.com"
+		[google.ms]="forcesafesearch.google.com"
+		[www.google.ms]="forcesafesearch.google.com"
+		[google.mu]="forcesafesearch.google.com"
+		[www.google.mu]="forcesafesearch.google.com"
+		[google.mv]="forcesafesearch.google.com"
+		[www.google.mv]="forcesafesearch.google.com"
+		[google.mw]="forcesafesearch.google.com"
+		[www.google.mw]="forcesafesearch.google.com"
+		[google.ne]="forcesafesearch.google.com"
+		[www.google.ne]="forcesafesearch.google.com"
+		[google.nl]="forcesafesearch.google.com"
+		[www.google.nl]="forcesafesearch.google.com"
+		[google.no]="forcesafesearch.google.com"
+		[www.google.no]="forcesafesearch.google.com"
+		[google.nr]="forcesafesearch.google.com"
+		[www.google.nr]="forcesafesearch.google.com"
+		[google.nu]="forcesafesearch.google.com"
+		[www.google.nu]="forcesafesearch.google.com"
+		[google.pl]="forcesafesearch.google.com"
+		[www.google.pl]="forcesafesearch.google.com"
+		[google.pn]="forcesafesearch.google.com"
+		[www.google.pn]="forcesafesearch.google.com"
+		[google.ps]="forcesafesearch.google.com"
+		[www.google.ps]="forcesafesearch.google.com"
+		[google.pt]="forcesafesearch.google.com"
+		[www.google.pt]="forcesafesearch.google.com"
+		[google.ro]="forcesafesearch.google.com"
+		[www.google.ro]="forcesafesearch.google.com"
+		[google.rs]="forcesafesearch.google.com"
+		[www.google.rs]="forcesafesearch.google.com"
+		[google.ru]="forcesafesearch.google.com"
+		[www.google.ru]="forcesafesearch.google.com"
+		[google.rw]="forcesafesearch.google.com"
+		[www.google.rw]="forcesafesearch.google.com"
+		[google.sc]="forcesafesearch.google.com"
+		[www.google.sc]="forcesafesearch.google.com"
+		[google.se]="forcesafesearch.google.com"
+		[www.google.se]="forcesafesearch.google.com"
+		[google.sh]="forcesafesearch.google.com"
+		[www.google.sh]="forcesafesearch.google.com"
+		[google.si]="forcesafesearch.google.com"
+		[www.google.si]="forcesafesearch.google.com"
+		[google.sk]="forcesafesearch.google.com"
+		[www.google.sk]="forcesafesearch.google.com"
+		[google.sm]="forcesafesearch.google.com"
+		[www.google.sm]="forcesafesearch.google.com"
+		[google.sn]="forcesafesearch.google.com"
+		[www.google.sn]="forcesafesearch.google.com"
+		[google.so]="forcesafesearch.google.com"
+		[www.google.so]="forcesafesearch.google.com"
+		[google.sr]="forcesafesearch.google.com"
+		[www.google.sr]="forcesafesearch.google.com"
+		[google.st]="forcesafesearch.google.com"
+		[www.google.st]="forcesafesearch.google.com"
+		[google.td]="forcesafesearch.google.com"
+		[www.google.td]="forcesafesearch.google.com"
+		[google.tg]="forcesafesearch.google.com"
+		[www.google.tg]="forcesafesearch.google.com"
+		[google.tk]="forcesafesearch.google.com"
+		[www.google.tk]="forcesafesearch.google.com"
+		[google.tl]="forcesafesearch.google.com"
+		[www.google.tl]="forcesafesearch.google.com"
+		[google.tm]="forcesafesearch.google.com"
+		[www.google.tm]="forcesafesearch.google.com"
+		[google.tn]="forcesafesearch.google.com"
+		[www.google.tn]="forcesafesearch.google.com"
+		[google.to]="forcesafesearch.google.com"
+		[www.google.to]="forcesafesearch.google.com"
+		[google.tt]="forcesafesearch.google.com"
+		[www.google.tt]="forcesafesearch.google.com"
+		[google.vg]="forcesafesearch.google.com"
+		[www.google.vg]="forcesafesearch.google.com"
+		[google.vu]="forcesafesearch.google.com"
+		[www.google.vu]="forcesafesearch.google.com"
+		[google.ws]="forcesafesearch.google.com"
+		[www.google.ws]="forcesafesearch.google.com"
 
-	# Cleanup previous settings
-	unbound-control local_zone_remove "bing.com" >/dev/null
-	unbound-control local_zone_remove "duckduckgo.com" >/dev/null
-	unbound-control local_zone_remove "yandex.com" >/dev/null
-	unbound-control local_zone_remove "yandex.ru" >/dev/null
-	unbound-control local_zone_remove "youtube.com" >/dev/null
-
-	local domain
-	for domain in ${google_tlds[@]}; do
-		unbound-control local_zone_remove "${domain}"
-	done >/dev/null
-
-	if [ "${ENABLE_SAFE_SEARCH}" = "on" ]; then
 		# Bing
-		unbound-control bing.com transparent >/dev/null
-		for address in $(resolve "strict.bing.com"); do
-			unbound-control local_data "www.bing.com ${LOCAL_TTL} IN A ${address}"
-		done >/dev/null
+		[bing.com]="strict.bing.com"
+		[www.bing.com]="strict.bing.com"
 
 		# DuckDuckGo
-		unbound-control local_zone duckduckgo.com typetransparent >/dev/null
-		for address in $(resolve "safe.duckduckgo.com"); do
-			unbound-control local_data "duckduckgo.com ${LOCAL_TTL} IN A ${address}"
-		done >/dev/null
-
-		# Google
-		local addresses="$(resolve "forcesafesearch.google.com")"
-		for domain in ${google_tlds[@]}; do
-			unbound-control local_zone "${domain}" transparent >/dev/null
-			for address in ${addresses}; do
-				unbound-control local_data "www.${domain} ${LOCAL_TTL} IN A ${address}"
-			done >/dev/null
-		done
+		[duckduckgo.com]="safe.duckduckgo.com"
+		[www.duckduckgo.com]="safe.duckduckgo.com"
 
 		# Yandex
-		for domain in yandex.com yandex.ru; do
-			unbound-control local_zone "${domain}" typetransparent >/dev/null
-			for address in $(resolve "familysearch.${domain}"); do
-				unbound-control local_data "${domain} ${LOCAL_TTL} IN A ${address}"
-			done >/dev/null
-		done
+		[yandex.com]="familysearch.yandex.com"
+		[www.yandex.com]="familysearch.yandex.com"
+		[yandex.ru]="familysearch.yandex.ru"
+		[www.yandex.ru]="familysearch.yandex.ru"
+	)
 
-		# YouTube
-		if [ "${ENABLE_SAFE_SEARCH_YOUTUBE}" = "on" ]; then
-			unbound-control local_zone youtube.com transparent >/dev/null
-			for address in $(resolve "restrictmoderate.youtube.com"); do
-				unbound-control local_data "www.youtube.com ${LOCAL_TTL} IN A ${address}"
-			done >/dev/null
-		fi
+	# Filter YouTube?
+	if [ "${ENABLE_SAFE_SEARCH_YOUTUBE}" = "on" ]; then
+		domains[youtube.com]="restrictmoderate.youtube.com"
+		domains[www.youtube.com]="restrictmoderate.youtube.com"
 	fi
 
-	return 0
+	(
+		# Write the header
+		config_header
+
+		# Nothing to do if safe search is not enabled
+		if [ "${ENABLE_SAFE_SEARCH}" != "on" ]; then
+			exit 0
+		fi
+
+		# We are writing server configuration
+		echo "server:"
+
+		# Write all domains
+		for domain in "${!domains[@]}"; do
+			echo "	local-zone: \"${domain}\" redirect"
+			echo "	local-data: \"${domain} CNAME ${domains[${domain}]}.\""
+		done
+	) > /etc/unbound/safesearch.conf
 }
 
 case "$1" in
@@ -579,14 +989,11 @@ case "$1" in
 		write_tuning_conf
 		write_hosts_conf
 		write_forward_conf
+		write_dnsbl_conf
+		write_safesearch_conf
 
 		boot_mesg "Starting Unbound DNS Proxy..."
 		loadproc /usr/sbin/unbound || exit $?
-
-		# Install Safe Search rules when the system is already online
-		if [ -e "/var/ipfire/red/active" ]; then
-			update_safe_search
-		fi
 		;;
 
 	stop)
@@ -603,9 +1010,11 @@ case "$1" in
 		# Update configuration files
 		write_forward_conf
 		write_hosts_conf
+		write_dnsbl_conf
+		write_safesearch_conf
 
 		# Call unbound-control and perform the reload
-		/usr/sbin/unbound-control -q reload
+		/usr/sbin/unbound-control -q fast_reload
 
 		# Dummy Resolve to wait for unbound
 		resolve "ping.ipfire.org" &>/dev/null
@@ -613,11 +1022,6 @@ case "$1" in
 		if [ "$1" = "update-forwarders" ]; then
 			# Make sure DNS works at this point
 			fix_time_if_dns_fails
-		fi
-
-		# Update Safe Search rules if the system is online.
-		if [ -e "/var/ipfire/red/active" ]; then
-			update_safe_search
 		fi
 		;;
 

@@ -40,6 +40,9 @@ var/ipfire/dhcp
 #var/ipfire/dhcp/settings
 var/ipfire/dhcpc
 var/ipfire/dns
+var/ipfire/dns/custom_domains
+var/ipfire/dns/dnsbl
+var/ipfire/dns/dnsbl.json
 #var/ipfire/dns/settings
 #var/ipfire/dns/servers
 var/ipfire/dnsforward
