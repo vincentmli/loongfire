@@ -66,11 +66,6 @@ my %services = (
                 "process" => "syslogd",
         },
 
-        # Kernel Logger
-        'Kernel Logging Server' => {
-                "process" => "klogd",
-        },
-
         # Time Server
         'NTP Server' => {
                 "process" => "ntpd",
