@@ -233,9 +233,6 @@ sub cleanupdbdir {
 		# Generate absolute path.
 		my $abs_path = "$dbdir/$item";
 
-		# Skip anything which is not a directory.
-		next unless (-d "$abs_path");
-
 		# Remove the directory and the content.
 		&File::Path::remove_tree($abs_path);
 	}
