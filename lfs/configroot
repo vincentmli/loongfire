@@ -122,6 +122,7 @@ $(TARGET) :
 	cp $(DIR_SRC)/config/cfgroot/loxilb-settings		$(CONFIG_ROOT)/loxilb/settings
 	cp $(DIR_SRC)/config/cfgroot/loxilb-FWconfig.txt	$(CONFIG_ROOT)/loxilb/FWconfig.txt
 	cp $(DIR_SRC)/config/cfgroot/haproxy-settings		$(CONFIG_ROOT)/haproxy/settings
+	cp $(DIR_SRC)/config/unbound/dnsbl.json                 $(CONFIG_ROOT)/dns/dnsbl.json
 	# Oneliner configfiles
 	echo  "ENABLED=off"		> $(CONFIG_ROOT)/vpn/settings
 	echo  "01"			> $(CONFIG_ROOT)/certs/serial

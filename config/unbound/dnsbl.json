@@ -1,0 +1,100 @@
+[
+	{
+		"name"        : "Advertising",
+		"zone"        : "ads.rpz.ipfire.org",
+		"primary"     : "xfr.dbl.ipfire.org",
+		"description" : "Blocks domains used for ads, tracking, and ad delivery",
+		"license"     : "CC BY-SA 4.0"
+	},
+	{
+		"name"        : "Dating",
+		"zone"        : "dating.rpz.ipfire.org",
+		"primary"     : "xfr.dbl.ipfire.org",
+		"description" : "Blocks domains for online dating and matchmaking services",
+		"license"     : "CC BY-SA 4.0"
+	},
+	{
+		"name"        : "DNS-over-HTTPS",
+		"zone"        : "doh.rpz.ipfire.org",
+		"primary"     : "xfr.dbl.ipfire.org",
+		"description" : "Blocks public DNS-over-HTTPS resolver endpoints",
+		"license"     : "CC BY-SA 4.0"
+	},
+	{
+		"name"        : "Gambling",
+		"zone"        : "gambling.rpz.ipfire.org",
+		"primary"     : "xfr.dbl.ipfire.org",
+		"description" : "Blocks domains related to online gambling and betting",
+		"license"     : "CC BY-SA 4.0"
+	},
+	{
+		"name"        : "Games",
+		"zone"        : "games.rpz.ipfire.org",
+		"primary"     : "xfr.dbl.ipfire.org",
+		"description" : "Blocks online gaming websites",
+		"license"     : "CC BY-SA 4.0"
+	},
+	{
+		"name"        : "Malware",
+		"zone"        : "malware.rpz.ipfire.org",
+		"primary"     : "xfr.dbl.ipfire.org",
+		"description" : "Blocks domains known to distribute malicious software",
+		"license"     : "CC BY-SA 4.0"
+	},
+	{
+		"name"        : "Phishing",
+		"zone"        : "phishing.rpz.ipfire.org",
+		"primary"     : "xfr.dbl.ipfire.org",
+		"description" : "Blocks domains used for credential theft and fraud",
+		"license"     : "CC BY-SA 4.0"
+	},
+	{
+		"name"        : "Piracy",
+		"zone"        : "piracy.rpz.ipfire.org",
+		"primary"     : "xfr.dbl.ipfire.org",
+		"description" : "Blocks domains associated with copyright-infringing downloads",
+		"license"     : "CC BY-SA 4.0"
+	},
+	{
+		"name"        : "Pornography",
+		"zone"        : "porn.rpz.ipfire.org",
+		"primary"     : "xfr.dbl.ipfire.org",
+		"description" : "Blocks domains hosting adult content",
+		"license"     : "CC BY-SA 4.0"
+	},
+	{
+		"name"        : "Shopping",
+		"zone"        : "shopping.rpz.ipfire.org",
+		"primary"     : "xfr.dbl.ipfire.org",
+		"description" : "Blocks e-commerce and online retail domains",
+		"license"     : "CC BY-SA 4.0"
+	},
+	{
+		"name"        : "Smart TV",
+		"zone"        : "smart-tv.rpz.ipfire.org",
+		"primary"     : "xfr.dbl.ipfire.org",
+		"description" : "Blocks telemetry for Smart TVs",
+		"license"     : "CC BY-SA 4.0"
+	},
+	{
+		"name"        : "Social Networks",
+		"zone"        : "social.rpz.ipfire.org",
+		"primary"     : "xfr.dbl.ipfire.org",
+		"description" : "Blocks domains of social media platforms",
+		"license"     : "CC BY-SA 4.0"
+	},
+	{
+		"name"        : "Streaming",
+		"zone"        : "streaming.rpz.ipfire.org",
+		"primary"     : "xfr.dbl.ipfire.org",
+		"description" : "Blocks music, video-on-demand, and live streaming service domains",
+		"license"     : "CC BY-SA 4.0"
+	},
+	{
+		"name"        : "Violence",
+		"zone"        : "violence.rpz.ipfire.org",
+		"primary"     : "xfr.dbl.ipfire.org",
+		"description" : "Blocks domains featuring violent or extremist content",
+		"license"     : "CC BY-SA 4.0"
+	}
+]
