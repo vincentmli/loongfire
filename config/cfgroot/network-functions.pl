@@ -333,6 +333,7 @@ sub get_netmask($) {
 
 sub normalize_network($) {
 	my $network = shift;
+
 	my $address = &get_netaddress($network);
 	my $prefix  = &get_prefix($network);
 
@@ -341,6 +342,23 @@ sub normalize_network($) {
 	}
 
 	return "${address}/${prefix}";
+}
+
+sub normalize_networks($) {
+	my @networks = ();
+
+	foreach my $network (@_) {
+		# Convert any IP addresses to networks
+		if (&check_ip_address($network)) {
+			push(@networks, "${network}/32");
+			next;
+		}
+
+		$network = &normalize_network($network);
+		push(@networks, $network);
+	}
+
+	return @networks;
 }
 
 # Returns True if $address is in $network.
