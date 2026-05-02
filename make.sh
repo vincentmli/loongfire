@@ -1600,7 +1600,7 @@ build_system() {
 	lfsmake2 linux-atm
 	lfsmake2 libqmi
 	lfsmake2 c-ares
-if [ "${BUILD_ARCH}" != "loongarch64" ]; then
+if [ "${BUILD_ARCH}" != "loongarch64" ] && [ "${BUILD_ARCH}" != "x86_64" ]; then
 	lfsmake2 rust-cfg-if
 	lfsmake2 rust-libc
 	lfsmake2 rust-windows-link
@@ -2025,7 +2025,7 @@ fi
 	lfsmake2 python3-pyasn1
 	lfsmake2 python3-botocore
 	lfsmake2 python3-cffi
-if [ "${BUILD_ARCH}" != "loongarch64" ]; then
+if [ "${BUILD_ARCH}" != "loongarch64" ] && [ "${BUILD_ARCH}" != "x86_64" ]; then
 	#python3-cryptography relies on rust that loongfire
 	#does not support for now
 	lfsmake2 python3-cryptography
