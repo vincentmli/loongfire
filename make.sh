@@ -1603,37 +1603,104 @@ build_system() {
 if [ "${BUILD_ARCH}" != "loongarch64" ]; then
 	lfsmake2 rust-cfg-if
 	lfsmake2 rust-libc
-	lfsmake2 rust-getrandom
-	lfsmake2 rust-version-check
+	lfsmake2 rust-windows-link
+	lfsmake2 rust-windows-sys
+	lfsmake2 rust-errno
+	lfsmake2 rust-anyhow
 	lfsmake2 rust-unicode-xid
+	lfsmake2 rust-unicode-ident
 	lfsmake2 rust-proc-macro2
 	lfsmake2 rust-quote
 	lfsmake2 rust-syn
-	lfsmake2 rust-lazy-static
-	lfsmake2 rust-memchr
-	lfsmake2 rust-aho-corasick
-	lfsmake2 rust-regex-syntax
-	lfsmake2 rust-regex
+	lfsmake2 rust-prettyplease
+	lfsmake2 rust-id-arena
+	lfsmake2 rust-log
 	lfsmake2 rust-semver
+	lfsmake2 rust-bitflags
+	lfsmake2 rust-allocator-api2
+	lfsmake2 rust-foldhash
+	lfsmake2 rust-equivalent
+	lfsmake2 rust-hashbrown
+	lfsmake2 rust-indexmap
+	lfsmake2 rust-serde_derive
+	lfsmake2 rust-serde_core
 	lfsmake2 rust-serde
+	lfsmake2 rust-memchr
 	lfsmake2 rust-itoa
 	lfsmake2 rust-ryu
 	lfsmake2 rust-serde_json
+	lfsmake2 rust-heck
+	lfsmake2 rust-topological-sort
+	lfsmake2 rust-auditable-serde
+	lfsmake2 rust-crc32fast
+	lfsmake2 rust-adler2
+	lfsmake2 rust-simd-adler32
+	lfsmake2 rust-miniz_oxide
+	lfsmake2 rust-flate2
+	lfsmake2 rust-smallvec
+	lfsmake2 rust-spdx
+	lfsmake2 rust-percent-encoding
+	lfsmake2 rust-form_urlencoded
+	lfsmake2 rust-displaydoc
+	lfsmake2 rust-writeable
 	lfsmake2 rust-synstructure
+	lfsmake2 rust-zerofrom-derive
+	lfsmake2 rust-zerofrom
+	lfsmake2 rust-zerovec-derive
+	lfsmake2 rust-zerovec
+	lfsmake2 rust-zerotrie
+	lfsmake2 rust-potential_utf
 	lfsmake2 rust-stable_deref_trait
-	lfsmake2 rust-log
-	lfsmake2 rust-semver
+	lfsmake2 rust-yoke-derive
+	lfsmake2 rust-yoke
+	lfsmake2 rust-icu_collections
+	lfsmake2 rust-icu_normalizer_data
+	lfsmake2 rust-litemap
+	lfsmake2 rust-tinystr
+	lfsmake2 rust-utf8_iter
+	lfsmake2 rust-utf16_iter
+	lfsmake2 rust-write16
+	lfsmake2 rust-icu_locale_core
+	lfsmake2 rust-icu_provider
+	lfsmake2 rust-icu_properties_data
+	lfsmake2 rust-icu_properties
+	lfsmake2 rust-icu_normalizer
+	lfsmake2 rust-idna_adapter
+	lfsmake2 rust-idna
+	lfsmake2 rust-url
+	lfsmake2 rust-leb128fmt
+	lfsmake2 rust-wasmparser
+	lfsmake2 rust-wasm-encoder
+	lfsmake2 rust-wasm-metadata
+	lfsmake2 rust-wit-parser
+	lfsmake2 rust-wit-component
+	lfsmake2 rust-wit-bindgen-core
+	lfsmake2 rust-wit-bindgen-rust
+	lfsmake2 rust-wit-bindgen-rust-macro
+	lfsmake2 rust-wit-bindgen
+	lfsmake2 rust-wasip2
+	lfsmake2 rust-r-efi
+	lfsmake2 rust-getrandom
+	lfsmake2 rust-version-check
+	lfsmake2 rust-syn-1.0.109
+	lfsmake2 rust-lazy-static
+	lfsmake2 rust-aho-corasick
+	lfsmake2 rust-regex-syntax
+	lfsmake2 rust-regex
 	lfsmake2 rust-autocfg
 	lfsmake2 rust-scopeguard
 	lfsmake2 rust-once_cell
+	lfsmake2 rust-serde_spanned
+	lfsmake2 rust-toml_datetime
+	lfsmake2 rust-winnow
+	lfsmake2 rust-toml_edit
 	lfsmake2 rust-toml
-	lfsmake2 rust-serde_derive
 	lfsmake2 rust-unindent
 	lfsmake2 rust-proc-macro-hack
+	lfsmake2 rust-indoc-impl-0.3.6
 	lfsmake2 rust-indoc-0.3.6
 	lfsmake2 rust-instant
 	lfsmake2 rust-lock_api
-	lfsmake2 rust-smallvec
 	lfsmake2 rust-parking_lot_core
 	lfsmake2 rust-parking_lot
 	lfsmake2 rust-paste-impl
@@ -1657,6 +1724,24 @@ if [ "${BUILD_ARCH}" != "loongarch64" ]; then
 	lfsmake2 rust-ouroboros
 	lfsmake2 rust-base64
 	lfsmake2 rust-pem
+	lfsmake2 rust-humantime
+	lfsmake2 rust-utf8parse
+	lfsmake2 rust-colorchoice
+	lfsmake2 rust-is_terminal_polyfill
+	lfsmake2 rust-once_cell_polyfill
+	lfsmake2 rust-strsim
+	lfsmake2 rust-anstyle
+	lfsmake2 rust-anstyle-parse
+	lfsmake2 rust-anstyle-query
+	lfsmake2 rust-anstyle-wincon
+	lfsmake2 rust-anstream
+	lfsmake2 rust-clap_lex
+	lfsmake2 rust-clap_builder
+	lfsmake2 rust-clap
+	lfsmake2 rust-fastrand
+	lfsmake2 rust-linux-raw-sys
+	lfsmake2 rust-rustix
+	lfsmake2 rust-tempfile
 fi
 	lfsmake2 gdb
 	lfsmake2 grub
