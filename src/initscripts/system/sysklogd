@@ -24,11 +24,8 @@
 
 case "${1}" in
 	start)
-		boot_mesg "Starting kernel log daemon..."
-		loadproc klogd -c 1
-
 		boot_mesg "Starting system log daemon..."
-		loadproc syslogd -m 0 -r
+		loadproc syslogd -s -m 0 -r -k
 
 		boot_mesg "Saving Bootlog..."
 		if [ -e /var/log/bootlog ]; then
@@ -38,9 +35,6 @@ case "${1}" in
 		evaluate_retval
 		;;
 	stop)
-		boot_mesg "Stopping kernel log daemon..."
-		killproc klogd
-
 		boot_mesg "Stopping system log daemon..."
 		killproc syslogd
 		;;
@@ -58,7 +52,6 @@ case "${1}" in
 
 	status)
 		statusproc syslogd
-		statusproc klogd
 		;;
 
 	*)
