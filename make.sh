@@ -2185,6 +2185,7 @@ fi
 	lfsmake2 ids-ruleset-sources
 	lfsmake2 ipblocklist-sources
 	lfsmake2 libbpf-bootstrap
+	lfsmake2 dnsbl
 
 	lfsmake2 memtest
 

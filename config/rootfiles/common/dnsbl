@@ -1,0 +1,16 @@
+etc/fcron.weekly/dnsbl-download.sh
+#var/ipfire/dns/README.txt
+var/ipfire/dns/ads.txt
+var/ipfire/dns/dating.txt
+var/ipfire/dns/doh.txt
+var/ipfire/dns/gambling.txt
+var/ipfire/dns/games.txt
+var/ipfire/dns/malware.txt
+var/ipfire/dns/phishing.txt
+var/ipfire/dns/piracy.txt
+var/ipfire/dns/porn.txt
+var/ipfire/dns/shopping.txt
+var/ipfire/dns/smart-tv.txt
+var/ipfire/dns/social.txt
+var/ipfire/dns/streaming.txt
+var/ipfire/dns/violence.txt
