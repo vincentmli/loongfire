@@ -2070,7 +2070,7 @@ fi
 	lfsmake2 sarg
 	lfsmake2 nginx
 	lfsmake2 sysbench
-	#lfsmake2 strace
+	lfsmake2 strace
 	lfsmake2 ltrace
 	lfsmake2 ipfire-netboot
 	lfsmake2 keepalived
