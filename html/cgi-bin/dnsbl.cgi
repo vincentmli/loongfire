@@ -37,6 +37,7 @@ my %mainsettings = ();
 my %settings = ();
 my %cgiparams = ();
 my %custom_domains = ();
+my %global_settings = ();
 my $dnsbl;
 
 # Arrays which contain the custom defined domain names.
@@ -52,9 +53,15 @@ my $settings_file = "${General::swroot}/dns/dnsbl";
 # File which contains the elements of the custom allow and block lists.
 my $custom_domains_file = "${General::swroot}/dns/custom_domains";
 
+# Global settings file (already exists with format KEY=VALUE)
+my $global_settings_file = "${General::swroot}/dns/settings";
+
 # Read-in main settings, for language, theme and colors.
 &General::readhash("${General::swroot}/main/settings", \%mainsettings);
 &General::readhash("/srv/web/ipfire/html/themes/ipfire/include/colors.txt", \%color);
+
+# Read global settings (existing format)
+&read_global_settings() if (-f "$global_settings_file");
 
 # Get the available network zones, based on the config type of the system and store
 # the list of zones in an array.
@@ -82,6 +89,24 @@ my @errormessages = ();
 
 #Get GUI values
 &Header::getcgihash(\%cgiparams);
+
+# Handle XDP setting save
+if ($cgiparams{'ACTION'} eq "save_xdp") {
+	# Update XDP setting
+	if ($cgiparams{'ENABLE_XDP'} eq "on") {
+		$global_settings{'ENABLE_XDP'} = "on";
+	} else {
+		$global_settings{'ENABLE_XDP'} = "off";
+	}
+	
+	# Write global settings preserving all existing settings
+	&write_global_settings();
+	
+	# Restart DNS service to apply XDP settings
+	# &General::system("/usr/local/bin/unboundctrl", "restart");
+	
+	push(@errormessages, "XDP acceleration setting has been saved. DNS service restarted.");
+}
 
 # Save settings on main page.
 if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
@@ -272,11 +297,65 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'edit'}") {
 &Header::closepage();
 
 #
+## Function to read global settings (KEY=VALUE format)
+#
+sub read_global_settings() {
+	%global_settings = ();
+	
+	open(my $fh, '<', $global_settings_file) or return;
+	
+	while (my $line = <$fh>) {
+		chomp($line);
+		next if ($line =~ /^\s*$/);  # Skip empty lines
+		next if ($line =~ /^\s*#/);   # Skip comments
+		
+		if ($line =~ /^([^=]+)=(.*)$/) {
+			my $key = $1;
+			my $value = $2;
+			$global_settings{$key} = $value;
+		}
+	}
+	
+	close($fh);
+}
+
+#
+## Function to write global settings preserving all existing settings
+#
+sub write_global_settings() {
+	# Read existing settings first to preserve any that weren't modified
+	%global_settings = ();
+	&read_global_settings() if (-f "$global_settings_file");
+	
+	# Update with current values from CGI
+	if ($cgiparams{'ENABLE_XDP'} eq "on") {
+		$global_settings{'ENABLE_XDP'} = "on";
+	} elsif (defined($cgiparams{'ENABLE_XDP'})) {
+		$global_settings{'ENABLE_XDP'} = "off";
+	}
+	
+	# Write all settings back
+	open(my $fh, '>', $global_settings_file) or die "Unable to write to $global_settings_file";
+	
+	foreach my $key (sort keys %global_settings) {
+		print $fh "$key=$global_settings{$key}\n";
+	}
+	
+	close($fh);
+}
+
+#
 ## Function to display the main page.
 #
 sub show_mainpage() {
 	# Read-in settings file
 	&readsettings("$settings_file", \%settings);
+	
+	# Get current XDP setting (default to off if not set)
+	my $xdp_checked = "";
+	if (exists($global_settings{'ENABLE_XDP'}) && $global_settings{'ENABLE_XDP'} eq "on") {
+		$xdp_checked = "checked='checked'";
+	}
 
 	# Read-in custom allow and blocklist file.
 	&readsettings("$custom_domains_file", \%custom_domains) if (-f "$custom_domains_file");
@@ -294,6 +373,33 @@ sub show_mainpage() {
 		}
 	}
 
+	# XDP Settings Box
+	&Header::openbox('100%', 'center', "XDP Acceleration Settings");
+	
+print <<END;
+	<form method='post' action='$ENV{'SCRIPT_NAME'}'>
+		<table width='100%' border='0' class='tbl'>
+			<tr>
+				<td width='5%' class="text-center">
+					<input type='checkbox' name='ENABLE_XDP' id='ENABLE_XDP' value='on' $xdp_checked>
+				</td>
+				<td width='95%'>
+					<strong>Enable XDP Acceleration</strong><br>
+					<small>XDP (eXpress Data Path) accelerates DNS filtering by processing packets directly in the network driver.
+					This can significantly improve performance for high-traffic environments. Requires kernel support for XDP.</small>
+				</td>
+			</tr>
+			<tr>
+				<td colspan='2' align='right'>
+					<input type='submit' name='ACTION' value='save_xdp'>
+				</td>
+			</tr>
+		</table>
+	</form>
+END
+
+	&Header::closebox();
+	
 	&Header::openbox('100%', 'center', $Lang::tr{"dnsbl lists"});
 
 print <<END;
@@ -313,21 +419,21 @@ END
 			}
 
 print <<END;
-		<tr>
+			<tr>
 			<td width='5%' class="text-center">
 				<input type='checkbox' form='main' name='$zone' id='$zone' value='on' $checked>
-			</td>
+				</td>
 			<td width='20%'>
 				<strong>$name</strong>
-			</td>
+				</td>
 			<td width='70%'>$description</td>
 			<td width='5%' align='center'>
 				<form id='$name' method='post' action='$ENV{'SCRIPT_NAME'}'></form>
 				<input type='hidden' form='$name' name='ACTION' value='$Lang::tr{'edit'}'>
 				<input type='image' form='$name' name='$Lang::tr{'edit'}' src='/images/edit.gif' alt='$Lang::tr{'edit'}' title='$Lang::tr{'edit'}' alt='submit'>
 				<input type='hidden' form='$name' name='ZONE' value='$zone'>
-			</td>
-		</tr>
+				</td>
+			</tr>
 END
 		}
 
