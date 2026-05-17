@@ -92,10 +92,11 @@ my @errormessages = ();
 
 # Handle XDP setting save
 if ($cgiparams{'ACTION'} eq "save_xdp") {
-	# Update XDP setting
-	if ($cgiparams{'ENABLE_XDP'} eq "on") {
+	# Update XDP setting - fix: handle unchecked checkbox properly
+	if (defined($cgiparams{'ENABLE_XDP'}) && $cgiparams{'ENABLE_XDP'} eq "on") {
 		$global_settings{'ENABLE_XDP'} = "on";
 	} else {
+		# Checkbox is unchecked or not present - set to off
 		$global_settings{'ENABLE_XDP'} = "off";
 	}
 	
@@ -327,10 +328,11 @@ sub write_global_settings() {
 	%global_settings = ();
 	&read_global_settings() if (-f "$global_settings_file");
 	
-	# Update with current values from CGI
-	if ($cgiparams{'ENABLE_XDP'} eq "on") {
+	# Update XDP setting based on checkbox presence - FIXED
+	if (defined($cgiparams{'ENABLE_XDP'}) && $cgiparams{'ENABLE_XDP'} eq "on") {
 		$global_settings{'ENABLE_XDP'} = "on";
-	} elsif (defined($cgiparams{'ENABLE_XDP'})) {
+	} else {
+		# Checkbox is unchecked or not present - set to off
 		$global_settings{'ENABLE_XDP'} = "off";
 	}
 	
@@ -392,10 +394,11 @@ print <<END;
 			<tr>
 				<td colspan='2' align='right'>
 					<input type='submit' name='ACTION' value='save_xdp'>
+					</form>
 				</td>
 			</tr>
-		</table>
-	</form>
+			</form>
+	</table>
 END
 
 	&Header::closebox();
@@ -481,10 +484,11 @@ print <<END;
 			<tr class="action">
 				<td colspan="2">
 					<input type='submit' name='CUSTOM_DOMAINS' value='$Lang::tr{'save'}'>
+					</form>
 				</td>
 			</tr>
-		</table>
-	</form>
+			</form>
+	</table>
 END
 
 	&Header::closebox();
@@ -520,6 +524,7 @@ print <<END;
 			<tr class="header">
 				<td colspan="2">
 					$Lang::tr{"dnsbl acl"}
+					</form>
 				</td>
 			</tr>
 
@@ -528,12 +533,14 @@ print <<END;
 					<p>
 						$Lang::tr{'dnsbl acl explanation'}
 					</p>
+					</form>
 				</td>
 			</tr>
 
 			<tr>
 				<td>
 					$Lang::tr{"network zone"}
+					</form>
 				</td>
 
 				<td>
@@ -560,17 +567,20 @@ END
 					}
 print <<END;
 					</select>
+					</form>
 				</td>
 			</tr>
 
 			<tr>
 				<td>
 					$Lang::tr{"dnsbl custom source"}
+					</form>
 				</td>
 
 				<td>
 					<textarea name='CUSTOM_ACL' rows='9' placeholder='1.2.3.4\n10.0.0.0/255.255.255.0\n192.168.0.0/24'
 						>@{[ join("\n", @custom_acl) ]}</textarea>
+					</form>
 				</td>
 			</tr>
 
@@ -578,6 +588,7 @@ print <<END;
 				<td colspan='2'>
 					<input type='submit' value='$Lang::tr{'back'}'>
 					<input type='submit' name='ACTION' value='$Lang::tr{'update'}'>
+					</form>
 				</td>
 			</tr>
 		</table>
