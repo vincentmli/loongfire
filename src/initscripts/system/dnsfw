@@ -1,0 +1,309 @@
+#!/bin/sh
+###############################################################################
+#                                                                             #
+# IPFire.org - A linux based firewall                                         #
+# Copyright (C) 2007-2022  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2024-2025  LoongFire <vincent.mc.li@gmail.com>                #
+#                                                                             #
+# This program is free software: you can redistribute it and/or modify        #
+# it under the terms of the GNU General Public License as published by        #
+# the Free Software Foundation, either version 3 of the License, or           #
+# (at your option) any later version.                                         #
+#                                                                             #
+# This program is distributed in the hope that it will be useful,             #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of              #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               #
+# GNU General Public License for more details.                                #
+#                                                                             #
+# You should have received a copy of the GNU General Public License           #
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.       #
+#                                                                             #
+###############################################################################
+
+. /etc/sysconfig/rc
+. $rc_functions
+
+eval $(/usr/local/bin/readhash /var/ipfire/dns/settings)
+
+DNS_DIR="/var/ipfire/dns"
+DNSBL_FILE="${DNS_DIR}/dnsbl"
+BPF_MAP_PATH="/sys/fs/bpf/dns-fw/dns_fw_blocklist"
+
+# Function to load all enabled blocklists
+load_dnsfw () {
+        /usr/sbin/xdp-loader status green0 | grep -w 'dns_fw'
+        if [ $? -ne 0 ]; then
+                xdp-loader load green0 -P 55 -p /sys/fs/bpf/dns-fw -n dns_fw /usr/lib/bpf/dns_fw.bpf.o
+                if [ $? -ge 1 ]; then
+                        boot_mesg "Native mode not supported, try SKB"
+                        xdp-loader load green0 -m skb -P 55 -p /sys/fs/bpf/dns-fw -n dns_fw /usr/lib/bpf/dns_fw.bpf.o
+                fi
+                # allow WUI nobody with permission to update map
+                chown -R nobody /sys/fs/bpf/dns-fw
+        fi
+        
+        # Synchronize blocklists based on dnsbl configuration
+        sync_blocklists
+}
+
+# Function to synchronize blocklists (add enabled, remove disabled)
+sync_blocklists() {
+        boot_mesg "Synchronizing DNS blocklists..."
+        
+        # Check if dnsbl file exists
+        if [ ! -f "$DNSBL_FILE" ]; then
+                boot_mesg "Warning: $DNSBL_FILE not found" WARNING
+                return 1
+        fi
+        
+        # Check if dns_fw command is available
+        if ! command -v dns_fw > /dev/null 2>&1; then
+                boot_mesg "dns_fw command not found!" ERROR
+                return 1
+        fi
+        
+        # Read each line from dnsbl file
+        while IFS= read -r line; do
+                # Skip empty lines
+                [ -z "$line" ] && continue
+                
+                # Extract list name and enabled flag
+                # Format: list.rpz.ipfire.org or list.rpz.ipfire.org,on,...
+                local list_name=$(echo "$line" | cut -d',' -f1)
+                local enabled_flag=$(echo "$line" | cut -d',' -f2)
+                
+                # Remove .rpz.ipfire.org suffix to get the base name
+                local base_name=$(echo "$list_name" | sed 's/\.rpz\.ipfire\.org$//')
+                local domain_list_file="${DNS_DIR}/${base_name}.txt"
+                
+                # Check if the domain list file exists
+                if [ ! -f "$domain_list_file" ]; then
+                        boot_mesg "Warning: Domain list file $domain_list_file not found" WARNING
+                        continue
+                fi
+                
+                # Check if this entry has ",on" flag (enabled)
+                if [ "$enabled_flag" = "on" ]; then
+                        boot_mesg "Adding ${base_name} blocklist from $domain_list_file"
+                        
+                        # Add domains from the file
+                        dns_fw "$BPF_MAP_PATH" batch-add "$domain_list_file"
+                        if [ $? -eq 0 ]; then
+                                boot_mesg "Successfully added ${base_name} blocklist"
+                        else
+                                boot_mesg "Failed to add ${base_name} blocklist" WARNING
+                        fi
+                else
+                        # Entry is not marked as "on" (could be "off" or empty), so delete it
+                        boot_mesg "Removing ${base_name} blocklist from BPF map"
+                        
+                        # Delete domains from the file
+                        dns_fw "$BPF_MAP_PATH" batch-delete "$domain_list_file"
+                        if [ $? -eq 0 ]; then
+                                boot_mesg "Successfully removed ${base_name} blocklist"
+                        else
+                                boot_mesg "Failed to remove ${base_name} blocklist" WARNING
+                        fi
+                fi
+        done < "$DNSBL_FILE"
+        
+        boot_mesg "Finished synchronizing blocklists"
+}
+
+# Function to unload XDP program
+unload_dnsfw () {
+        /usr/sbin/xdp-loader status green0 | grep -w 'dns_fw'
+        if [ $? -eq 0 ]; then
+                prog_id=$(xdp-loader status green0 | grep 'dns_fw' | awk '{print $4}')
+                /usr/sbin/xdp-loader unload -i $prog_id green0
+                if [ $? -eq 0 ]; then
+                        boot_mesg "dns_fw unloaded successfully"
+                	/usr/sbin/dns_fw /sys/fs/bpf/dns-fw/dns_fw_blocklist clear
+                else
+                        boot_mesg "Error unloading dns_fw" ERROR
+                fi
+        else
+                boot_mesg "dns_fw not loaded, nothing to unload"
+        fi
+}
+
+# Function to add a single blocklist
+add_blocklist() {
+        local base_name="$1"
+        local domain_list_file="${DNS_DIR}/${base_name}.txt"
+        
+        if [ ! -f "$domain_list_file" ]; then
+                boot_mesg "Domain list file $domain_list_file not found" ERROR
+                return 1
+        fi
+        
+        if ! command -v dns_fw > /dev/null 2>&1; then
+                boot_mesg "dns_fw command not found!" ERROR
+                return 1
+        fi
+        
+        boot_mesg "Adding ${base_name} blocklist from $domain_list_file"
+        dns_fw "$BPF_MAP_PATH" batch-add "$domain_list_file"
+        return $?
+}
+
+# Function to remove a single blocklist
+remove_blocklist() {
+        local base_name="$1"
+        local domain_list_file="${DNS_DIR}/${base_name}.txt"
+        
+        if [ ! -f "$domain_list_file" ]; then
+                boot_mesg "Domain list file $domain_list_file not found" ERROR
+                return 1
+        fi
+        
+        if ! command -v dns_fw > /dev/null 2>&1; then
+                boot_mesg "dns_fw command not found!" ERROR
+                return 1
+        fi
+        
+        boot_mesg "Removing ${base_name} blocklist from BPF map"
+        dns_fw "$BPF_MAP_PATH" batch-delete "$domain_list_file"
+        return $?
+}
+
+# Function to show current blocklist status
+show_blocklist_status() {
+        echo "Current DNS blocklist status:"
+        echo "=============================="
+        
+        if [ ! -f "$DNSBL_FILE" ]; then
+                echo "Warning: $DNSBL_FILE not found"
+                return 1
+        fi
+        
+        while IFS= read -r line; do
+                [ -z "$line" ] && continue
+                
+                local list_name=$(echo "$line" | cut -d',' -f1)
+                local enabled_flag=$(echo "$line" | cut -d',' -f2)
+                local base_name=$(echo "$list_name" | sed 's/\.rpz\.ipfire\.org$//')
+                
+                if [ "$enabled_flag" = "on" ]; then
+                        echo "✓ $base_name: ENABLED"
+                else
+                        echo "✗ $base_name: DISABLED"
+                fi
+        done < "$DNSBL_FILE"
+}
+
+is_dns_fw_attached () {
+        /usr/sbin/xdp-loader status green0 | grep -w 'dns_fw' >> /dev/null
+        if [ $? -eq 0 ]; then
+                echo "dns_fw is attached to green0"
+                return 0
+        else
+                echo "dns_fw is not attached to green0"
+                return 1
+        fi
+}
+
+case "$1" in
+        start)
+                boot_mesg -n "Starting dns-fw..."
+                if [ "$ENABLE_XDP" = "on" ]; then
+                        load_dnsfw
+                        evaluate_retval
+                else
+                        boot_mesg "XDP acceleration is disabled (ENABLE_XDP=$ENABLE_XDP)" 
+                        evaluate_retval
+                fi
+                ;;
+
+        stop)
+                boot_mesg "Stopping dns-fw..."
+                if [ "$ENABLE_XDP" = "off" ]; then
+                        unload_dnsfw
+                else
+                        boot_mesg "XDP acceleration is disabled, nothing to stop"
+                fi
+                evaluate_retval
+                ;;
+
+        status)
+                is_dns_fw_attached
+                ;;
+        
+        blocklist-status)
+                show_blocklist_status
+                ;;
+        
+        sync)
+                boot_mesg "Synchronizing DNS blocklists..."
+                if [ "$ENABLE_XDP" = "on" ]; then
+                        if is_dns_fw_attached > /dev/null 2>&1; then
+                                sync_blocklists
+                                evaluate_retval
+                        else
+                                boot_mesg "dns_fw is not loaded, please start it first" ERROR
+                                evaluate_retval
+                        fi
+                else
+                        boot_mesg "XDP acceleration is disabled, cannot sync blocklists"
+                        evaluate_retval
+                fi
+                ;;
+        
+        add-blocklist)
+                if [ -z "$2" ]; then
+                        echo "Usage: $0 add-blocklist <blocklist_name>"
+                        echo "Example: $0 add-blocklist porn"
+                        exit 1
+                fi
+                add_blocklist "$2"
+                ;;
+        
+        remove-blocklist)
+                if [ -z "$2" ]; then
+                        echo "Usage: $0 remove-blocklist <blocklist_name>"
+                        echo "Example: $0 remove-blocklist porn"
+                        exit 1
+                fi
+                remove_blocklist "$2"
+                ;;
+
+        restart)
+                $0 stop
+                sleep 1
+                $0 start
+                ;;
+        
+        reload)
+                boot_mesg "Reloading DNS blocklists (resync)..."
+                if [ "$ENABLE_XDP" = "on" ]; then
+                        if is_dns_fw_attached > /dev/null 2>&1; then
+                                sync_blocklists
+                                evaluate_retval
+                        else
+                                boot_mesg "dns_fw is not loaded, please start it first" ERROR
+                                evaluate_retval
+                        fi
+                else
+                        boot_mesg "XDP acceleration is disabled, cannot reload blocklists"
+                        evaluate_retval
+                fi
+                ;;
+
+        *)
+                echo "Usage: $0 {start|stop|restart|reload|status|sync|blocklist-status|add-blocklist|remove-blocklist}"
+                echo ""
+                echo "Commands:"
+                echo "  start              - Load XDP program and sync blocklists"
+                echo "  stop               - Unload XDP program"
+                echo "  restart            - Stop then start"
+                echo "  reload             - Resync blocklists (add enabled, remove disabled)"
+                echo "  status             - Check if XDP program is attached"
+                echo "  sync               - Same as reload"
+                echo "  blocklist-status   - Show which blocklists are enabled/disabled"
+                echo "  add-blocklist <name>   - Manually add a blocklist (e.g., porn)"
+                echo "  remove-blocklist <name>- Manually remove a blocklist"
+                exit 1
+                ;;
+esac
+
+exit 0

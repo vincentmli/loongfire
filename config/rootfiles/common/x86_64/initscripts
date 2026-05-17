@@ -103,6 +103,7 @@ etc/rc.d/init.d/ddos
 etc/rc.d/init.d/tcp-ddos
 etc/rc.d/init.d/xdpgeoip
 etc/rc.d/init.d/xdpipblocklist
+etc/rc.d/init.d/dnsfw
 #etc/rc.d/rc0.d
 etc/rc.d/rc0.d/K01grub-btrfsd
 #etc/rc.d/rc0.d/K01vdradmin

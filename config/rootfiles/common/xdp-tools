@@ -25,6 +25,7 @@ usr/sbin/xdp_geoip
 usr/sbin/xdp_ddos
 usr/sbin/class_filter
 usr/sbin/xdp_ipblocklist
+etc/rc.d/rc3.d/S108dnsfw
 usr/lib/bpf/xdpdump_bpf.o
 usr/lib/bpf/xdpdump_xdp.o
 usr/lib/bpf/xdpfilt_alw_all.o
