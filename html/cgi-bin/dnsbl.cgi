@@ -104,7 +104,7 @@ if ($cgiparams{'ACTION'} eq "save_xdp") {
 	&write_global_settings();
 	
 	# Restart DNS service to apply XDP settings
-	# &General::system("/usr/local/bin/unboundctrl", "restart");
+	&General::system("/usr/local/bin/dnsfwctrl", "restart");
 	
 	push(@errormessages, "XDP acceleration setting has been saved. DNS service restarted.");
 }
@@ -133,8 +133,12 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
 	# Write config hash.
 	&writesettings("$settings_file", \%tmphash);
 
-	# Reload Unbound
-	&General::system("/usr/local/bin/unboundctrl", "reload");
+	if ($global_settings{'ENABLE_XDP'} eq "on") {
+		&General::system("/usr/local/bin/dnsfwctrl", "sync");
+	} else {
+		# Reload Unbound
+		&General::system("/usr/local/bin/unboundctrl", "reload");
+	}
 
 # Save changed zone ACL
 } elsif ($cgiparams{'ACTION'} eq "$Lang::tr{'update'}") {
@@ -190,8 +194,12 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
 		# Write the new ACL settings to settings file.
 		&writesettings("$settings_file", \%tmphash);
 
-		# Reload Unbound
-		&General::system("/usr/local/bin/unboundctrl", "reload");
+		if ($global_settings{'ENABLE_XDP'} eq "on") {
+			&General::system("/usr/local/bin/dnsfwctrl", "sync");
+		} else {
+			# Reload Unbound
+			&General::system("/usr/local/bin/unboundctrl", "reload");
+		}
 	}
 
 # Save changed custom domains to allow or block
@@ -275,8 +283,13 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
 		# Save the domains
 		&writesettings("$custom_domains_file", \%tmp);
 
-		# Reload Unbound
-		&General::system("/usr/local/bin/unboundctrl", "reload");
+		if ($global_settings{'ENABLE_XDP'} eq "on") {
+			&General::system("/usr/local/bin/dnsfwctrl", "sync");
+		} else {
+			# Reload Unbound
+			&General::system("/usr/local/bin/unboundctrl", "reload");
+		}
+
 	}
 }
 

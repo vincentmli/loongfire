@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 	} else if (strcmp(argv[1], "clear") == 0) {
 		safe_system("/usr/sbin/dns_fw /sys/fs/bpf/dns-fw/dns_fw_blocklist clear");
 	} else if (strcmp(argv[1], "sync") == 0) {
-		safe_system("/usr/sbin/dns_fw /sys/fs/bpf/dns-fw/dns_fw_blocklist sync");
+		safe_system("/etc/rc.d/init.d/dnsfw sync");
 	} else if (strcmp(argv[1], "status") == 0) {
 		safe_system("/etc/rc.d/init.d/dnsfw status");
 	} else {
