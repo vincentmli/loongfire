@@ -45,3 +45,4 @@ usr/local/bin/xdpgeoipctrl
 usr/local/bin/xdpipblocklistctrl
 usr/local/bin/xdpsnictrl
 usr/local/bin/xdpdnsctrl
+usr/local/bin/dnsfwctrl
