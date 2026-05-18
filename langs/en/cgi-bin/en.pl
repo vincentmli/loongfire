@@ -912,6 +912,8 @@
 'dnsbl dns firewall' => 'DNS Firewall',
 'dnsbl error domain specified twice' => 'The domain cannot be allowed and blocked at the same time.',
 'dnsbl lists' => 'Lists',
+'dnsbl xdp enable' => 'Enable XDP Acceleration',
+'dnsbl xdp description' => 'XDP (eXpress Data Path) accelerates DNS filtering by processing packets directly in the network driver. This can significantly improve performance for high-traffic environments. Requires kernel support for XDP',
 'dnsforward' => 'DNS Forwarding',
 'dnsforward add a new entry' => 'Add a new entry',
 'dnsforward configuration' => 'DNS forward configuration',

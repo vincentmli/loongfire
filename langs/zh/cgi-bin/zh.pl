@@ -909,6 +909,8 @@
 'dnsbl dns firewall' => 'DNS 防火墙',
 'dnsbl error domain specified twice' => '域名不能同时被放行和拦截',
 'dnsbl lists' => '列表',
+'dnsbl xdp enable' => '启用 XDP 加速',
+'dnsbl xdp description' => 'XDP（快速数据路径）通过在网络驱动中直接处理数据包来加速 DNS 过滤，从而显著提升高流量环境下的性能。该功能需要内核支持 XDP',
 'dnsforward' => 'DNS转发',
 'dnsforward add a new entry' => '添加条目',
 'dnsforward configuration' => 'DNS转发配置',

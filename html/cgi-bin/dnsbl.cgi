@@ -399,9 +399,8 @@ print <<END;
 					<input type='checkbox' name='ENABLE_XDP' id='ENABLE_XDP' value='on' $xdp_checked>
 				</td>
 				<td width='95%'>
-					<strong>Enable XDP Acceleration</strong><br>
-					<small>XDP (eXpress Data Path) accelerates DNS filtering by processing packets directly in the network driver.
-					This can significantly improve performance for high-traffic environments. Requires kernel support for XDP.</small>
+					<strong>$Lang::tr{'dnsbl xdp enable'}</strong><br>
+					<small>$Lang::tr{'dnsbl xdp description'}</small>
 				</td>
 			</tr>
 			<tr>
