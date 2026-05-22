@@ -342,6 +342,10 @@ iptables_init() {
 	iptables -N OVPNINPUTN2N
 	iptables -A INPUT -j OVPNINPUTN2N
 
+	# Local Services
+	iptables -N LOCAL_OUTPUT
+	iptables -A OUTPUT -j LOCAL_OUTPUT
+
 	# Tor (outbound)
 	iptables -N TOR_OUTPUT
 	iptables -A OUTPUT -j TOR_OUTPUT
