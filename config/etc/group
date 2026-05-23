@@ -30,6 +30,7 @@ nobody:x:99:
 users:x:100:
 suricata:x:101:
 logwatch:x:102:
+unbound:x:103:
 cron:x:104:
 syslogd:x:105:
 klogd:x:106:

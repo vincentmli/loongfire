@@ -89,4 +89,4 @@ HOME=/
 %weekly * * /bin/find /var/log/rrd -mtime +365 -type f -name '*.rrd' -delete -o -type d -empty -delete
 
 # Update DNS trust anchor
-%daily,random * * @runas(nobody) /usr/sbin/unbound-anchor -a /var/lib/unbound/root.key -c /etc/unbound/icannbundle.pem
+%daily,random * * @runas(unbound) /usr/sbin/unbound-anchor -a /var/lib/unbound/root.key -c /etc/unbound/icannbundle.pem
