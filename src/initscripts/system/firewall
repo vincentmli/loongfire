@@ -442,6 +442,9 @@ iptables_init() {
 	# run captivectrl
 	/usr/local/bin/captivectrl
 
+	# Grant Unbound access
+	iptables -A LOCAL_OUTPUT -m owner --uid-owner unbound -j ACCEPT
+
 	# If a Tor relay is enabled apply firewall rules
 	if [ "${TOR_RELAY_ENABLED}" = "on" -a -n "${TOR_RELAY_PORT}" ]; then
 		/usr/local/bin/torctrl restart &> /dev/null
