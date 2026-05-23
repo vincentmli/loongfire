@@ -1767,6 +1767,7 @@ fi
 	lfsmake2 usbutils
 	lfsmake2 libxml2
 	lfsmake2 libxslt
+	lfsmake2 python3-lxml
 	lfsmake2 perl-BerkeleyDB
 	lfsmake2 cyrus-sasl
 	lfsmake2 openldap
