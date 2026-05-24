@@ -5,9 +5,9 @@
 #                      by Zabbix server
 #
 # Author: robin.roevens (at) disroot.org
-# Version: 3.0
+# Version: 3.1
 #
-# Copyright (C) 2007-2024  IPFire Team  <info@ipfire.org> 
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -96,6 +96,17 @@ my %services = (
         'OpenVPN Roadwarrior Server' => {
                 "process" => "openvpn",
                 "pidfile" => "/var/run/openvpn-rw.pid",
+        },
+
+        # LLDPD
+        'Link Layer Discovery Protocol' => {
+                "process" => "lldpd",
+        },
+
+        # DBus
+        'D-Bus Daemon' => {
+                "process" => "dbus-daemon",
+                "pidfile" => "/var/run/dbus/pid",
         }
 );
 
