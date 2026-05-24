@@ -24,16 +24,16 @@
 
 include Config
 
-VER        = 6.0
+VER        = 6.0.3
 SUMMARY    = YAML parser and emitter for Python
 
-THISAPP    = PyYAML-$(VER)
+THISAPP    = pyyaml-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
 DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = python3-yaml
-PAK_VER    = 3
+PAK_VER    = 4
 
 DEPS       =
 
@@ -47,7 +47,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 00a871f6a6ea8b0a3f7aec4279b03e102af2c2b75ce45f2bcf68584f67843b2a0b37113bd431c73d9c84b2abaaf48bd97163aa970074afb8e7ef04247938f271
+$(DL_FILE)_BLAKE2 = 6c20c1ba8e82b7f4235d826a9e893306be25a54fa8a499421ed5d30aeb1dbe9be9c70e5282d7c6a2b89583faba778fa0151f3145311fae10afdeba4ced50d161
 
 install : $(TARGET)
 
