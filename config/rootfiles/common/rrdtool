@@ -25,7 +25,7 @@ usr/lib/perl5/site_perl/5.36.0/xxxMACHINExxx-linux-thread-multi/auto/RRDs/RRDs.s
 #usr/lib/python3.10/site-packages/rrdtool-0.1.10-py3.10.egg-info/SOURCES.txt
 #usr/lib/python3.10/site-packages/rrdtool-0.1.10-py3.10.egg-info/dependency_links.txt
 #usr/lib/python3.10/site-packages/rrdtool-0.1.10-py3.10.egg-info/top_level.txt
-usr/lib/python3.10/site-packages/rrdtool.cpython-310-xxxMACHINExxx-linux-gnu.so
+usr/lib/python3.10/site-packages/rrdtool.cpython-310.so
 #usr/share/doc/rrdtool-1.9.0
 #usr/share/doc/rrdtool-1.9.0/html
 #usr/share/doc/rrdtool-1.9.0/html/RRDp.html
