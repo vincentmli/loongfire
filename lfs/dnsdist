@@ -26,7 +26,7 @@ include Config
 
 SUMMARY    = A highly DNS-, DoS- and abuse-aware loadbalancer
 
-VER        = 2.0.2
+VER        = 2.0.5
 
 THISAPP    = dnsdist-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
@@ -34,7 +34,7 @@ DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = dnsdist
-PAK_VER    = 24
+PAK_VER    = 34
 
 DEPS       =
 
@@ -50,7 +50,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 87a4179f474d7f8117e4e03c4ff680f79207c8056765c6925ee21b3011e4555e47ad9c97950f30ab2876ac0978ee07555017cb1bbc6b93792992c1821f8da27a
+$(DL_FILE)_BLAKE2 = e00273f837d24b07c3d424c507fff8fea6f0c579014ad20a24dbd75a86c8c24a9a3d3477b3e044999303b34fa02ffa2e28d22dade967fdc1cca540b91c135015
 
 install : $(TARGET)
 
@@ -84,19 +84,12 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 
-	# HACK: Create dummy systemctl to satisfy configure check
-	# IPFire builds udev from systemd source but not full systemd
-	# This allows dnsdist to pass the systemctl check without needing full systemd
-	echo '#!/bin/bash' > /usr/bin/systemctl
-	chmod +x /usr/bin/systemctl
-
 	cd $(DIR_APP) && patch -Np3 < $(DIR_SRC)/src/patches/dnsdist-2.0.2-dnsdist-xsk.patch
-	cd $(DIR_APP) && patch -Np3 < $(DIR_SRC)/src/patches/dnsdist-2.0.2-vloginfo.patch
 	cd $(DIR_APP) && ./configure \
 		--prefix=/usr \
 		--sysconfdir=/etc \
-		--enable-openssl \
-		--disable-gnutls \
+		--with-libssl \
+		--without-gnutls \
 		--enable-dns-over-tls \
 		--with-lua \
 		--with-ebpf \
@@ -116,9 +109,6 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
         # Install xsk AF_XDP configuration
 	install -v -m 644 $(DIR_SRC)/config/dnsdist/dnsdist-xsk.conf \
 		/etc/dnsdist-xsk.conf
-
-	# Clean up dummy systemctl to keep system clean
-	rm -f /usr/bin/systemctl
 
 	@rm -rf $(DIR_APP)
 	@$(POSTBUILD)
