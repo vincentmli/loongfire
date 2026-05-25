@@ -185,13 +185,13 @@ index 34eaf68c7..38aa63354 100644
 +	iptables --wait -D IPSECINPUT -i $PLUTO_INTERFACE -p ESP \
 +		-s $PLUTO_PEER $S_PEER_PORT \
 +		-d $PLUTO_ME $D_MY_PORT -j ACCEPT
-+	iptables --wait -D IPSECINPUT -o $PLUTO_INTERFACE -p IPIP \
++	iptables --wait -D IPSECOUTPUT -o $PLUTO_INTERFACE -p IPIP \
 +		-s $PLUTO_ME $D_MY_PORT \
 +		-d $PLUTO_PEER $S_PEER_PORT -j ACCEPT
-+	iptables --wait -D IPSECINPUT -o $PLUTO_INTERFACE -p AH \
++	iptables --wait -D IPSECOUTPUT -o $PLUTO_INTERFACE -p AH \
 +		-s $PLUTO_ME $D_MY_PORT \
 +		-d $PLUTO_PEER $S_PEER_PORT -j ACCEPT
-+	iptables --wait -D IPSECINPUT -o $PLUTO_INTERFACE -p ESP \
++	iptables --wait -D IPSECOUTPUT -o $PLUTO_INTERFACE -p ESP \
 +		-s $PLUTO_ME $D_MY_PORT \
 +		-d $PLUTO_PEER $S_PEER_PORT -j ACCEPT
  	;;
