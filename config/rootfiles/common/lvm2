@@ -23,6 +23,7 @@ usr/lib/udev/rules.d/95-dm-notify.rules
 usr/sbin/blkdeactivate
 usr/sbin/dmsetup
 usr/sbin/dmstats
+usr/sbin/dmvdostats
 usr/sbin/fsadm
 usr/sbin/lvchange
 usr/sbin/lvconvert
@@ -74,6 +75,9 @@ usr/sbin/vgs
 usr/sbin/vgscan
 usr/sbin/vgsplit
 #usr/share/man/man5/lvm.conf.5
+#usr/share/man/man7/lvm-args.7
+#usr/share/man/man7/lvm-categories.7
+#usr/share/man/man7/lvm-index.7
 #usr/share/man/man7/lvmautoactivation.7
 #usr/share/man/man7/lvmcache.7
 #usr/share/man/man7/lvmraid.7
@@ -84,6 +88,7 @@ usr/sbin/vgsplit
 #usr/share/man/man8/blkdeactivate.8
 #usr/share/man/man8/dmsetup.8
 #usr/share/man/man8/dmstats.8
+#usr/share/man/man8/dmvdostats.8
 #usr/share/man/man8/fsadm.8
 #usr/share/man/man8/lvchange.8
 #usr/share/man/man8/lvconvert.8
