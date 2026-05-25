@@ -31,11 +31,13 @@ usr/lib/postfix/flush
 usr/lib/postfix/lmtp
 usr/lib/postfix/local
 usr/lib/postfix/master
+usr/lib/postfix/nbdb_reindexd
 usr/lib/postfix/nqmgr
 usr/lib/postfix/oqmgr
 usr/lib/postfix/pickup
 usr/lib/postfix/pipe
 usr/lib/postfix/post-install
+usr/lib/postfix/postfix-non-bdb-script
 usr/lib/postfix/postfix-script
 usr/lib/postfix/postfix-tls-script
 usr/lib/postfix/postfix-wrapper
@@ -74,6 +76,7 @@ usr/sbin/sendmail.postfix
 #usr/share/man/man1/postcat.1
 #usr/share/man/man1/postconf.1
 #usr/share/man/man1/postdrop.1
+#usr/share/man/man1/postfix-non-bdb.1
 #usr/share/man/man1/postfix-tls.1
 #usr/share/man/man1/postfix.1
 #usr/share/man/man1/postkick.1
@@ -121,6 +124,7 @@ usr/sbin/sendmail.postfix
 #usr/share/man/man8/lmtp.8
 #usr/share/man/man8/local.8
 #usr/share/man/man8/master.8
+#usr/share/man/man8/nbdb_reindexd.8
 #usr/share/man/man8/oqmgr.8
 #usr/share/man/man8/pickup.8
 #usr/share/man/man8/pipe.8

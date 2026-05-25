@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -26,7 +26,7 @@ include Config
 
 SUMMARY    = A fast, secure, and flexible mailer
 
-VER        = 3.10.6
+VER        = 3.11.1
 
 THISAPP    = postfix-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -34,7 +34,7 @@ DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = postfix
-PAK_VER    = 50
+PAK_VER    = 52
 
 DEPS       =
 
@@ -72,7 +72,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = ca9f371f15af45c72ee97830d5bfb08b4ef2020409e55b1a99ef20681dfaec86fa7f7f799caa7b6e5757da0ea9ccbd5ac51104244b2e315f3cedb414b3e46451
+$(DL_FILE)_BLAKE2 = 38f5579b9252c6b91f1ea5af170fef3f1348dccdb41aaf0ab1c33eaaca2789d0b757bb03ef4b0e5ade1f69d7b195cbac4a714a0e5f0d2c8768d62db8adce23fc
 
 install : $(TARGET)
 
