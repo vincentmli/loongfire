@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 6.0.4
+VER        = 6.0.6
 
 THISAPP    = strongswan-$(VER)
 DL_FILE    = $(THISAPP).tar.bz2
@@ -43,7 +43,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 2291900bda3e679cb68f35e44fe20011d82b44e7a9ed3fd0ae7c40ed57154c5ecded1ab5bffc9ab30c93de667ef9b103a7da1a2b31d8e2eae97b268f0be11f01
+$(DL_FILE)_BLAKE2 = 0d98b9230029c6a02f56a7ce7393b2d241dc77880bcae8affb0280a75c190ce96a8727fa079ae46540115f0dbfc3228799742faddccab0e2cbe86f4934e8e23a
 
 install : $(TARGET)
 
