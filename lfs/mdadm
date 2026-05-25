@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 4.5
+VER        = 4.6
 #          https://git.kernel.org/pub/scm/utils/mdadm/mdadm.git/
 
 THISAPP    = mdadm-$(VER)
@@ -41,7 +41,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 6cfa80514b4d51c2e8c5e3275ec3dce1a59c509fd83dbc41d395e47ed59c19df30b0382cf6dc5f3c6faf973296e341bc5e461303b3a0f6ce58da887ef0e8a418
+$(DL_FILE)_BLAKE2 = 5a2c523670cc659397b0d36f1026f944e630d422e16d3830bb5d94a03ac84118d99553f7f7d555e3f8cd445908cb2519725bc56d9516de24dd837ecdea0be3bc
 
 install : $(TARGET)
 
