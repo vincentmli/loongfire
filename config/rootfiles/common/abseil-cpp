@@ -44,11 +44,11 @@
 #usr/include/absl/base/internal/exception_safety_testing.h
 #usr/include/absl/base/internal/exception_testing.h
 #usr/include/absl/base/internal/hide_ptr.h
-#usr/include/absl/base/internal/identity.h
 #usr/include/absl/base/internal/iterator_traits.h
 #usr/include/absl/base/internal/iterator_traits_test_helper.h
 #usr/include/absl/base/internal/low_level_alloc.h
 #usr/include/absl/base/internal/low_level_scheduling.h
+#usr/include/absl/base/internal/nullability_traits.h
 #usr/include/absl/base/internal/per_thread_tls.h
 #usr/include/absl/base/internal/poison.h
 #usr/include/absl/base/internal/pretty_function.h
@@ -94,6 +94,7 @@
 #usr/include/absl/container/btree_map.h
 #usr/include/absl/container/btree_set.h
 #usr/include/absl/container/btree_test.h
+#usr/include/absl/container/chunked_queue.h
 #usr/include/absl/container/fixed_array.h
 #usr/include/absl/container/flat_hash_map.h
 #usr/include/absl/container/flat_hash_set.h
@@ -102,6 +103,7 @@
 #usr/include/absl/container/internal
 #usr/include/absl/container/internal/btree.h
 #usr/include/absl/container/internal/btree_container.h
+#usr/include/absl/container/internal/chunked_queue.h
 #usr/include/absl/container/internal/common.h
 #usr/include/absl/container/internal/common_policy_traits.h
 #usr/include/absl/container/internal/compressed_tuple.h
@@ -114,6 +116,7 @@
 #usr/include/absl/container/internal/hashtable_debug.h
 #usr/include/absl/container/internal/hashtable_debug_hooks.h
 #usr/include/absl/container/internal/hashtablez_sampler.h
+#usr/include/absl/container/internal/heterogeneous_lookup_testing.h
 #usr/include/absl/container/internal/inlined_vector.h
 #usr/include/absl/container/internal/layout.h
 #usr/include/absl/container/internal/node_slot_policy.h
@@ -131,6 +134,8 @@
 #usr/include/absl/container/internal/unordered_set_lookup_test.h
 #usr/include/absl/container/internal/unordered_set_members_test.h
 #usr/include/absl/container/internal/unordered_set_modifiers_test.h
+#usr/include/absl/container/linked_hash_map.h
+#usr/include/absl/container/linked_hash_set.h
 #usr/include/absl/container/node_hash_map.h
 #usr/include/absl/container/node_hash_set.h
 #usr/include/absl/crc
@@ -157,6 +162,8 @@
 #usr/include/absl/crc/internal/non_temporal_memcpy.h
 #usr/include/absl/debugging
 #usr/include/absl/debugging/CMakeFiles
+#usr/include/absl/debugging/CMakeFiles/borrowed_fixup_buffer.dir
+#usr/include/absl/debugging/CMakeFiles/borrowed_fixup_buffer.dir/internal
 #usr/include/absl/debugging/CMakeFiles/debugging_internal.dir
 #usr/include/absl/debugging/CMakeFiles/debugging_internal.dir/internal
 #usr/include/absl/debugging/CMakeFiles/decode_rust_punycode.dir
@@ -177,6 +184,7 @@
 #usr/include/absl/debugging/internal
 #usr/include/absl/debugging/internal/address_is_readable.h
 #usr/include/absl/debugging/internal/addresses.h
+#usr/include/absl/debugging/internal/borrowed_fixup_buffer.h
 #usr/include/absl/debugging/internal/bounded_utf8_length_sequence.h
 #usr/include/absl/debugging/internal/decode_rust_punycode.h
 #usr/include/absl/debugging/internal/demangle.h
@@ -311,6 +319,7 @@
 #usr/include/absl/log/internal/check_op.h
 #usr/include/absl/log/internal/conditions.h
 #usr/include/absl/log/internal/config.h
+#usr/include/absl/log/internal/container.h
 #usr/include/absl/log/internal/flags.h
 #usr/include/absl/log/internal/fnmatch.h
 #usr/include/absl/log/internal/globals.h
@@ -343,6 +352,9 @@
 #usr/include/absl/memory/memory.h
 #usr/include/absl/meta
 #usr/include/absl/meta/CMakeFiles
+#usr/include/absl/meta/internal
+#usr/include/absl/meta/internal/constexpr_testing.h
+#usr/include/absl/meta/internal/requires.h
 #usr/include/absl/meta/type_traits.h
 #usr/include/absl/numeric
 #usr/include/absl/numeric/CMakeFiles
@@ -462,10 +474,11 @@
 #usr/include/absl/strings/CMakeFiles/cordz_info.dir/internal
 #usr/include/absl/strings/CMakeFiles/cordz_sample_token.dir
 #usr/include/absl/strings/CMakeFiles/cordz_sample_token.dir/internal
+#usr/include/absl/strings/CMakeFiles/generic_printer_internal.dir
+#usr/include/absl/strings/CMakeFiles/generic_printer_internal.dir/internal
 #usr/include/absl/strings/CMakeFiles/str_format_internal.dir
 #usr/include/absl/strings/CMakeFiles/str_format_internal.dir/internal
 #usr/include/absl/strings/CMakeFiles/str_format_internal.dir/internal/str_format
-#usr/include/absl/strings/CMakeFiles/string_view.dir
 #usr/include/absl/strings/CMakeFiles/strings.dir
 #usr/include/absl/strings/CMakeFiles/strings.dir/internal
 #usr/include/absl/strings/CMakeFiles/strings_internal.dir
@@ -482,6 +495,7 @@
 #usr/include/absl/strings/has_absl_stringify.h
 #usr/include/absl/strings/has_ostream_operator.h
 #usr/include/absl/strings/internal
+#usr/include/absl/strings/internal/append_and_overwrite.h
 #usr/include/absl/strings/internal/charconv_bigint.h
 #usr/include/absl/strings/internal/charconv_parse.h
 #usr/include/absl/strings/internal/cord_data_edge.h
@@ -503,6 +517,8 @@
 #usr/include/absl/strings/internal/damerau_levenshtein_distance.h
 #usr/include/absl/strings/internal/escaping.h
 #usr/include/absl/strings/internal/escaping_test_common.h
+#usr/include/absl/strings/internal/generic_printer.h
+#usr/include/absl/strings/internal/generic_printer_internal.h
 #usr/include/absl/strings/internal/memutil.h
 #usr/include/absl/strings/internal/numbers_test_common.h
 #usr/include/absl/strings/internal/ostringstream.h
@@ -525,6 +541,7 @@
 #usr/include/absl/strings/internal/utf8.h
 #usr/include/absl/strings/match.h
 #usr/include/absl/strings/numbers.h
+#usr/include/absl/strings/resize_and_overwrite.h
 #usr/include/absl/strings/str_cat.h
 #usr/include/absl/strings/str_format.h
 #usr/include/absl/strings/str_join.h
@@ -587,6 +604,7 @@
 #usr/include/absl/time/internal/cctz/src/time_zone_impl.h
 #usr/include/absl/time/internal/cctz/src/time_zone_info.h
 #usr/include/absl/time/internal/cctz/src/time_zone_libc.h
+#usr/include/absl/time/internal/cctz/src/time_zone_name_win.h
 #usr/include/absl/time/internal/cctz/src/time_zone_posix.h
 #usr/include/absl/time/internal/cctz/src/tzfile.h
 #usr/include/absl/time/internal/get_current_time_chrono.inc
@@ -611,6 +629,7 @@
 #usr/lib/cmake/absl/abslTargets-noconfig.cmake
 #usr/lib/cmake/absl/abslTargets.cmake
 #usr/lib/libabsl_base.a
+#usr/lib/libabsl_borrowed_fixup_buffer.a
 #usr/lib/libabsl_city.a
 #usr/lib/libabsl_civil_time.a
 #usr/lib/libabsl_cord.a
@@ -642,6 +661,7 @@
 #usr/lib/libabsl_flags_reflection.a
 #usr/lib/libabsl_flags_usage.a
 #usr/lib/libabsl_flags_usage_internal.a
+#usr/lib/libabsl_generic_printer_internal.a
 #usr/lib/libabsl_graphcycles_internal.a
 #usr/lib/libabsl_hash.a
 #usr/lib/libabsl_hashtable_profiler.a
@@ -689,7 +709,6 @@
 #usr/lib/libabsl_statusor.a
 #usr/lib/libabsl_str_format_internal.a
 #usr/lib/libabsl_strerror.a
-#usr/lib/libabsl_string_view.a
 #usr/lib/libabsl_strings.a
 #usr/lib/libabsl_strings_internal.a
 #usr/lib/libabsl_symbolize.a
@@ -715,10 +734,12 @@
 #usr/lib/pkgconfig/absl_base_internal.pc
 #usr/lib/pkgconfig/absl_bind_front.pc
 #usr/lib/pkgconfig/absl_bits.pc
+#usr/lib/pkgconfig/absl_borrowed_fixup_buffer.pc
 #usr/lib/pkgconfig/absl_bounded_utf8_length_sequence.pc
 #usr/lib/pkgconfig/absl_btree.pc
 #usr/lib/pkgconfig/absl_charset.pc
 #usr/lib/pkgconfig/absl_check.pc
+#usr/lib/pkgconfig/absl_chunked_queue.pc
 #usr/lib/pkgconfig/absl_city.pc
 #usr/lib/pkgconfig/absl_civil_time.pc
 #usr/lib/pkgconfig/absl_cleanup.pc
@@ -727,6 +748,7 @@
 #usr/lib/pkgconfig/absl_compare.pc
 #usr/lib/pkgconfig/absl_compressed_tuple.pc
 #usr/lib/pkgconfig/absl_config.pc
+#usr/lib/pkgconfig/absl_constexpr_testing_internal.pc
 #usr/lib/pkgconfig/absl_container_common.pc
 #usr/lib/pkgconfig/absl_container_memory.pc
 #usr/lib/pkgconfig/absl_cord.pc
@@ -773,6 +795,7 @@
 #usr/lib/pkgconfig/absl_flat_hash_map.pc
 #usr/lib/pkgconfig/absl_flat_hash_set.pc
 #usr/lib/pkgconfig/absl_function_ref.pc
+#usr/lib/pkgconfig/absl_generic_printer_internal.pc
 #usr/lib/pkgconfig/absl_graphcycles_internal.pc
 #usr/lib/pkgconfig/absl_has_ostream_operator.pc
 #usr/lib/pkgconfig/absl_hash.pc
@@ -784,6 +807,7 @@
 #usr/lib/pkgconfig/absl_hashtable_debug_hooks.pc
 #usr/lib/pkgconfig/absl_hashtable_profiler.pc
 #usr/lib/pkgconfig/absl_hashtablez_sampler.pc
+#usr/lib/pkgconfig/absl_heterogeneous_lookup_testing.pc
 #usr/lib/pkgconfig/absl_inlined_vector.pc
 #usr/lib/pkgconfig/absl_inlined_vector_internal.pc
 #usr/lib/pkgconfig/absl_int128.pc
@@ -792,6 +816,8 @@
 #usr/lib/pkgconfig/absl_kernel_timeout_internal.pc
 #usr/lib/pkgconfig/absl_layout.pc
 #usr/lib/pkgconfig/absl_leak_check.pc
+#usr/lib/pkgconfig/absl_linked_hash_map.pc
+#usr/lib/pkgconfig/absl_linked_hash_set.pc
 #usr/lib/pkgconfig/absl_log.pc
 #usr/lib/pkgconfig/absl_log_entry.pc
 #usr/lib/pkgconfig/absl_log_flags.pc
@@ -802,6 +828,7 @@
 #usr/lib/pkgconfig/absl_log_internal_check_op.pc
 #usr/lib/pkgconfig/absl_log_internal_conditions.pc
 #usr/lib/pkgconfig/absl_log_internal_config.pc
+#usr/lib/pkgconfig/absl_log_internal_container.pc
 #usr/lib/pkgconfig/absl_log_internal_flags.pc
 #usr/lib/pkgconfig/absl_log_internal_fnmatch.pc
 #usr/lib/pkgconfig/absl_log_internal_format.pc
@@ -831,6 +858,7 @@
 #usr/lib/pkgconfig/absl_non_temporal_arm_intrinsics.pc
 #usr/lib/pkgconfig/absl_non_temporal_memcpy.pc
 #usr/lib/pkgconfig/absl_nullability.pc
+#usr/lib/pkgconfig/absl_nullability_traits_internal.pc
 #usr/lib/pkgconfig/absl_numeric.pc
 #usr/lib/pkgconfig/absl_numeric_representation.pc
 #usr/lib/pkgconfig/absl_optional.pc
@@ -870,6 +898,7 @@
 #usr/lib/pkgconfig/absl_raw_hash_set.pc
 #usr/lib/pkgconfig/absl_raw_hash_set_resize_impl.pc
 #usr/lib/pkgconfig/absl_raw_logging_internal.pc
+#usr/lib/pkgconfig/absl_requires_internal.pc
 #usr/lib/pkgconfig/absl_sample_recorder.pc
 #usr/lib/pkgconfig/absl_scoped_set_env.pc
 #usr/lib/pkgconfig/absl_span.pc
@@ -882,7 +911,9 @@
 #usr/lib/pkgconfig/absl_strerror.pc
 #usr/lib/pkgconfig/absl_string_view.pc
 #usr/lib/pkgconfig/absl_strings.pc
+#usr/lib/pkgconfig/absl_strings_append_and_overwrite.pc
 #usr/lib/pkgconfig/absl_strings_internal.pc
+#usr/lib/pkgconfig/absl_strings_resize_and_overwrite.pc
 #usr/lib/pkgconfig/absl_symbolize.pc
 #usr/lib/pkgconfig/absl_synchronization.pc
 #usr/lib/pkgconfig/absl_throw_delegate.pc
