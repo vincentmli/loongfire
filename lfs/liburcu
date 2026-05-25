@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 0.15.5
+VER        = 0.15.6
 
 THISAPP    = userspace-rcu-$(VER)
 DL_FILE    = $(THISAPP).tar.bz2
@@ -41,7 +41,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 3e0ad236f77f1146ac3e7fe93ae8f3ea86632af38b78c6648a19c9df33959ff08e42779f6d34b47dfd3f7188efc39f8f4daaba81d702743e357d3bd9327000fc
+$(DL_FILE)_BLAKE2 = 7bc4892f7a322051a1326e7857a14ebdde5867dbccd6a7ceaf1ce0e74668e5ff5f829f6b9d5b6be2163ae000fe2a07bf937fb62b67e7959d7ed8021f67f6ce04
 
 install : $(TARGET)
 
@@ -76,8 +76,8 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 	$(UPDATE_AUTOMAKE)
 	cd $(DIR_APP) && ./configure \
-		            --prefix=/usr \
-		            --disable-static
+		            	--prefix=/usr \
+		            	--disable-static
 	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install
 	@rm -rf $(DIR_APP)
