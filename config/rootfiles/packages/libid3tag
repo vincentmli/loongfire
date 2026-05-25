@@ -6,5 +6,5 @@
 #usr/lib/cmake/id3tag/id3tagTargets.cmake
 #usr/lib/libid3tag.so
 usr/lib/libid3tag.so.0
-usr/lib/libid3tag.so.0.16.3
+usr/lib/libid3tag.so.0.16.4
 #usr/lib/pkgconfig/id3tag.pc
