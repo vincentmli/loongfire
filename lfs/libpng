@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 1.6.55
+VER        = 1.6.58
 
 THISAPP    = libpng-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
@@ -40,7 +40,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 2fd88e6e9f4e72edbafbfdd6d8e78522033920a250f8cb37f29ba8e9593cdf006b06f4e73de4e83fc5ddaaa3725362f27f5a16727ae841fd8969b74f28517ec4
+$(DL_FILE)_BLAKE2 = 51042e8f2b56d469b516db9cbde6d4b6813a62d1b7117898ba32a9a5ac5cd73832c627d7377745e5d5154aade6ec6928fc6b9cd9b96885f64b7ca7df19ca40ec
 
 install : $(TARGET)
 
