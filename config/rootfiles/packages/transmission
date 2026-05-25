@@ -6,6 +6,7 @@ usr/bin/transmission-daemon
 usr/bin/transmission-edit
 usr/bin/transmission-remote
 usr/bin/transmission-show
+usr/lib/systemd/system/transmission-daemon.service
 usr/share/transmission
 #usr/share/transmission/public_html
 #usr/share/transmission/public_html/images
@@ -14,6 +15,8 @@ usr/share/transmission
 #usr/share/transmission/public_html/images/webclip-icon.png
 #usr/share/transmission/public_html/index.html
 #usr/share/transmission/public_html/transmission-app.css
+#usr/share/transmission/public_html/transmission-app.css.LEGAL.txt
+#usr/share/transmission/public_html/transmission-app.css.map
 #usr/share/transmission/public_html/transmission-app.js
 #usr/share/transmission/public_html/transmission-app.js.LEGAL.txt
 var/ipfire/backup/addons/includes/transmission
