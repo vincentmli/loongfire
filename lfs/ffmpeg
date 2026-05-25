@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -26,7 +26,7 @@ include Config
 
 SUMMARY	   = Library for working with various multimedia formats
 
-VER        = 8.0
+VER        = 8.1
 
 THISAPP    = ffmpeg-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
@@ -34,7 +34,7 @@ DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = ffmpeg
-PAK_VER    = 22
+PAK_VER    = 23
 
 DEPS       = sdl2 lame libvorbis
 
@@ -52,7 +52,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 8c45093665131e9aef07cc49726a2de008760728723cf9ee1833fe0697624ca2572c13eb319bd567b79fcb2db110b73fbbf0889237c10fc589d6f895a0e5aa88
+$(DL_FILE)_BLAKE2 = 3710f8d3d60f89e404e837d238d089bdd7fd3be9404014aa1f3d4dd8983f10c7fefd7f4b27996fb8cb664f54aa3417da67f4ea02c896fe1026383198c45f5b26
 
 install : $(TARGET)
 
