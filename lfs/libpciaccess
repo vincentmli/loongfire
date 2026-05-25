@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2022  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -26,7 +26,7 @@ include Config
 
 SUMMARY    = Generic PCI access library
 
-VER        = 0.17
+VER        = 0.19
 
 THISAPP    = libpciaccess-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
@@ -34,7 +34,7 @@ DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = libpciaccess
-PAK_VER    = 3
+PAK_VER    = 4
 
 DEPS       =
 
@@ -48,7 +48,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 41539b3d6385fe7c42b562c7602f87b07730bbbeea7d65d3cc8e5af974ed5f9985b0779d51891493dd241a36bb171a3744e3b1f3fd30bee8a19bb5bd785f4c5f
+$(DL_FILE)_BLAKE2 = b39b99aa4a5e0190cfc4f94c26180849949dfcc5d21ad4b575041beda307c119d72b9020ab39b7183fb8caf4774333f3c76df0e487011c61ae5858e55abc7284
 
 install : $(TARGET)
 check : $(patsubst %,$(DIR_CHK)/%,$(objects))
@@ -80,8 +80,11 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
-	cd $(DIR_APP) && ./configure --prefix=/usr
-	cd $(DIR_APP) && make $(MAKETUNING) $(EXTRA_MAKE)
-	cd $(DIR_APP) && make install
+	$(UPDATE_AUTOMAKE)
+	cd $(DIR_APP) && meson setup \
+                     	--prefix=/usr \
+				builddir/
+	cd $(DIR_APP) && ninja -C builddir/ $(MAKETUNING)
+	cd $(DIR_APP) && ninja -C builddir/ install
 	@rm -rf $(DIR_APP)
 	@$(POSTBUILD)
