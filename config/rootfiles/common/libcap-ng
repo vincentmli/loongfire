@@ -1,4 +1,3 @@
-#usr/bin/captest
 #usr/bin/filecap
 #usr/bin/netcap
 #usr/bin/pscap
@@ -13,6 +12,7 @@ usr/lib/libdrop_ambient.so.0
 usr/lib/libdrop_ambient.so.0.0.0
 #usr/lib/pkgconfig/libcap-ng.pc
 #usr/share/aclocal/cap-ng.m4
+#usr/share/bash-completion/completions/libcap-ng.bash_completion
 #usr/share/man/man3/capng_apply.3
 #usr/share/man/man3/capng_apply_caps_fd.3
 #usr/share/man/man3/capng_capability_to_name.3
@@ -32,10 +32,10 @@ usr/lib/libdrop_ambient.so.0.0.0
 #usr/share/man/man3/capng_save_state.3
 #usr/share/man/man3/capng_set_rootid.3
 #usr/share/man/man3/capng_setpid.3
+#usr/share/man/man3/capng_stage_additional_groups.3
 #usr/share/man/man3/capng_update.3
 #usr/share/man/man3/capng_updatev.3
 #usr/share/man/man7/libdrop_ambient.7
-#usr/share/man/man8/captest.8
 #usr/share/man/man8/filecap.8
 #usr/share/man/man8/netcap.8
 #usr/share/man/man8/pscap.8
