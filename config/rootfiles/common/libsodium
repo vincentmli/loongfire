@@ -16,6 +16,7 @@
 #usr/include/sodium/crypto_core_ed25519.h
 #usr/include/sodium/crypto_core_hchacha20.h
 #usr/include/sodium/crypto_core_hsalsa20.h
+#usr/include/sodium/crypto_core_keccak1600.h
 #usr/include/sodium/crypto_core_ristretto255.h
 #usr/include/sodium/crypto_core_salsa20.h
 #usr/include/sodium/crypto_core_salsa2012.h
@@ -24,11 +25,16 @@
 #usr/include/sodium/crypto_generichash_blake2b.h
 #usr/include/sodium/crypto_hash.h
 #usr/include/sodium/crypto_hash_sha256.h
+#usr/include/sodium/crypto_hash_sha3.h
 #usr/include/sodium/crypto_hash_sha512.h
+#usr/include/sodium/crypto_ipcrypt.h
 #usr/include/sodium/crypto_kdf.h
 #usr/include/sodium/crypto_kdf_blake2b.h
 #usr/include/sodium/crypto_kdf_hkdf_sha256.h
 #usr/include/sodium/crypto_kdf_hkdf_sha512.h
+#usr/include/sodium/crypto_kem.h
+#usr/include/sodium/crypto_kem_mlkem768.h
+#usr/include/sodium/crypto_kem_xwing.h
 #usr/include/sodium/crypto_kx.h
 #usr/include/sodium/crypto_onetimeauth.h
 #usr/include/sodium/crypto_onetimeauth_poly1305.h
@@ -59,6 +65,10 @@
 #usr/include/sodium/crypto_verify_16.h
 #usr/include/sodium/crypto_verify_32.h
 #usr/include/sodium/crypto_verify_64.h
+#usr/include/sodium/crypto_xof_shake128.h
+#usr/include/sodium/crypto_xof_shake256.h
+#usr/include/sodium/crypto_xof_turboshake128.h
+#usr/include/sodium/crypto_xof_turboshake256.h
 #usr/include/sodium/export.h
 #usr/include/sodium/randombytes.h
 #usr/include/sodium/randombytes_internal_random.h
@@ -69,5 +79,5 @@
 #usr/lib/libsodium.la
 #usr/lib/libsodium.so
 usr/lib/libsodium.so.26
-usr/lib/libsodium.so.26.2.0
+usr/lib/libsodium.so.26.4.0
 #usr/lib/pkgconfig/libsodium.pc
