@@ -27,6 +27,7 @@ usr/bin/udev-hwdb
 #usr/include/systemd/sd-dhcp6-lease.h
 #usr/include/systemd/sd-dhcp6-option.h
 #usr/include/systemd/sd-dhcp6-protocol.h
+#usr/include/systemd/sd-dns-resolver.h
 #usr/include/systemd/sd-event.h
 #usr/include/systemd/sd-gpt.h
 #usr/include/systemd/sd-hwdb.h
@@ -51,15 +52,14 @@ usr/bin/udev-hwdb
 #usr/include/systemd/sd-path.h
 #usr/include/systemd/sd-radv.h
 #usr/include/systemd/sd-resolve.h
-#usr/include/systemd/sd-utf8.h
 #usr/include/systemd/sd-varlink-idl.h
 #usr/include/systemd/sd-varlink.h
 #usr/lib/libsystemd.so
 usr/lib/libsystemd.so.0
-usr/lib/libsystemd.so.0.41.0
+usr/lib/libsystemd.so.0.43.0
 #usr/lib/libudev.so
 usr/lib/libudev.so.1
-usr/lib/libudev.so.1.7.11
+usr/lib/libudev.so.1.7.13
 #usr/lib/pkgconfig/libsystemd.pc
 #usr/lib/pkgconfig/libudev.pc
 usr/lib/udev
@@ -88,6 +88,7 @@ usr/lib/udev/hwdb.d/60-input-id.hwdb
 usr/lib/udev/hwdb.d/60-keyboard.hwdb
 usr/lib/udev/hwdb.d/60-seat.hwdb
 usr/lib/udev/hwdb.d/60-sensor.hwdb
+usr/lib/udev/hwdb.d/60-tpm2.hwdb
 usr/lib/udev/hwdb.d/70-analyzers.hwdb
 usr/lib/udev/hwdb.d/70-av-production.hwdb
 usr/lib/udev/hwdb.d/70-cameras.hwdb
@@ -121,6 +122,7 @@ usr/lib/udev/rules.d/60-dmi-id.rules
 usr/lib/udev/rules.d/60-drm.rules
 usr/lib/udev/rules.d/60-evdev.rules
 usr/lib/udev/rules.d/60-fido-id.rules
+usr/lib/udev/rules.d/60-gpiochip.rules
 usr/lib/udev/rules.d/60-infiniband.rules
 usr/lib/udev/rules.d/60-input-id.rules
 usr/lib/udev/rules.d/60-net.rules
@@ -134,8 +136,10 @@ usr/lib/udev/rules.d/60-persistent-storage.rules
 usr/lib/udev/rules.d/60-persistent-v4l.rules
 usr/lib/udev/rules.d/60-sensor.rules
 usr/lib/udev/rules.d/60-serial.rules
+usr/lib/udev/rules.d/60-tpm2-id.rules
 usr/lib/udev/rules.d/61-extrahd.rules
 usr/lib/udev/rules.d/64-btrfs.rules
+usr/lib/udev/rules.d/65-integration.rules
 usr/lib/udev/rules.d/70-camera.rules
 usr/lib/udev/rules.d/70-joystick.rules
 usr/lib/udev/rules.d/70-memory.rules
