@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 3.8.11
+VER        = 3.8.13
 
 THISAPP    = gnutls-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
@@ -40,7 +40,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 54ec3fb396187294ae59c65fa92a515175d8ab19d9f5656569b372b5764b3090724aaa8cedd9467b530f2c74e86a6bfd956d3bd9439a7b69656dcc24e303cbe6
+$(DL_FILE)_BLAKE2 = 80677a45a7c6f892287020e3e6b0add2432f2c64a4c9a649ce889921ac65b44931504ad0682ccc12e4b6d8f94c1a72e35c50673c9d04bd4e327063b812339380
 
 install : $(TARGET)
 
@@ -70,12 +70,10 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
-	cd $(DIR_APP) && \
-		./configure \
-			--prefix=/usr \
-			--without-p11-kit \
-			--disable-openssl-compatibility \
-			--disable-guile
+	cd $(DIR_APP) && ./configure \
+					--prefix=/usr \
+					--without-p11-kit \
+					--disable-openssl-compatibility
 	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install
 	@rm -rf $(DIR_APP)
