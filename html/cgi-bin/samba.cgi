@@ -2,7 +2,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2005-2013  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2005-2025  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -784,16 +784,6 @@ if (-e "${General::swroot}/samba/smb.conf.local") {
 
 	close(LOCAL);
 }
-
-print FILE <<END;
-# Export all printers
-[printers]
-path = /var/spool/samba/
-printable = yes
-
-END
-close FILE;
-
 	&General::system("/usr/local/bin/sambactrl", "smbsafeconf");
 }
 
@@ -801,8 +791,10 @@ sub joindomain {
 	my $username = shift;
 	my $password = shift;
 
-	my @options = ("/usr/local/bin/sambactrl", "join", $username, $password);
-	my $output = qx(@options);
+	my @output = &General::system_output(
+		"/usr/local/bin/sambactrl", "join", $username, $password,
+	);
 
-	return $output;
+	# Join together the output
+	return join("\n", @output);
 }
