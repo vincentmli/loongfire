@@ -1023,28 +1023,34 @@ sub get_protocol_options {
 }
 
 sub format_ports {
-	my $ports = shift;
-	my $type = shift;
+        my $ports = shift;
+        my $type = shift;
 
-	my $arg;
-	if ($type eq "src") {
-		$arg = "--sport";
-	} elsif ($type eq "dst") {
-		$arg = "--dport";
-	}
+        my @options = ();
 
-	my @options = ();
+        # Handle multiple ports
+        if ($ports =~ /\|/) {
+                $ports =~ s/\|/,/g;
 
-	if ($ports =~ /\|/) {
-		$ports =~ s/\|/,/g;
-		push(@options, ("-m", "multiport"));
-	}
+                # Enable multiport match
+                push(@options, ("-m", "multiport"));
 
-	if ($ports) {
-		push(@options, ($arg, $ports));
-	}
+                if ($type eq "src") {
+                        push(@options, "--source-ports", ${ports});
+                } elsif ($type eq "dst") {
+                        push(@options, "--destination-ports", ${ports});
+                }
 
-	return @options;
+        # Handle single ports
+        } else {
+                if ($type eq "src") {
+                        push(@options, "--sport", ${ports});
+                } elsif ($type eq "dst") {
+                        push(@options, "--dport", ${ports});
+                }
+        }
+
+        return @options;
 }
 
 sub get_dnat_target_port {
