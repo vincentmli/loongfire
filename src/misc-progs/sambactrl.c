@@ -11,6 +11,9 @@
 char command[BUFFER_SIZE];
 
 int main(int argc, char *argv[]) {
+	char who[BUFFER_SIZE];
+	int r;
+
 	if (!(initsetuid()))
 		exit(1);
 
@@ -116,9 +119,21 @@ int main(int argc, char *argv[]) {
 
 	} else if (strcmp(argv[1], "join") == 0) {
 		if (argc == 4) {
-			snprintf(command, BUFFER_SIZE - 1, "/usr/bin/net join -U \"%s%%%s\"",
-				argv[2], argv[3]);
-			return safe_system(command);
+			// Format who is joining
+			r = snprintf(who, sizeof(who), "%s%%%s", argv[2], argv[3]);
+			if (r < 0)
+				return r;
+
+			// Compose command line
+			char* args[] = {
+				"join",
+				"-U",
+				who,
+				NULL,
+			};
+
+			// Run the operation
+			return run("/usr/bin/net", args);
 		} else {
 			fprintf(stderr, "Wrong number of arguments. Need username and password.\n");
 			return 1;
