@@ -1824,7 +1824,6 @@ fi
 	lfsmake2 perl-LWP-Protocol-https
 	lfsmake2 perl-Net-HTTP
 	lfsmake2 perl-Net-DNS
-	lfsmake2 perl-Net-IPv4Addr
 	lfsmake2 perl-Net_SSLeay
 	lfsmake2 perl-IO-Stringy
 	lfsmake2 perl-IO-Socket-SSL
