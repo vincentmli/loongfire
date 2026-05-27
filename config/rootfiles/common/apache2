@@ -371,6 +371,8 @@ srv/web/ipfire/html/captive
 #srv/web/ipfire/manual/developer/index.html
 #srv/web/ipfire/manual/developer/index.html.en
 #srv/web/ipfire/manual/developer/index.html.zh-cn.utf8
+#srv/web/ipfire/manual/developer/mod_example_1.c
+#srv/web/ipfire/manual/developer/mod_example_2.c
 #srv/web/ipfire/manual/developer/modguide.html
 #srv/web/ipfire/manual/developer/modguide.html.en
 #srv/web/ipfire/manual/developer/modules.html
@@ -1201,10 +1203,6 @@ srv/web/ipfire/html/captive
 #srv/web/ipfire/manual/platform/netware.html.en
 #srv/web/ipfire/manual/platform/netware.html.fr.utf8
 #srv/web/ipfire/manual/platform/netware.html.ko.euc-kr
-#srv/web/ipfire/manual/platform/perf-hp.html
-#srv/web/ipfire/manual/platform/perf-hp.html.en
-#srv/web/ipfire/manual/platform/perf-hp.html.fr.utf8
-#srv/web/ipfire/manual/platform/perf-hp.html.ko.euc-kr
 #srv/web/ipfire/manual/platform/rpm.html
 #srv/web/ipfire/manual/platform/rpm.html.en
 #srv/web/ipfire/manual/platform/rpm.html.fr.utf8
