@@ -8,6 +8,8 @@ usr/lib/openvpn/plugins/openvpn-plugin-auth-pam.so
 #usr/lib/openvpn/plugins/openvpn-plugin-down-root.la
 usr/lib/openvpn/plugins/openvpn-plugin-down-root.so
 usr/lib/openvpn/verify
+#usr/libexec/openvpn
+usr/libexec/openvpn/dns-updown
 usr/sbin/openvpn
 usr/sbin/openvpn-authenticator
 #usr/share/doc/openvpn
@@ -15,7 +17,6 @@ usr/sbin/openvpn-authenticator
 #usr/share/doc/openvpn/COPYRIGHT.GPL
 #usr/share/doc/openvpn/Changes.rst
 #usr/share/doc/openvpn/README
-#usr/share/doc/openvpn/README.IPv6
 #usr/share/doc/openvpn/README.auth-pam
 #usr/share/doc/openvpn/README.down-root
 #usr/share/doc/openvpn/README.mbedtls
