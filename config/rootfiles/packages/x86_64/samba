@@ -124,6 +124,7 @@ usr/bin/wspsearch
 #usr/include/samba-4.0/util/idtree_random.h
 #usr/include/samba-4.0/util/signal.h
 #usr/include/samba-4.0/util/substitute.h
+#usr/include/samba-4.0/util/talloc_keep_secret.h
 #usr/include/samba-4.0/util/tfork.h
 #usr/include/samba-4.0/util/time.h
 #usr/include/samba-4.0/util_ldb.h
@@ -188,6 +189,7 @@ usr/lib/python3.10/site-packages/ldb.cpython-310-x86_64-linux-gnu.so
 usr/lib/python3.10/site-packages/samba/__init__.py
 usr/lib/python3.10/site-packages/samba/_glue.cpython-310-x86_64-linux-gnu.so
 usr/lib/python3.10/site-packages/samba/_ldb.cpython-310-x86_64-linux-gnu.so
+usr/lib/python3.10/site-packages/samba/asn1.py
 usr/lib/python3.10/site-packages/samba/auth.cpython-310-x86_64-linux-gnu.so
 usr/lib/python3.10/site-packages/samba/auth_util.py
 usr/lib/python3.10/site-packages/samba/colour.py
@@ -287,6 +289,7 @@ usr/lib/python3.10/site-packages/samba/emulate/traffic.py
 usr/lib/python3.10/site-packages/samba/emulate/traffic_packets.py
 usr/lib/python3.10/site-packages/samba/forest_update.py
 usr/lib/python3.10/site-packages/samba/functional_level.py
+usr/lib/python3.10/site-packages/samba/generate_csr.py
 usr/lib/python3.10/site-packages/samba/gensec.cpython-310-x86_64-linux-gnu.so
 usr/lib/python3.10/site-packages/samba/getopt.py
 usr/lib/python3.10/site-packages/samba/gkdi.py
@@ -337,6 +340,7 @@ usr/lib/python3.10/site-packages/samba/kcc/graph.py
 usr/lib/python3.10/site-packages/samba/kcc/graph_utils.py
 usr/lib/python3.10/site-packages/samba/kcc/kcc_utils.py
 usr/lib/python3.10/site-packages/samba/kcc/ldif_import_export.py
+usr/lib/python3.10/site-packages/samba/key_credential_link.py
 usr/lib/python3.10/site-packages/samba/logger.py
 usr/lib/python3.10/site-packages/samba/lsa_utils.py
 usr/lib/python3.10/site-packages/samba/mdb_util.py
@@ -353,6 +357,8 @@ usr/lib/python3.10/site-packages/samba/netbios.cpython-310-x86_64-linux-gnu.so
 usr/lib/python3.10/site-packages/samba/netcmd/__init__.py
 usr/lib/python3.10/site-packages/samba/netcmd/common.py
 usr/lib/python3.10/site-packages/samba/netcmd/computer.py
+usr/lib/python3.10/site-packages/samba/netcmd/computer_generate_csr.py
+usr/lib/python3.10/site-packages/samba/netcmd/computer_keytrust.py
 usr/lib/python3.10/site-packages/samba/netcmd/contact.py
 usr/lib/python3.10/site-packages/samba/netcmd/dbcheck.py
 usr/lib/python3.10/site-packages/samba/netcmd/delegation.py
@@ -434,7 +440,9 @@ usr/lib/python3.10/site-packages/samba/netcmd/user/delete.py
 usr/lib/python3.10/site-packages/samba/netcmd/user/disable.py
 usr/lib/python3.10/site-packages/samba/netcmd/user/edit.py
 usr/lib/python3.10/site-packages/samba/netcmd/user/enable.py
+usr/lib/python3.10/site-packages/samba/netcmd/user/generate_csr.py
 usr/lib/python3.10/site-packages/samba/netcmd/user/getgroups.py
+usr/lib/python3.10/site-packages/samba/netcmd/user/keytrust.py
 usr/lib/python3.10/site-packages/samba/netcmd/user/list.py
 usr/lib/python3.10/site-packages/samba/netcmd/user/move.py
 usr/lib/python3.10/site-packages/samba/netcmd/user/password.py
@@ -580,6 +588,7 @@ usr/lib/python3.10/site-packages/samba/tdb_util.py
 #usr/lib/python3.10/site-packages/samba/tests/domain_backup_offline.py
 #usr/lib/python3.10/site-packages/samba/tests/dsdb.py
 #usr/lib/python3.10/site-packages/samba/tests/dsdb_api.py
+#usr/lib/python3.10/site-packages/samba/tests/dsdb_dn.py
 #usr/lib/python3.10/site-packages/samba/tests/dsdb_dns.py
 #usr/lib/python3.10/site-packages/samba/tests/dsdb_lock.py
 #usr/lib/python3.10/site-packages/samba/tests/dsdb_quiet_env_tests.py
@@ -609,6 +618,7 @@ usr/lib/python3.10/site-packages/samba/tdb_util.py
 #usr/lib/python3.10/site-packages/samba/tests/kcc/kcc_utils.py
 #usr/lib/python3.10/site-packages/samba/tests/kcc/ldif_import_export.py
 #usr/lib/python3.10/site-packages/samba/tests/key_credential_link.py
+#usr/lib/python3.10/site-packages/samba/tests/key_credential_link_samdb.py
 #usr/lib/python3.10/site-packages/samba/tests/krb5
 #usr/lib/python3.10/site-packages/samba/tests/krb5/alias_tests.py
 #usr/lib/python3.10/site-packages/samba/tests/krb5/as_canonicalization_tests.py
@@ -629,12 +639,14 @@ usr/lib/python3.10/site-packages/samba/tdb_util.py
 #usr/lib/python3.10/site-packages/samba/tests/krb5/kdc_tests.py
 #usr/lib/python3.10/site-packages/samba/tests/krb5/kdc_tgs_tests.py
 #usr/lib/python3.10/site-packages/samba/tests/krb5/kdc_tgt_tests.py
+#usr/lib/python3.10/site-packages/samba/tests/krb5/key_trust_tests.py
 #usr/lib/python3.10/site-packages/samba/tests/krb5/kpasswd_tests.py
 #usr/lib/python3.10/site-packages/samba/tests/krb5/lockout_tests.py
 #usr/lib/python3.10/site-packages/samba/tests/krb5/ms_kile_client_principal_lookup_tests.py
 #usr/lib/python3.10/site-packages/samba/tests/krb5/netlogon.py
 #usr/lib/python3.10/site-packages/samba/tests/krb5/nt_hash_tests.py
 #usr/lib/python3.10/site-packages/samba/tests/krb5/pac_align_tests.py
+#usr/lib/python3.10/site-packages/samba/tests/krb5/pkinit_certificate_mapping_tests.py
 #usr/lib/python3.10/site-packages/samba/tests/krb5/pkinit_tests.py
 #usr/lib/python3.10/site-packages/samba/tests/krb5/protected_users_tests.py
 #usr/lib/python3.10/site-packages/samba/tests/krb5/raw_testcase.py
@@ -756,8 +768,10 @@ usr/lib/python3.10/site-packages/samba/tdb_util.py
 #usr/lib/python3.10/site-packages/samba/tests/samba_tool/user_auth_policy.py
 #usr/lib/python3.10/site-packages/samba/tests/samba_tool/user_auth_silo.py
 #usr/lib/python3.10/site-packages/samba/tests/samba_tool/user_check_password_script.py
+#usr/lib/python3.10/site-packages/samba/tests/samba_tool/user_generate_csr.py
 #usr/lib/python3.10/site-packages/samba/tests/samba_tool/user_get_kerberos_ticket.py
 #usr/lib/python3.10/site-packages/samba/tests/samba_tool/user_getpassword_gmsa.py
+#usr/lib/python3.10/site-packages/samba/tests/samba_tool/user_keytrust.py
 #usr/lib/python3.10/site-packages/samba/tests/samba_tool/user_virtualCryptSHA.py
 #usr/lib/python3.10/site-packages/samba/tests/samba_tool/user_virtualCryptSHA_base.py
 #usr/lib/python3.10/site-packages/samba/tests/samba_tool/user_virtualCryptSHA_gpg.py
@@ -975,6 +989,7 @@ usr/lib/samba/vfs/acl_tdb.so
 usr/lib/samba/vfs/acl_xattr.so
 usr/lib/samba/vfs/aio_fork.so
 usr/lib/samba/vfs/aio_pthread.so
+usr/lib/samba/vfs/aio_ratelimit.so
 usr/lib/samba/vfs/audit.so
 usr/lib/samba/vfs/btrfs.so
 usr/lib/samba/vfs/cap.so
@@ -1039,6 +1054,8 @@ usr/sbin/winbindd
 #usr/share/locale/hu/LC_MESSAGES/pam_winbind.mo
 #usr/share/locale/it/LC_MESSAGES/pam_winbind.mo
 #usr/share/locale/ja/LC_MESSAGES/pam_winbind.mo
+#usr/share/locale/ka/LC_MESSAGES/net.mo
+#usr/share/locale/ka/LC_MESSAGES/pam_winbind.mo
 #usr/share/locale/ko/LC_MESSAGES/pam_winbind.mo
 #usr/share/locale/nb/LC_MESSAGES/pam_winbind.mo
 #usr/share/locale/nl/LC_MESSAGES/pam_winbind.mo
