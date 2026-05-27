@@ -400,7 +400,6 @@ sub writeserverconf {
     print CONF "reneg-sec 86400\n";
     print CONF "user nobody\n";
     print CONF "group nobody\n";
-    print CONF "persist-key\n";
     print CONF "persist-tun\n";
 	print CONF "verb 3\n";
 
@@ -1247,7 +1246,6 @@ unless(-d "${General::swroot}/ovpn/n2nconf/$cgiparams{'NAME'}"){mkdir "${General
   print SERVERCONF "user nobody\n";
   print SERVERCONF "group nobody\n";
   print SERVERCONF "persist-tun\n";
-  print SERVERCONF "persist-key\n";
   print SERVERCONF "script-security 2\n";
   print SERVERCONF "# IP/DNS for remote Server Gateway\n";
 
@@ -1346,7 +1344,6 @@ unless(-d "${General::swroot}/ovpn/n2nconf/$cgiparams{'NAME'}"){mkdir "${General
   print CLIENTCONF "user nobody\n";
   print CLIENTCONF "group nobody\n";
   print CLIENTCONF "persist-tun\n";
-  print CLIENTCONF "persist-key\n";
   print CLIENTCONF "script-security 2\n";
   print CLIENTCONF "# IP/DNS for remote Server Gateway\n";
   print CLIENTCONF "remote $cgiparams{'REMOTE'}\n";
@@ -2331,7 +2328,6 @@ END
 		print CLIENTCONF "user nobody\n";
 		print CLIENTCONF "group nobody\n";
 		print CLIENTCONF "persist-tun\n";
-		print CLIENTCONF "persist-key\n";
 		print CLIENTCONF "script-security 2\n";
 		print CLIENTCONF "# IP/DNS for remote Server Gateway\n";
 		print CLIENTCONF "remote $vpnsettings{'VPN_IP'}\n";
@@ -3178,8 +3174,8 @@ END
 			@match = split(/^Updated,(.+)/, $line);
 			$status = $match[1];
 
-		} elsif ( $line =~ /^(.+),(\d+\.\d+\.\d+\.\d+\:\d+),(\d+),(\d+),(.+)/) {
-			@match = split(m/^(.+),(\d+\.\d+\.\d+\.\d+\:\d+),(\d+),(\d+),(.+)/, $line);
+		} elsif ( $line =~ /^(.+),(.+\:\d+\.\d+\.\d+\.\d+\:\d+),(\d+),(\d+),(.+)/) {
+			@match = split(m/^(.+),(.+\:\d+\.\d+\.\d+\.\d+\:\d+),(\d+),(\d+),(.+)/, $line);
 
 			# Skip the header
 			next if ($match[1] eq "Common Name");
@@ -3191,12 +3187,13 @@ END
 			$users[$uid]{'BytesSent'} = &General::formatBytes($match[4]);
 			$users[$uid]{'Since'} = $match[5];
 
-			my $address = (split ':', $users[$uid]{'RealAddress'})[0];
+			my $address = (split ':', $users[$uid]{'RealAddress'})[1];
+			$users[$uid]{'RealAddress'} = $address;
 			$users[$uid]{'Country'} = &Location::Functions::lookup_country_code($address);
 			$uid++;
 
-		} elsif ($line =~ /^(\d+\.\d+\.\d+\.\d+),(.+),(\d+\.\d+\.\d+\.\d+\:\d+),(.+)/) {
-			@match = split(m/^(\d+\.\d+\.\d+\.\d+),(.+),(\d+\.\d+\.\d+\.\d+\:\d+),(.+)/, $line);
+		} elsif ($line =~ /^(\d+\.\d+\.\d+\.\d+),(.+),(.+\:\d+\.\d+\.\d+\.\d+\:\d+),(.+)/) {
+			@match = split(m/^(\d+\.\d+\.\d+\.\d+),(.+),(.+\:\d+\.\d+\.\d+\.\d+\:\d+),(.+)/, $line);
 
 			# Skip the header
 			next if ($match[1] eq "Virtual Address");
@@ -5317,8 +5314,8 @@ END
 			foreach my $line (@status) {
 				chomp($line);
 
-				if ($line =~ /^(.+),(\d+\.\d+\.\d+\.\d+\:\d+),(\d+),(\d+),(.+)/) {
-					my @match = split(m/^(.+),(\d+\.\d+\.\d+\.\d+\:\d+),(\d+),(\d+),(.+)/, $line);
+				if ($line =~ /^(.+),(.+\:\d+\.\d+\.\d+\.\d+\:\d+),(\d+),(\d+),(.+)/) {
+					my @match = split(m/^(.+),(.+\:\d+\.\d+\.\d+\.\d+\:\d+),(\d+),(\d+),(.+)/, $line);
 
 					if ($match[1] ne "Common Name") {
 						$cn = $match[1];
