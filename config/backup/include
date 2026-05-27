@@ -61,4 +61,5 @@ var/lib/suricata
 var/log/ip-acct/*
 var/log/rrd/*
 var/log/rrd/collectd
+var/log/suricata/reporter.db
 var/log/vnstat
