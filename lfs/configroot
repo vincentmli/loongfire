@@ -170,4 +170,7 @@ $(TARGET) :
 	chown -Rv root:root $(CONFIG_ROOT)/*/bin
 	chown root:nobody $(CONFIG_ROOT)/dhcpc
 
+	# Build the language cache
+	/usr/local/bin/update-lang-cache
+
 	@$(POSTBUILD)

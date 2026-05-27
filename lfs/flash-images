@@ -156,8 +156,6 @@ endif
 	mount --bind /dev  $(MNThdd)/dev
 	mount --bind /sys  $(MNThdd)/sys
 
-	chroot $(MNThdd) /usr/bin/perl -e "require '/var/ipfire/lang.pl'; &Lang::BuildCacheLang"
-
 	# Run the filesystem cleanup script
 	chroot $(MNThdd) /usr/local/bin/filesystem-cleanup > $(DIR_TMP)/cleanup.log
 

@@ -758,13 +758,6 @@ int main(int argc, char *argv[]) {
 	/* Save language und local settings */
 	write_lang_configs(config.language);
 
-	/* Build cache lang file */
-	snprintf(commandstring, STRING_SIZE, "/usr/sbin/chroot /harddisk /usr/bin/perl -e \"require '" CONFIG_ROOT "/lang.pl'; &Lang::BuildCacheLang\"");
-	if (runcommandwithstatus(commandstring, title, _("Installing the language cache..."), logfile)) {
-		errorbox(_("Unable to install the language cache."));
-		goto EXIT;
-	}
-
 	/* trigger udev to add disk-by-uuid entries */
 	snprintf(commandstring, STRING_SIZE, "/usr/sbin/chroot /harddisk /bin/udevadm trigger");
 	if (runcommandwithstatus(commandstring, title, _("Trigger udev to redetect partitions..."), logfile)) {
