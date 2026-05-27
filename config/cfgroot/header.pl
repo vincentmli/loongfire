@@ -336,7 +336,8 @@ sub openbox {
 	my $width = shift;
 	my $align = shift;
 
-	my $title = shift;
+	# Escale the title
+	my $title = &Header::escape(shift);
 
 	my @classes = ("section", "is-box", @_);
 
