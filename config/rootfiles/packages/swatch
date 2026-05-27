@@ -3,6 +3,7 @@ usr/bin/swatchdog
 usr/lib/perl5/site_perl/5.36.0/Swatchdog/Actions.pm
 usr/lib/perl5/site_perl/5.36.0/Swatchdog/Threshold.pm
 usr/lib/perl5/site_perl/5.36.0/Swatchdog/Throttle.pm
+#usr/lib/perl5/site_perl/5.36.0/auto
 #usr/lib/perl5/site_perl/5.36.0/auto/Swatchdog
 #usr/lib/perl5/site_perl/5.36.0/auto/Swatchdog/Actions
 #usr/lib/perl5/site_perl/5.36.0/auto/Swatchdog/Actions/autosplit.ix
