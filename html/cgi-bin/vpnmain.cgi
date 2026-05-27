@@ -3802,7 +3802,7 @@ sub make_subnets($$) {
 	my @nets = split(/\|/, $subnets);
 	my @cidr_nets = ();
 	foreach my $net (@nets) {
-		my $cidr_net = &General::ipcidr($net);
+		my $cidr_net = &Network::normalize_network($net);
 
 		# Skip 0.0.0.0/0 for remote because this renders the
 		# while system inaccessible
