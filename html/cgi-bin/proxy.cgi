@@ -168,12 +168,12 @@ my $HAVE_NTLM_AUTH = (-e "/usr/bin/ntlm_auth");
 
 my $green_cidr = "";
 if (&Header::green_used() && $netsettings{'GREEN_DEV'}) {
-	$green_cidr = &General::ipcidr("$netsettings{'GREEN_NETADDRESS'}\/$netsettings{'GREEN_NETMASK'}");
+	$green_cidr = &Network::normalize_network("$netsettings{'GREEN_NETADDRESS'}\/$netsettings{'GREEN_NETMASK'}");
 }
 
 my $blue_cidr = "";
 if (&Header::blue_used() && $netsettings{'BLUE_DEV'}) {
-	$blue_cidr = &General::ipcidr("$netsettings{'BLUE_NETADDRESS'}\/$netsettings{'BLUE_NETMASK'}");
+	$blue_cidr = &Network::normalize_network("$netsettings{'BLUE_NETADDRESS'}\/$netsettings{'BLUE_NETMASK'}");
 }
 
 &Header::showhttpheaders();
