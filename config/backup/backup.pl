@@ -108,6 +108,14 @@ restore_backup() {
 		-s /bin/false			\
 		-u 52 dhcpcd
 
+	# create unbound user
+	groupadd -g 103 unbound
+	useradd -c 'unbound User'	\
+		-d /var/empty		\
+		-g unbound		\
+		-s /bin/false		\
+		-u 103 unbound
+
 	# Run converters
 
 	# Outgoing Firewall
