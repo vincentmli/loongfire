@@ -17,7 +17,6 @@ package General;
 use strict;
 use Socket;
 use IO::Socket;
-use Net::IPv4Addr qw(:all);
 
 $General::version = 'VERSION';
 $General::swroot = 'CONFIG_ROOT';
@@ -878,17 +877,6 @@ sub IpInSubnet {
 	my $netmask = shift;
 
 	return &Network::ip_address_in_network($addr, "$network/$netmask");
-}
-
-sub ipcidr {
-	my ($ip,$cidr) = &Net::IPv4Addr::ipv4_parse(shift);
-	return "$ip\/$cidr";
-}
-
-sub ipcidr2msk {
-       my ($ip,$cidr) = &Net::IPv4Addr::ipv4_parse(shift);
-       my $netmask = &Net::IPv4Addr::ipv4_cidr2msk($cidr);
-       return "$ip\/$netmask";
 }
 
 sub validemail {
