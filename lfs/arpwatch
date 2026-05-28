@@ -90,6 +90,8 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 
+	$(UPDATE_AUTOMAKE)
+
 	# Fix compilation issues
 	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/arpwatch/53_stop-using-_getshort.patch
 	cd $(DIR_APP) && sed -i '1i#include <time.h>' report.c
@@ -106,9 +108,6 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 				--enable-zeropad
 	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install
-
-	# Install initscripts
-	$(call INSTALL_INITSCRIPTS,$(SERVICES))
 
 	# Install the data directory
 	-mkdir -pv /var/lib/arpwatch
