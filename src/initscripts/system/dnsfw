@@ -27,7 +27,9 @@ eval $(/usr/local/bin/readhash /var/ipfire/dns/settings)
 
 DNS_DIR="/var/ipfire/dns"
 DNSBL_FILE="${DNS_DIR}/dnsbl"
+CUSTOM_DOMAINS_FILE="${DNS_DIR}/custom_domains"
 BPF_MAP_PATH="/sys/fs/bpf/dns-fw/dns_fw_blocklist"
+BPF_CUSTOM_MAP_PATH="/sys/fs/bpf/dns-fw/dns_fw_custom_map"
 
 # Function to load all enabled blocklists
 load_dnsfw () {
@@ -44,6 +46,83 @@ load_dnsfw () {
         
         # Synchronize blocklists based on dnsbl configuration
         sync_blocklists
+        
+        # Load custom domains
+        load_custom_domains
+}
+
+# Function to load custom domains from file (handles old format from dnsbl.cgi)
+load_custom_domains() {
+        boot_mesg "Loading custom domain exceptions..."
+        
+        # Check if custom domains file exists
+        if [ ! -f "$CUSTOM_DOMAINS_FILE" ]; then
+                boot_mesg "No custom domains file found at $CUSTOM_DOMAINS_FILE" WARNING
+                return 0
+        fi
+        
+        # Check if dns_fw command is available
+        if ! command -v dns_fw > /dev/null 2>&1; then
+                boot_mesg "dns_fw command not found!" ERROR
+                return 1
+        fi
+        
+        # Clear existing custom domains first
+        dns_fw "$BPF_CUSTOM_MAP_PATH" custom-clear > /dev/null 2>&1
+        
+        boot_mesg "Loading custom domains from $CUSTOM_DOMAINS_FILE"
+        
+        # Process each line (handles old format: domain.com,allowed, or domain.com,blocked,)
+        while IFS= read -r line; do
+                # Skip empty lines
+                [ -z "$line" ] && continue
+                
+                # Extract domain (first field) and status (second field)
+                local domain=$(echo "$line" | cut -d',' -f1)
+                local status=$(echo "$line" | cut -d',' -f2)
+                
+                # Validate status (allowed or blocked)
+                if [ "$status" = "allowed" ] || [ "$status" = "blocked" ]; then
+                        dns_fw "$BPF_CUSTOM_MAP_PATH" custom-add "$domain" "$status" > /dev/null 2>&1
+                        if [ $? -eq 0 ]; then
+                                boot_mesg "  Loaded: $domain -> $status"
+                        fi
+                fi
+        done < "$CUSTOM_DOMAINS_FILE"
+        
+        boot_mesg "Finished loading custom domain exceptions"
+}
+
+# Function to sync custom domains from file to BPF map (without clearing all)
+sync_custom_domains() {
+        boot_mesg "Syncing custom domain exceptions..."
+        
+        if [ ! -f "$CUSTOM_DOMAINS_FILE" ]; then
+                boot_mesg "No custom domains file found at $CUSTOM_DOMAINS_FILE" WARNING
+                return 0
+        fi
+        
+        if ! command -v dns_fw > /dev/null 2>&1; then
+                boot_mesg "dns_fw command not found!" ERROR
+                return 1
+        fi
+        
+        # Clear existing custom domains first
+        dns_fw "$BPF_CUSTOM_MAP_PATH" custom-clear > /dev/null 2>&1
+        
+        # Load current domains from file
+        while IFS= read -r line; do
+                [ -z "$line" ] && continue
+                
+                local domain=$(echo "$line" | cut -d',' -f1)
+                local status=$(echo "$line" | cut -d',' -f2)
+                
+                if [ "$status" = "allowed" ] || [ "$status" = "blocked" ]; then
+                        dns_fw "$BPF_CUSTOM_MAP_PATH" custom-add "$domain" "$status" > /dev/null 2>&1
+                fi
+        done < "$CUSTOM_DOMAINS_FILE"
+        
+        boot_mesg "Custom domains synced successfully"
 }
 
 # Function to synchronize blocklists (add enabled, remove disabled)
@@ -118,7 +197,8 @@ unload_dnsfw () {
                 /usr/sbin/xdp-loader unload -i $prog_id green0
                 if [ $? -eq 0 ]; then
                         boot_mesg "dns_fw unloaded successfully"
-                	/usr/sbin/dns_fw /sys/fs/bpf/dns-fw/dns_fw_blocklist clear
+                        /usr/sbin/dns_fw "$BPF_MAP_PATH" clear
+                        /usr/sbin/dns_fw "$BPF_CUSTOM_MAP_PATH" custom-clear
                 else
                         boot_mesg "Error unloading dns_fw" ERROR
                 fi
@@ -192,6 +272,39 @@ show_blocklist_status() {
         done < "$DNSBL_FILE"
 }
 
+# Function to show custom domain status
+show_custom_status() {
+        echo "Custom Domain Exceptions (loaded in BPF):"
+        echo "=========================================="
+        
+        if ! command -v dns_fw > /dev/null 2>&1; then
+                echo "dns_fw command not found!"
+                return 1
+        fi
+        
+        dns_fw "$BPF_CUSTOM_MAP_PATH" custom-list
+}
+
+# Function to reload custom domains (full reload from file)
+reload_custom_domains() {
+        boot_mesg "Reloading custom domain exceptions..."
+        load_custom_domains
+        evaluate_retval
+}
+
+# Function to clear custom domains
+clear_custom_domains() {
+        boot_mesg "Clearing custom domain exceptions..."
+        
+        if ! command -v dns_fw > /dev/null 2>&1; then
+                boot_mesg "dns_fw command not found!" ERROR
+                return 1
+        fi
+        
+        dns_fw "$BPF_CUSTOM_MAP_PATH" custom-clear
+        evaluate_retval
+}
+
 is_dns_fw_attached () {
         /usr/sbin/xdp-loader status green0 | grep -w 'dns_fw' >> /dev/null
         if [ $? -eq 0 ]; then
@@ -231,6 +344,23 @@ case "$1" in
         
         blocklist-status)
                 show_blocklist_status
+                ;;
+        
+        custom-status)
+                show_custom_status
+                ;;
+        
+        custom-sync)
+                sync_custom_domains
+                evaluate_retval
+                ;;
+        
+        custom-reload)
+                reload_custom_domains
+                ;;
+        
+        custom-clear)
+                clear_custom_domains
                 ;;
         
         sync)
@@ -290,9 +420,9 @@ case "$1" in
                 ;;
 
         *)
-                echo "Usage: $0 {start|stop|restart|reload|status|sync|blocklist-status|add-blocklist|remove-blocklist}"
+                echo "Usage: $0 {start|stop|restart|reload|status|sync|blocklist-status|custom-status|custom-sync|custom-reload|custom-clear|add-blocklist|remove-blocklist}"
                 echo ""
-                echo "Commands:"
+                echo "DNS Blocklist Commands:"
                 echo "  start              - Load XDP program and sync blocklists"
                 echo "  stop               - Unload XDP program"
                 echo "  restart            - Stop then start"
@@ -302,6 +432,12 @@ case "$1" in
                 echo "  blocklist-status   - Show which blocklists are enabled/disabled"
                 echo "  add-blocklist <name>   - Manually add a blocklist (e.g., porn)"
                 echo "  remove-blocklist <name>- Manually remove a blocklist"
+                echo ""
+                echo "Custom Domain Commands (exceptions/overrides):"
+                echo "  custom-status      - Show all custom domain exceptions loaded in BPF"
+                echo "  custom-sync        - Sync custom domains from file to BPF map"
+                echo "  custom-reload      - Full reload custom domains from file"
+                echo "  custom-clear       - Remove all custom domain exceptions"
                 exit 1
                 ;;
 esac

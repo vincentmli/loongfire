@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
 		exit(1);
 
 	if (argc < 2) {
-		fprintf(stderr, "\nNo argument given.\n\ndnsfwctrl (start|stop|restart|sync|clear|status)\n\n");
+		fprintf(stderr, "\nNo argument given.\n\ndnsfwctrl (start|stop|restart|sync|clear|status|custom-sync|custom-reload|custom-clear|custom-status)\n\n");
 		exit(1);
 	}
 
@@ -30,13 +30,23 @@ int main(int argc, char *argv[]) {
 	} else if (strcmp(argv[1], "restart") == 0) {
 		safe_system("/etc/rc.d/init.d/dnsfw restart");
 	} else if (strcmp(argv[1], "clear") == 0) {
+		// Clear both blocklist and custom map
 		safe_system("/usr/sbin/dns_fw /sys/fs/bpf/dns-fw/dns_fw_blocklist clear");
+		safe_system("/usr/sbin/dns_fw /sys/fs/bpf/dns-fw/dns_fw_custom_map custom-clear");
 	} else if (strcmp(argv[1], "sync") == 0) {
 		safe_system("/etc/rc.d/init.d/dnsfw sync");
 	} else if (strcmp(argv[1], "status") == 0) {
 		safe_system("/etc/rc.d/init.d/dnsfw status");
+	} else if (strcmp(argv[1], "custom-sync") == 0) {
+		safe_system("/etc/rc.d/init.d/dnsfw custom-sync");
+	} else if (strcmp(argv[1], "custom-reload") == 0) {
+		safe_system("/etc/rc.d/init.d/dnsfw custom-reload");
+	} else if (strcmp(argv[1], "custom-clear") == 0) {
+		safe_system("/etc/rc.d/init.d/dnsfw custom-clear");
+	} else if (strcmp(argv[1], "custom-status") == 0) {
+		safe_system("/etc/rc.d/init.d/dnsfw custom-status");
 	} else {
-		fprintf(stderr, "\nBad argument given.\n\ndnsfwctrl (start|stop|restart|clear|sync|status)\n\n");
+		fprintf(stderr, "\nBad argument given.\n\ndnsfwctrl (start|stop|restart|clear|sync|status|custom-sync|custom-reload|custom-clear|custom-status)\n\n");
 		exit(1);
 	}
 
