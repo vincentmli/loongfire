@@ -336,8 +336,11 @@ sub openbox {
 	my $width = shift;
 	my $align = shift;
 
-	# Escale the title
-	my $title = &Header::escape(shift);
+	# Escape the title using cleanhtml which handles UTF-8 correctly
+	my $title = shift;
+	if ($title) {
+		$title = &Header::cleanhtml($title, "y");
+	}
 
 	my @classes = ("section", "is-box", @_);
 
