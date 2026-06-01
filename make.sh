@@ -2196,7 +2196,7 @@ fi
 	# Build images
 	lfsmake2 cdrom
 	lfsmake2 flash-images
-	lfsmake2 core-updates
+	#lfsmake2 core-updates
 }
 
 build_packages() {
