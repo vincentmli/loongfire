@@ -105,8 +105,6 @@ if ($cgiparams{'ACTION'} eq "save_xdp") {
 	
 	# Restart DNS service to apply XDP settings
 	&General::system("/usr/local/bin/dnsfwctrl", "restart");
-	
-	push(@errormessages, "XDP acceleration setting has been saved. DNS service restarted.");
 }
 
 # Save settings on main page.
