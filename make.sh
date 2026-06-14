@@ -23,7 +23,7 @@ NAME="LoongFire"							# Software name
 SNAME="loongfire"							# Short name
 # If you update the version don't forget to update backupiso and add it to core update
 VERSION="2.29"							# Version number
-CORE="202"							# Core Level (Filename)
+CORE="203"							# Core Level (Filename)
 SLOGAN="www.ipfire.org"						# Software slogan
 CONFIG_ROOT=/var/ipfire						# Configuration rootdir
 
