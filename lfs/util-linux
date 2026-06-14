@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 2.41.2
+VER        = 2.42
 #          https://www.kernel.org/pub/linux/utils/util-linux/
 
 THISAPP    = util-linux-$(VER)
@@ -43,7 +43,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 96cf8022a2d727df373f717fcca750e4f3ffd365f50af35cb805fecb7fa39962dea134fab7efdb9dfdc5aa6ac721e758e2ea40254e21d3fd9e9e5e4b2d25aa91
+$(DL_FILE)_BLAKE2 = 531b79bbec272cf1007c55ff4042b5e1b14bcc0dc098e54e4b76ea2e70c785fc763f96686ad8cea5ea9c0f7190794f4d828b7742e3aa18a0c3ef506d34e9d465
 
 install : $(TARGET)
 
@@ -74,7 +74,6 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 	$(UPDATE_AUTOMAKE)
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/util-linux-2.41.2-FTBFS-bsearch.patch
 	cd $(DIR_APP) && ./configure \
 				--docdir=/usr/share/doc/util-linux \
 				--disable-chfn-chsh \
@@ -84,7 +83,6 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 				--disable-login \
 				--disable-nologin \
 				--disable-su \
-				--disable-setpriv \
 				--disable-runuser \
 				--disable-pylibmount \
 				--disable-liblastlog2 \
