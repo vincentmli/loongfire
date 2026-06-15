@@ -2095,6 +2095,7 @@ fi
 	lfsmake2 tmux
 	lfsmake2 perl-Text-CSV_XS
 	lfsmake2 lua
+	lfsmake2 luajit
 	lfsmake2 haproxy
 	lfsmake2 ipset
 	lfsmake2 bird
