@@ -2095,7 +2095,11 @@ fi
 	lfsmake2 tmux
 	lfsmake2 perl-Text-CSV_XS
 	lfsmake2 lua
+if [ "${BUILD_ARCH}" != "loongarch64" ]; then
 	lfsmake2 luajit
+else
+	lfsmake2 luajit-loongarch
+fi
 	lfsmake2 haproxy
 	lfsmake2 ipset
 	lfsmake2 bird
