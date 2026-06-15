@@ -28,10 +28,32 @@ export PATH=/usr/local/sbin:/usr/local/bin:${PATH}
 # AWS supports an MTU of up to 9001 bytes
 DEFAULT_MTU=9001
 
+# IMDSv2 token
+IMDS_TOKEN=""
+
 get() {
 	local file="${1}"
+	local args=(
+		"--silent"
+	)
 
-	wget -qO - "http://169.254.169.254/latest/${file}"
+	# Fetch the token if we don't have one, yet
+	if [ -z "${IMDS_TOKEN}" ]; then
+		IMDS_TOKEN="$(curl \
+			--silent \
+			--request "PUT" \
+			--header "X-aws-ec2-metadata-token-ttl-seconds: 3600" \
+			"http://169.254.169.254/latest/api/token")"
+	fi
+
+	# Pass the token if we have been able to obtain it
+	if [ -n "${IMDS_TOKEN}" ]; then
+		args+=(
+			"--header" "X-aws-ec2-metadata-token: ${IMDS_TOKEN}"
+		)
+	fi
+
+	curl "${args[@]}" "http://169.254.169.254/latest/${file}"
 }
 
 to_address() {
