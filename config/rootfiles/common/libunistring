@@ -22,7 +22,7 @@
 #usr/lib/libunistring.la
 #usr/lib/libunistring.so
 usr/lib/libunistring.so.5
-usr/lib/libunistring.so.5.2.0
+usr/lib/libunistring.so.5.2.1
 #usr/share/doc/libunistring
 #usr/share/doc/libunistring/libunistring_1.html
 #usr/share/doc/libunistring/libunistring_10.html
