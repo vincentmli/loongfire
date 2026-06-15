@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 1.6.8
+VER        = 1.8.0
 
 THISAPP    = libksba-$(VER)
 DL_FILE    = $(THISAPP).tar.bz2
@@ -40,7 +40,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 13efba4f1f22de8e149049443ac1b68dea75c7526678f0a462c6922fb2f6de71c8c20d6c41b726e3083076f201576645b2f9181340fa2c49ca4de2ed1f6064fb
+$(DL_FILE)_BLAKE2 = ce1ceaf4b2542c2ac391fe944e81d0a05d73abf6abbc2637ef2c6c93d0a110a9fd352ae1586eb486148244ec68b0974348f440560991ca96196ab57549ab2cd3
 
 install : $(TARGET)
 
