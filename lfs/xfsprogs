@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 6.18.0
+VER        = 7.0.1
 #          https://www.kernel.org/pub/linux/utils/fs/xfs/xfsprogs/
 
 THISAPP    = xfsprogs-$(VER)
@@ -47,7 +47,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 225cb49a39a2539e48513985d72602c0c067f73597e3fe1d9d4062989ed98c3a0b2c85bb9d465c60acefce3243a7e2320808727e6ce527fbc35216bde235144e
+$(DL_FILE)_BLAKE2 = 0834beee30b6f4d6cf16c4e34d2daff0720d1f620d75f1794eb8c8f8d822768f48e8d6d51e51ec8c1eeb73a0e3123a8baa6647cf3215f9d25254cc13d6cf02ba
 
 install : $(TARGET)
 

@@ -19,6 +19,8 @@ sbin/xfs_repair
 #usr/lib/libhandle.la
 #usr/lib/libhandle.so
 usr/lib/udev/rules.d/64-xfs.rules
+#usr/libexec/xfsprogs
+usr/libexec/xfsprogs/xfs_healer
 usr/sbin/xfs_admin
 usr/sbin/xfs_bmap
 usr/sbin/xfs_copy
@@ -64,12 +66,15 @@ usr/sbin/xfs_spaceman
 #usr/share/man/man2/ioctl_xfs_getparents.2
 #usr/share/man/man2/ioctl_xfs_getresblks.2
 #usr/share/man/man2/ioctl_xfs_goingdown.2
+#usr/share/man/man2/ioctl_xfs_health_fd_on_monitored_fs.2
+#usr/share/man/man2/ioctl_xfs_health_monitor.2
 #usr/share/man/man2/ioctl_xfs_inumbers.2
 #usr/share/man/man2/ioctl_xfs_rtgroup_geometry.2
 #usr/share/man/man2/ioctl_xfs_scrub_metadata.2
 #usr/share/man/man2/ioctl_xfs_scrubv_metadata.2
 #usr/share/man/man2/ioctl_xfs_setresblks.2
 #usr/share/man/man2/ioctl_xfs_start_commit.2
+#usr/share/man/man2/ioctl_xfs_verify_media.2
 #usr/share/man/man3/attr_list_by_handle.3
 #usr/share/man/man3/attr_multi_by_handle.3
 #usr/share/man/man3/fd_to_handle.3
@@ -96,6 +101,7 @@ usr/sbin/xfs_spaceman
 #usr/share/man/man8/xfs_freeze.8
 #usr/share/man/man8/xfs_fsr.8
 #usr/share/man/man8/xfs_growfs.8
+#usr/share/man/man8/xfs_healer.8
 #usr/share/man/man8/xfs_info.8
 #usr/share/man/man8/xfs_io.8
 #usr/share/man/man8/xfs_logprint.8
