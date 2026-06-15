@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -131,8 +131,8 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 		--with-dl \
 		--with-large-files \
 		--without-gnutls \
-		--without-netfilter-conntrack
-
+		--without-netfilter-conntrack \
+		--without-nettle
 	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install
 
@@ -172,9 +172,9 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	chown -R nobody:nobody /var/ipfire/updatexlrator
 	chown -R root:root /var/ipfire/updatexlrator/bin
 	chown root:root /var/ipfire/updatexlrator/updxlrator-lib.pl
-	chown nobody.squid /var/updatecache
-	chown nobody.squid /var/updatecache/download
-	chown nobody.squid /var/updatecache/metadata
+	chown nobody:squid /var/updatecache
+	chown nobody:squid /var/updatecache/download
+	chown nobody:squid /var/updatecache/metadata
 	chmod 775 /var/updatecache
 	chmod 775 /var/updatecache/download
 	chmod 775 /var/updatecache/metadata
@@ -184,7 +184,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	chown squid:squid /var/log/squid
 	ln -sf /usr/lib/squid /usr/lib/squid/auth
 	cp -f $(DIR_SRC)/config/proxy/proxy.pac /srv/web/ipfire/html/proxy.pac
-	chown nobody.nobody /srv/web/ipfire/html/proxy.pac
+	chown nobody:nobody /srv/web/ipfire/html/proxy.pac
 	ln -sf /srv/web/ipfire/html/proxy.pac /srv/web/ipfire/html/wpad.dat
 
 	# Copy stylesheets for the errorpages
