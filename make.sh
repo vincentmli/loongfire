@@ -2187,6 +2187,7 @@ fi
 
 	lfsmake2 xdp-tools
 	lfsmake2 knot
+	lfsmake2 knot-resolver
 	lfsmake2 dnsdist
 	lfsmake2 suricata
 	lfsmake2 ids-ruleset-sources

@@ -1,0 +1,37 @@
+From 5a936de58bc68f6004f6beb5abbb7b7724c6320f Mon Sep 17 00:00:00 2001
+From: Michael Tremer <michael.tremer@ipfire.org>
+Date: Wed, 27 May 2026 11:41:27 +0000
+Subject: [PATCH] policy: Add flag to force TCP as transport
+
+This is already implemented in the backend, but the flag has not been
+exposed. This patch adds the flag so that any forwarders will be
+connected to using TCP.
+
+Signed-off-by: Michael Tremer <michael.tremer@ipfire.org>
+---
+ modules/policy/policy.lua | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/modules/policy/policy.lua b/modules/policy/policy.lua
+index 77fa29a71..88e235a8b 100644
+--- a/modules/policy/policy.lua
++++ b/modules/policy/policy.lua
+@@ -914,6 +914,7 @@ Throws lua exceptions when detecting something fishy.
+       i.e. we trust their DNSSEC validation.
+     - for auths this inserts a negative trust anchor
+       Beware that setting .set_insecure() *later* would override that.
++  .tcp to force transport over TCP
+ \param targets same format as policy.TLS_FORWARD() except that `tls = true`
+                can be specified for each address (defaults to false)
+ --]]
+@@ -924,6 +925,7 @@ function policy.rule_forward_add(subtree, options, targets)
+ 			{
+ 				is_nods = options.dnssec == false,
+ 				is_auth = options.auth,
++				is_tcp  = options.tcp
+ 			},
+ 			targets_3
+ 		) == 0)
+-- 
+2.47.3
+
