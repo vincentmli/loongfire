@@ -1,0 +1,127 @@
+#!/bin/bash
+
+readonly DB_PATH="/var/lib/knot-resolver/leases.db"
+
+main() {
+	# Create the database if it does not exist
+	if [ ! -f "${DB_PATH}" ]; then
+		if ! sqlite3 "${DB_PATH}" >/dev/null \
+				</usr/lib/knot-resolver/leases.schema; then
+			echo "${0}: Failed to create database" >&2
+			return 1
+		fi
+	fi
+
+	local action="${1}"
+	shift
+
+	case "${action}" in
+		commit)
+			local address
+			local hostname
+			local domainname
+
+			while [ $# -gt 0 ]; do
+				case "${1}" in
+					ADDRESS=*)
+						address="${1#*=}"
+						;;
+					HOSTNAME=*)
+						hostname="${1#*=}"
+						;;
+					DOMAINNAME=*)
+						domainname="${1#*=}"
+						;;
+					*)
+						# Ignore any unknown arguments
+						;;
+				esac
+				shift
+			done
+
+			# Check if we have enough data
+			if [ -z "${address}" ]; then
+				echo "${0}: Missing ADDRESS=" >&2
+				return 2
+			elif [ -z "${hostname}" ]; then
+				echo "${0}: Missing HOSTNAME=" >&2
+				return 2
+			elif [ -z "${domainname}" ]; then
+				echo "${0}: Missing DOMAINNAME=" >&2
+				return 2
+
+			# Validate the hostname
+			elif ! [[ ${hostname} =~ ^[A-Za-z0-9_-]{1,63}$ ]]; then
+				echo "${0}: Invalid hostname" >&2
+				return 2
+			fi
+
+			# Join the hostname together
+			hostname="${hostname}.${domainname}."
+
+			# Make the hostname lowercase
+			hostname="${hostname,,}"
+
+			sqlite3 "${DB_PATH}" <<-EOF
+				-- Set parameters
+				.parameter set :address '${address}'
+				.parameter set :hostname '${hostname}'
+
+				-- Run statement
+				INSERT INTO
+					leases
+				(
+					address,
+					hostname
+				)
+				VALUES
+				(
+					:address,
+					:hostname
+				)
+				ON CONFLICT
+				(
+					address
+				)
+				DO UPDATE SET
+					hostname = excluded.hostname;
+			EOF
+			;;
+
+		release|expiry)
+			local address
+
+			while [ $# -gt 0 ]; do
+				case "${1}" in
+					ADDRESS=*)
+						address="${1#*=}"
+						;;
+					*)
+						# Ignore any unknown arguments
+						;;
+				esac
+				shift
+			done
+
+			# Check if we have enough data
+			if [ -z "${address}" ]; then
+				echo "${0}: Missing ADDRESS=" >&2
+				return 2
+			fi
+
+			sqlite3 "${DB_PATH}" <<-EOF
+				-- Set parameters
+				.parameter set :address '${address}'
+
+				-- Run statement
+				DELETE FROM
+					leases
+				WHERE
+					address = :address;
+			EOF
+	esac
+
+	return 0
+}
+
+main "$@" || exit $?

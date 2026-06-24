@@ -1,0 +1,81 @@
+# Knot Resolver Configuration File For IPFire
+# DO NOT EDIT as any changes will be overwritten
+
+# Enable logging
+logging:
+  level: info
+  target: syslog
+
+# Listen on all interfaces
+network:
+  listen:
+    - interface: 0.0.0.0@53
+
+  do-ipv4: true
+  do-ipv6: false
+
+# Start as many workers as we have CPU threads
+workers: auto
+
+# Enable a persistent cache
+cache:
+  storage: /var/cache/knot-resolver
+  size-max: 256M
+
+  # Enable prefetching
+  prefetch:
+    expiring: true
+
+options:
+  # Minimise all queries
+  minimize: true
+
+  # Apply workarounds for broken domains
+  violators-workarounds: true
+
+  # Detect time jumps
+  time-jump-detection: true
+
+# Load our policy
+lua:
+  script: |
+    -- Load config helpers
+    local config = require("config")
+
+    -- Reset the minimum UDP source port
+    config.reset_min_udp_source_port()
+
+    -- Load the settings
+    local settings = config.load_settings("/var/ipfire/dns/settings")
+
+    -- Load DHCP Leases Lookup
+    config.load_leases()
+
+    -- Load custom RPZ allowlist workaround
+    config.load_rpz_workaround()
+
+    -- Load Forwarders
+    config.load_forwarders(settings)
+
+  # Load policies
+  policy-script: |
+    -- Load config helpers
+    local config = require("config")
+
+    -- Load the settings
+    local settings = config.load_settings("/var/ipfire/dns/settings")
+
+    -- Load hosts
+    config.load_hosts()
+
+    -- Load RPZs
+    config.load_rpzs()
+
+    -- Load SafeSearch
+    config.load_safesearch(settings)
+
+    -- Load Forwarding Rules
+    config.load_forwarding()
+
+    -- Load Forwarders
+    config.load_forwarders(settings)

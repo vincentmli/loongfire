@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS leases(
+	address TEXT PRIMARY KEY,
+	hostname TEXT NOT NULL
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS
+	leases_address ON leases(address);
+CREATE UNIQUE INDEX IF NOT EXISTS
+	leases_hostname ON leases(hostname COLLATE NOCASE);
+
+-- Run in WAL mode
+PRAGMA journal_mode=WAL;
+PRAGMA synchronous=NORMAL;
