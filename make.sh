@@ -1588,7 +1588,6 @@ build_system() {
 	lfsmake2 libevent2
 	lfsmake2 apr
 	lfsmake2 aprutil
-	lfsmake2 unbound
 	lfsmake2 libtasn1
 	lfsmake2 libunistring
 	lfsmake2 gnutls
