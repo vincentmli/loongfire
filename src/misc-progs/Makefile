@@ -31,7 +31,7 @@ SUID_PROGS = squidctrl sshctrl ipfirereboot \
 	redctrl syslogdctrl extrahdctrl sambactrl \
 	smartctrl clamavctrl addonctrl pakfire wlanapctrl \
 	setaliases urlfilterctrl updxlratorctrl fireinfoctrl rebuildroutes \
-	getconntracktable wirelessclient torctrl ddnsctrl unboundctrl \
+	getconntracktable wirelessclient torctrl ddnsctrl \
 	captivectrl wireguardctrl tcpddosctrl xdpgeoipctrl \
 	xdpipblocklistctrl xdpsnictrl xdpdnsctrl lldpdctrl dnsfwctrl
 

@@ -123,8 +123,6 @@ if ($cgiparams{'ACTION'} eq $Lang::tr{'add'})
 			$cgiparams{'ID'} = $cgiparams{'EDITING'};
 		}
 	}
-	# Restart unbound
-	&General::system('/usr/local/bin/unboundctrl', 'reload');
 }
 
 ###
@@ -141,8 +139,6 @@ if ($cgiparams{'ACTION'} eq $Lang::tr{'remove'})
 		unless ($cgiparams{'ID'} eq $id) { print FILE "$line"; }
 	}
 	close(FILE);
-	# Restart unbound.
-	&General::system('/usr/local/bin/unboundctrl', 'reload');
 }
 
 ###
@@ -168,8 +164,6 @@ if ($cgiparams{'ACTION'} eq $Lang::tr{'toggle enable disable'})
 		}
 	}
 	close(FILE);
-	# Restart unbound.
-	&General::system('/usr/local/bin/unboundctrl', 'reload');
 }
 
 ###

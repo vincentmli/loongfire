@@ -853,8 +853,6 @@ sub _handle_unbound_and_more () {
 		# Call suricatactrl to perform a reload.
 		&IDS::call_suricatactrl("restart");
 	}
-	# Restart unbound
-	&General::system('/usr/local/bin/unboundctrl', 'reload');
 }
 
 # Check if the system is online (RED is connected).

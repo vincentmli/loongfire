@@ -133,9 +133,6 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
 
 	if ($global_settings{'ENABLE_XDP'} eq "on") {
 		&General::system("/usr/local/bin/dnsfwctrl", "sync");
-	} else {
-		# Reload Unbound
-		&General::system("/usr/local/bin/unboundctrl", "reload");
 	}
 
 # Save changed zone ACL
@@ -194,9 +191,6 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
 
 		if ($global_settings{'ENABLE_XDP'} eq "on") {
 			&General::system("/usr/local/bin/dnsfwctrl", "sync");
-		} else {
-			# Reload Unbound
-			&General::system("/usr/local/bin/unboundctrl", "reload");
 		}
 	}
 
@@ -283,9 +277,6 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
 
 		if ($global_settings{'ENABLE_XDP'} eq "on") {
 			&General::system("/usr/local/bin/dnsfwctrl", "custom-sync");
-		} else {
-			# Reload Unbound
-			&General::system("/usr/local/bin/unboundctrl", "reload");
 		}
 
 	}

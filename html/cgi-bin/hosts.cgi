@@ -488,5 +488,4 @@ sub SortDataFile
 #
 sub BuildConfiguration {
     &General::system('/usr/local/bin/rebuildhosts');
-    &General::system('/usr/local/bin/unboundctrl', 'reload');
 }
