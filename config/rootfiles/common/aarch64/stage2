@@ -108,6 +108,7 @@ usr/local/bin/update-ids-ruleset
 usr/local/bin/update-ipblocklists
 usr/local/bin/update-lang-cache
 usr/local/bin/update-location-database
+usr/local/bin/update-rpzs
 #usr/local/include
 #usr/local/lib
 #usr/local/sbin

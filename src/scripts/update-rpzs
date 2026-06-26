@@ -1,0 +1,85 @@
+#!/bin/bash
+###############################################################################
+#                                                                             #
+# IPFire.org - An Open Source Firewall                                        #
+# Copyright (C) 2026 - IPFire Team  <info@ipfire.org>                         #
+#                                                                             #
+# This program is free software: you can redistribute it and/or modify        #
+# it under the terms of the GNU General Public License as published by        #
+# the Free Software Foundation, either version 3 of the License, or           #
+# (at your option) any later version.                                         #
+#                                                                             #
+# This program is distributed in the hope that it will be useful,             #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of              #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               #
+# GNU General Public License for more details.                                #
+#                                                                             #
+# You should have received a copy of the GNU General Public License           #
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.       #
+#                                                                             #
+###############################################################################
+
+readonly SYNC_PATH="/var/lib/knot-resolver/zones"
+
+readonly ZONE_SYNC_ARGS=(
+	# Be quiet
+	"--quiet"
+
+	# Output Path
+	"--path=${SYNC_PATH}"
+
+	# Always use TLS
+	"--secure"
+)
+
+main() {
+	local name
+	local primary
+	local zone
+	local _zone
+	local enabled
+	local rest
+	local failed=0
+
+	local -A primaries=()
+	local -A all_zones=()
+
+	while IFS=$'\t' read -r name zone primary; do
+		while IFS=$',' read -r _zone enabled rest; do
+			# Skip if we are looking at the wrong list
+			[ "${zone}" = "${_zone}" ] || continue
+
+			# We are done if the list is not enabled
+			[ "${enabled}" = "on" ] || break
+
+			# Store the enabled zone with their primary
+			all_zones["${zone}"]="${primary}"
+
+			# Collect a list of all unique primaries
+			primaries["${primary}"]=1
+		done < /var/ipfire/dns/dnsbl		
+	done <<< "$(jq -r '.[] | [.name, .zone, .primary] | @tsv' /var/ipfire/dns/dnsbl.json)"
+
+	# Walk through all primaries
+	for primary in "${!primaries[@]}"; do
+		local zones=()
+
+		# Collect all zones that match this primary
+		for zone in "${!all_zones[@]}"; do
+			if [ "${all_zones["${zone}"]}" = "${primary}" ]; then
+				zones+=( "${zone}" )
+			fi
+		done
+
+		# Run the sync as unprivileged user
+		setpriv --reuid="knot-resolver" --regid="knot-resolver" --init-groups \
+			zone-sync "${ZONE_SYNC_ARGS[@]}" --primary="${primary}"  "${zones[@]}" || failed=$?
+	done
+
+	# Reload DNS
+	/usr/local/bin/dnsctrl reload
+
+	return ${failed}
+}
+
+main "$@" || exit $?
