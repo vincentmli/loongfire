@@ -1,5 +1,4 @@
 etc/sysconfig/lm_sensors
-etc/unbound/unbound.conf
 *.tmp
 var/cache/suricata/sgh/*
 var/ipfire/ethernet/settings

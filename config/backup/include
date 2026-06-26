@@ -18,7 +18,6 @@ etc/squid/squid.conf.pre.local
 etc/sysconfig/*
 etc/sysconfig/firewall.local
 etc/sysconfig/rc.local
-etc/unbound
 root/.bash_history
 root/.gitconfig
 root/.ssh
