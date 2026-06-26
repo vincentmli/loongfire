@@ -2189,6 +2189,7 @@ fi
 	lfsmake2 linux-initrd
 
 	lfsmake2 xdp-tools
+	lfsmake2 python3-aiohttp
 	lfsmake2 knot
 	lfsmake2 knot-resolver
 	lfsmake2 dnsdist
