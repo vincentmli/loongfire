@@ -455,10 +455,10 @@ if ($dhcpsettings{'ACTION'} eq $Lang::tr{'add'}.'2') {
     }
 
     unless ($errormessage) {
-	$dhcpsettings{'FIX_REMARK'} = &Header::cleanhtml($dhcpsettings{'FIX_REMARK'});
-	$dhcpsettings{'FIX_NEXTADDR'} = &Header::cleanhtml($dhcpsettings{'FIX_NEXTADDR'});
-	$dhcpsettings{'FIX_FILENAME'} = &Header::cleanhtml($dhcpsettings{'FIX_FILENAME'});
-	$dhcpsettings{'FIX_ROOTPATH'} = &Header::cleanhtml($dhcpsettings{'FIX_ROOTPATH'});
+	$dhcpsettings{'FIX_REMARK'} = &Header::escape($dhcpsettings{'FIX_REMARK'});
+	$dhcpsettings{'FIX_NEXTADDR'} = &Header::escape($dhcpsettings{'FIX_NEXTADDR'});
+	$dhcpsettings{'FIX_FILENAME'} = &Header::escape($dhcpsettings{'FIX_FILENAME'});
+	$dhcpsettings{'FIX_ROOTPATH'} = &Header::escape($dhcpsettings{'FIX_ROOTPATH'});
 	if ($dhcpsettings{'KEY2'} eq '') { #add or edit ?
 	    unshift (@current2, "$dhcpsettings{'FIX_MAC'},$dhcpsettings{'FIX_ADDR'},$dhcpsettings{'FIX_ENABLED'},$dhcpsettings{'FIX_NEXTADDR'},$dhcpsettings{'FIX_FILENAME'},$dhcpsettings{'FIX_ROOTPATH'},$dhcpsettings{'FIX_REMARK'}\n");
 	    open(FILE, ">$filename2") or die 'Unable to open fixed lease file.';
@@ -1381,13 +1381,17 @@ on commit {
 		"ADDRESS=",
 		binary-to-ascii(10, 8, ".", leased-address)
 	);
-	set ClientName = concat(
-		"NAME=",
+	set ClientHostName = concat(
+		"HOSTNAME=",
 		pick-first-value(option host-name, config-option-host-name, client-name, "")
 	);
+	set ClientDomainName = concat(
+		"DOMAINNAME=",
+		pick-first-value(config-option domain-name, "")
+	);
 
-	if (ClientName != "") {
-		execute("/usr/sbin/unbound-dhcp-leases-client", "commit", ClientAddress, ClientName);
+	if (ClientHostName != "") {
+		execute("/usr/sbin/dhcp-lease", "commit", ClientAddress, ClientHostName, ClientDomainName);
 	}
 }
 
@@ -1396,13 +1400,17 @@ on release {
 		"ADDRESS=",
 		binary-to-ascii(10, 8, ".", leased-address)
 	);
-	set ClientName = concat(
-		"NAME=",
+	set ClientHostName = concat(
+		"HOSTNAME=",
 		pick-first-value(option host-name, config-option-host-name, client-name, "")
 	);
+	set ClientDomainName = concat(
+		"DOMAINNAME=",
+		pick-first-value(config-option domain-name, "")
+	);
 
-	if (ClientName != "") {
-		execute("/usr/sbin/unbound-dhcp-leases-client", "release", ClientAddress, ClientName);
+	if (ClientHostName != "") {
+		execute("/usr/sbin/dhcp-lease", "release", ClientAddress, ClientHostName, ClientDomainName);
 	}
 }
 
@@ -1412,7 +1420,7 @@ on expiry {
 		binary-to-ascii(10, 8, ".", leased-address)
 	);
 
-	execute("/usr/sbin/unbound-dhcp-leases-client", "expiry", ClientAddress);
+	execute("/usr/sbin/dhcp-lease", "expiry", ClientAddress);
 }
 
 EOF
