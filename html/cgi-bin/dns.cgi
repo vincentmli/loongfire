@@ -105,6 +105,9 @@ if ($cgiparams{'GENERAL'} eq $Lang::tr{'save'}) {
 		# Call function to handle unbound restart, etc.
 		&_handle_unbound_and_more()
 	}
+
+	# Reload DNS
+	&General::system_background("/usr/local/bin/dnsctrl", "reload");
 }
 
 ###
@@ -144,7 +147,7 @@ if (($cgiparams{'SERVERS'} eq $Lang::tr{'save'}) || ($cgiparams{'SERVERS'} eq $L
 	# Go further if there was no error.
 	if ( ! $errormessage) {
 		# Check if a remark has been entered.
-		$cgiparams{'REMARK'} = &Header::cleanhtml($cgiparams{'REMARK'});
+		$cgiparams{'REMARK'} = &Header::escape($cgiparams{'REMARK'});
 
 		my %dns_servers = ();
 		my $id;
@@ -326,10 +329,6 @@ $selected{'PROTO'}{'TLS'} = '';
 $selected{'PROTO'}{'TCP'} = '';
 $selected{'PROTO'}{$settings{'PROTO'}} = "selected='selected'";
 
-$selected{'QNAME_MIN'}{'standard'} = '';
-$selected{'QNAME_MIN'}{'strict'} = '';
-$selected{'QNAME_MIN'}{$settings{'QNAME_MIN'}} = "selected='selected'";
-
 # Display nameserver and configuration sections.
 &show_nameservers();
 &show_general_dns_configuration();
@@ -409,19 +408,6 @@ sub show_general_dns_configuration () {
 			</tr>
 
 			<tr>
-				<td width="33%">
-					$Lang::tr{'dns mode for qname minimisation'}
-				</td>
-
-				<td>
-					<select name="QNAME_MIN">
-						<option value="standard" $selected{'QNAME_MIN'}{'standard'}>$Lang::tr{'standard'}</option>
-						<option value="strict" $selected{'QNAME_MIN'}{'strict'}>$Lang::tr{'strict'}</option>
-					</select>
-				</td>
-			</tr>
-
-			<tr>
 				<td colspan="2" align="right">
 					<input type="submit" name="GENERAL" value="$Lang::tr{'save'}">
 				</td>
@@ -439,17 +425,9 @@ END
 sub show_nameservers () {
 	&Header::openbox('100%', 'center', "$Lang::tr{'dns servers'}");
 
-	# Determine if we are running in recursor mode
-	my $recursor = 0;
-	my $unbound_forward = qx(unbound-control forward);
-	if ($unbound_forward =~ m/^off/) {
-		$recursor = 1;
-	}
-
 	my $dns_status_string;
 	my $dns_status_col;
 	my $dns_working;
-
 
 	# Test if the DNS system is working.
 	#
@@ -464,10 +442,6 @@ sub show_nameservers () {
 	} else {
 		$dns_status_string = "$Lang::tr{'broken'}";
 		$dns_status_col = "${Header::colourred}";
-	}
-
-	if ($recursor) {
-		$dns_status_string .= " (" . $Lang::tr{'dns recursor mode'} . ")";
 	}
 
 	print <<END;
