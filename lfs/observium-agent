@@ -34,7 +34,7 @@ DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/observium
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = observium-agent
-PAK_VER    = 3
+PAK_VER    = 4
 
 DEPS       = xinetd
 
@@ -93,7 +93,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 
 	# Install modules
 	mkdir -pv /usr/lib/observium_agent/scripts-{available,enabled}
-	install -m 755 $(DIR_APP)/scripts/agent-local/{apache,dmi,ksm,lmsensors,nfs,nfsd,nginx,postfix_mailgraph,postfix_qshape,unbound,vmwaretools} \
+	install -m 755 $(DIR_APP)/scripts/agent-local/{apache,dmi,ksm,lmsensors,nfs,nfsd,nginx,postfix_mailgraph,postfix_qshape,vmwaretools} \
 		/usr/lib/observium_agent/scripts-available/
 
 	# Backup
