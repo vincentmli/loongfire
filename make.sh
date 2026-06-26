@@ -2099,6 +2099,7 @@ if [ "${BUILD_ARCH}" != "loongarch64" ]; then
 else
 	lfsmake2 luajit-loongarch
 fi
+	lfsmake2 luarocks
 	lfsmake2 lua-cqueues
 	lfsmake2 lua-csv
 	lfsmake2 haproxy
