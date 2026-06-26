@@ -54,12 +54,6 @@ case "$1" in
 		boot_mesg "Starting DHCP Server..."
 		loadproc -f /usr/sbin/dhcpd -q ${LISTEN_INTERFACES}
 
-		# Start Unbound DHCP Lease Bridge unless RFC2136 is used
-		if [ "${DNS_UPDATE_ENABLED}" != on ]; then
-			boot_mesg "Starting Unbound DHCP Leases Bridge..."
-			loadproc /usr/sbin/unbound-dhcp-leases-bridge -d
-		fi
-
 		(sleep 5 && chmod 644 /var/run/dhcpd.pid) & # Fix because silly dhcpd creates its pid with mode 640
 		;;
 
@@ -75,9 +69,6 @@ case "$1" in
 		    rm -f /var/run/dhcpd.pid > /dev/null 2>&1
 		    echo_ok;
 		fi
-
-		boot_mesg "Stopping Unbound DHCP Leases Bridge..."
-		killproc /usr/sbin/unbound-dhcp-leases-bridge
 		;;
 
 	reload)
@@ -93,7 +84,6 @@ case "$1" in
 
 	status)
 		statusproc /usr/sbin/dhcpd
-		statusproc /usr/sbin/unbound-dhcp-leases-bridge
 		;;
 
 	*)
