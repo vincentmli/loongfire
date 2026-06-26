@@ -1594,6 +1594,7 @@ build_system() {
 	lfsmake2 libuv
 	lfsmake2 liburcu
 	lfsmake2 bind
+	lfsmake2 zone-sync
 	lfsmake2 dhcp
 	lfsmake2 dhcpcd
 	lfsmake2 boost
