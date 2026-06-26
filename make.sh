@@ -2102,6 +2102,7 @@ fi
 	lfsmake2 luarocks
 	lfsmake2 lua-cqueues
 	lfsmake2 lua-csv
+	lfsmake2 lua-sqlite3
 	lfsmake2 haproxy
 	lfsmake2 ipset
 	lfsmake2 bird
