@@ -1,5 +1,4 @@
 usr/bin/certtool
-usr/bin/danetool
 usr/bin/gnutls-cli
 usr/bin/gnutls-cli-debug
 usr/bin/gnutls-serv
@@ -9,7 +8,6 @@ usr/bin/psktool
 #usr/include/gnutls/abstract.h
 #usr/include/gnutls/compat.h
 #usr/include/gnutls/crypto.h
-#usr/include/gnutls/dane.h
 #usr/include/gnutls/dtls.h
 #usr/include/gnutls/gnutls.h
 #usr/include/gnutls/gnutlsxx.h
@@ -26,10 +24,6 @@ usr/bin/psktool
 #usr/include/gnutls/urls.h
 #usr/include/gnutls/x509-ext.h
 #usr/include/gnutls/x509.h
-#usr/lib/libgnutls-dane.la
-#usr/lib/libgnutls-dane.so
-usr/lib/libgnutls-dane.so.0
-usr/lib/libgnutls-dane.so.0.4.1
 #usr/lib/libgnutls.la
 #usr/lib/libgnutls.so
 usr/lib/libgnutls.so.30
@@ -38,7 +32,6 @@ usr/lib/libgnutls.so.30.42.0
 #usr/lib/libgnutlsxx.so
 usr/lib/libgnutlsxx.so.30
 usr/lib/libgnutlsxx.so.30.0.0
-#usr/lib/pkgconfig/gnutls-dane.pc
 #usr/lib/pkgconfig/gnutls.pc
 #usr/share/doc/gnutls
 #usr/share/doc/gnutls/gnutls-client-server-use-case.png
@@ -88,7 +81,6 @@ usr/lib/libgnutlsxx.so.30.0.0
 #usr/share/locale/vi/LC_MESSAGES/gnutls.mo
 #usr/share/locale/zh_CN/LC_MESSAGES/gnutls.mo
 #usr/share/man/man1/certtool.1
-#usr/share/man/man1/danetool.1
 #usr/share/man/man1/gnutls-cli-debug.1
 #usr/share/man/man1/gnutls-cli.1
 #usr/share/man/man1/gnutls-serv.1
