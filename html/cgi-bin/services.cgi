@@ -73,7 +73,7 @@ $querry[1] = 'hour' unless defined $querry[1];
 
 		# DNS Proxy
 		$Lang::tr{'dns proxy server'} => {
-			"process" => "unbound",
+			"process" => "kresd",
 		},
 
 		# Syslog
