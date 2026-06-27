@@ -218,6 +218,24 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 
 	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/gcc-15.2.0-9c9d3aef2f66625d9cb03ef4baee10ed6648e681.patch
 
+	# Fix compilation with kernel 7.1.1+ which removed linux/scc.h
+	# Remove the scc.h include and comment out struct references that depend on it
+	cd $(DIR_APP) && sed -i \
+		-e '/#include <linux\/scc.h>/d' \
+		-e '/unsigned struct_scc_modem_sz = sizeof(struct scc_modem);/s/^/\/\* /' \
+		-e '/unsigned struct_scc_modem_sz = sizeof(struct scc_modem);/s/$$/ \*\//' \
+		-e '/unsigned struct_scc_stat_sz = sizeof(struct scc_stat);/s/^/\/\* /' \
+		-e '/unsigned struct_scc_stat_sz = sizeof(struct scc_stat);/s/$$/ \*\//' \
+		libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.cpp
+
+	# Also comment out the CHECK_SIZE and CHECK_TYPE_SIZE macros for scc_modem and scc_stat if they exist
+	cd $(DIR_APP) && sed -i \
+		-e '/CHECK_SIZE_AND_OFFSET(scc_modem,/s/^/\/\* /' \
+		-e '/CHECK_SIZE_AND_OFFSET(scc_modem,/s/$$/ \*\//' \
+		-e '/CHECK_SIZE_AND_OFFSET(scc_stat,/s/^/\/\* /' \
+		-e '/CHECK_SIZE_AND_OFFSET(scc_stat,/s/$$/ \*\//' \
+		libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.cpp
+
 	cd $(DIR_APP) && sed -i 's/install_to_$$(INSTALL_DEST) //' libiberty/Makefile.in
 	cd $(DIR_APP) && sed -i gcc/Makefile.in \
 		-e 's@\./fixinc\.sh@-c true@' \
