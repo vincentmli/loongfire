@@ -2191,6 +2191,7 @@ fi
 	lfsmake2 xdp-tools
 	lfsmake2 python3-multidict
 	lfsmake2 python3-expandvars
+	lfsmake2 python3-propcache
 	lfsmake2 python3-yarl
 	lfsmake2 python3-aiohttp
 	lfsmake2 knot
