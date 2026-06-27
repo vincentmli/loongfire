@@ -33,7 +33,7 @@ SUID_PROGS = squidctrl sshctrl ipfirereboot \
 	setaliases urlfilterctrl updxlratorctrl fireinfoctrl rebuildroutes \
 	getconntracktable wirelessclient torctrl ddnsctrl \
 	captivectrl wireguardctrl tcpddosctrl xdpgeoipctrl \
-	xdpipblocklistctrl xdpsnictrl xdpdnsctrl lldpdctrl dnsfwctrl
+	xdpipblocklistctrl xdpsnictrl xdpdnsctrl lldpdctrl dnsfwctrl dnsctrl
 
 OBJS = $(patsubst %,%.o,$(PROGS) $(SUID_PROGS))
 

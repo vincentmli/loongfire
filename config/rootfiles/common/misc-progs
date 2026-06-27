@@ -5,6 +5,7 @@ usr/local/bin/captivectrl
 usr/local/bin/collectdctrl
 usr/local/bin/ddnsctrl
 usr/local/bin/dhcpctrl
+usr/local/bin/dnsctrl
 usr/local/bin/extrahdctrl
 usr/local/bin/fireinfoctrl
 usr/local/bin/firewallctrl
