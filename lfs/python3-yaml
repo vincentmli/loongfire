@@ -25,19 +25,12 @@
 include Config
 
 VER        = 6.0.3
-SUMMARY    = YAML parser and emitter for Python
 
 THISAPP    = pyyaml-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
 DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
-PROG       = python3-yaml
-PAK_VER    = 4
-
-DEPS       =
-
-SERVICES   =
 
 ###############################################################################
 # Top-level Rules
@@ -56,9 +49,6 @@ check : $(patsubst %,$(DIR_CHK)/%,$(objects))
 download :$(patsubst %,$(DIR_DL)/%,$(objects))
 
 b2 : $(subst %,%_BLAKE2,$(objects))
-
-dist:
-	@$(PAK)
 
 ###############################################################################
 # Downloading, checking, b2sum
