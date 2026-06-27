@@ -2196,6 +2196,7 @@ fi
 	lfsmake2 python3-yarl
 	lfsmake2 python3-async-timeout
 	lfsmake2 python3-aiohappyeyeballs
+	lfsmake2 python3-aiosignal
 	lfsmake2 python3-aiohttp
 	lfsmake2 knot
 	lfsmake2 knot-resolver
