@@ -416,13 +416,14 @@ getpids()
 }
 
 #*******************************************************************************
-# Function - loadproc [-f] [-n nicelevel] [-p pidfile] pathname [args]
+# Function - loadproc [-f] [-n nicelevel] [-p pidfile] [-u user] pathname [args]
 #
 # Purpose: This runs the specified program as a daemon
 #
 # Inputs: -f, run the program even if it is already running
 #         -n nicelevel, specifies a nice level. See nice(1).
 #         -p pidfile, uses the specified pidfile
+#         -u user, starts the process as the user
 #         pathname, pathname to the specified program
 #         args, arguments to pass to specified program
 #
@@ -446,6 +447,7 @@ loadproc()
 	local pidfile=""
 	local forcestart=""
 	local nicelevel=""
+	local user
 	local pid
 
 # This will ensure compatibility with previous LFS Bootscripts
@@ -470,6 +472,10 @@ loadproc()
 				;;
 			-p)
 				pidfile="${2}"
+				shift 2
+				;;
+			-u)
+				user="${2}"
 				shift 2
 				;;
 			-*)
@@ -513,6 +519,11 @@ loadproc()
 	fi
 
 	local cmd=( "${@}" )
+
+	# Start as a different user
+	if [ -n "${user}" ]; then
+		cmd=( "setpriv" "--reuid=${user}" "--init-groups" "--" "$@" )
+	fi
 
 	if [ -n "${nicelevel}" ]; then
 		cmd="nice -n "${nicelevel}" ${cmd}"
