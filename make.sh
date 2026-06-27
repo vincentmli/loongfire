@@ -2190,6 +2190,7 @@ fi
 
 	lfsmake2 xdp-tools
 	lfsmake2 python3-multidict
+	lfsmake2 python3-expandvars
 	lfsmake2 python3-aiohttp
 	lfsmake2 knot
 	lfsmake2 knot-resolver
