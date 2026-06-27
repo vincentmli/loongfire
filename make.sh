@@ -2199,6 +2199,7 @@ fi
 	lfsmake2 python3-aiosignal
 	lfsmake2 python3-frozenlist
 	lfsmake2 python3-aiohttp
+	lfsmake2 python3-supervisor
 	lfsmake2 knot
 	lfsmake2 knot-resolver
 	lfsmake2 dnsdist
