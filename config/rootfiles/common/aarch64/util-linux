@@ -50,6 +50,7 @@ sbin/swapon
 sbin/switch_root
 sbin/wipefs
 sbin/zramctl
+#usr/bin/bits
 #usr/bin/cal
 usr/bin/chmem
 usr/bin/choom
@@ -58,6 +59,8 @@ usr/bin/choom
 #usr/bin/colcrt
 #usr/bin/colrm
 #usr/bin/column
+#usr/bin/copyfilerange
+#usr/bin/coresched
 usr/bin/eject
 usr/bin/enosys
 usr/bin/exch
@@ -65,6 +68,7 @@ usr/bin/exch
 usr/bin/fallocate
 usr/bin/fincore
 usr/bin/flock
+#usr/bin/getino
 usr/bin/getopt
 usr/bin/hardlink
 usr/bin/hexdump
@@ -99,6 +103,7 @@ usr/bin/scriptlive
 #usr/bin/scriptreplay
 #usr/bin/setarch
 usr/bin/setpgid
+usr/bin/setpriv
 usr/bin/setsid
 #usr/bin/setterm
 #usr/bin/taskset
@@ -147,19 +152,24 @@ usr/sbin/rtcwake
 #usr/share/bash-completion
 #usr/share/bash-completion/completions
 #usr/share/bash-completion/completions/addpart
+#usr/share/bash-completion/completions/bits
 #usr/share/bash-completion/completions/blkdiscard
 #usr/share/bash-completion/completions/blkid
+#usr/share/bash-completion/completions/blkpr
 #usr/share/bash-completion/completions/blkzone
 #usr/share/bash-completion/completions/blockdev
 #usr/share/bash-completion/completions/cal
 #usr/share/bash-completion/completions/cfdisk
 #usr/share/bash-completion/completions/chcpu
 #usr/share/bash-completion/completions/chmem
+#usr/share/bash-completion/completions/choom
 #usr/share/bash-completion/completions/chrt
 #usr/share/bash-completion/completions/col
 #usr/share/bash-completion/completions/colcrt
 #usr/share/bash-completion/completions/colrm
 #usr/share/bash-completion/completions/column
+#usr/share/bash-completion/completions/copyfilerange
+#usr/share/bash-completion/completions/coresched
 #usr/share/bash-completion/completions/ctrlaltdel
 #usr/share/bash-completion/completions/delpart
 #usr/share/bash-completion/completions/dmesg
@@ -178,6 +188,7 @@ usr/sbin/rtcwake
 #usr/share/bash-completion/completions/fsck.minix
 #usr/share/bash-completion/completions/fsfreeze
 #usr/share/bash-completion/completions/fstrim
+#usr/share/bash-completion/completions/getino
 #usr/share/bash-completion/completions/getopt
 #usr/share/bash-completion/completions/hardlink
 #usr/share/bash-completion/completions/hexdump
@@ -197,6 +208,7 @@ usr/sbin/rtcwake
 #usr/share/bash-completion/completions/lsblk
 #usr/share/bash-completion/completions/lsclocks
 #usr/share/bash-completion/completions/lscpu
+#usr/share/bash-completion/completions/lsfd
 #usr/share/bash-completion/completions/lsipc
 #usr/share/bash-completion/completions/lsirq
 #usr/share/bash-completion/completions/lslocks
@@ -232,6 +244,7 @@ usr/sbin/rtcwake
 #usr/share/bash-completion/completions/scriptreplay
 #usr/share/bash-completion/completions/setarch
 #usr/share/bash-completion/completions/setpgid
+#usr/share/bash-completion/completions/setpriv
 #usr/share/bash-completion/completions/setsid
 #usr/share/bash-completion/completions/setterm
 #usr/share/bash-completion/completions/sfdisk
@@ -256,6 +269,7 @@ usr/sbin/rtcwake
 #usr/share/doc/util-linux
 #usr/share/doc/util-linux/getopt-example.bash
 #usr/share/doc/util-linux/getopt-example.tcsh
+#usr/share/man/man1/bits.1
 #usr/share/man/man1/cal.1
 #usr/share/man/man1/choom.1
 #usr/share/man/man1/chrt.1
@@ -263,6 +277,8 @@ usr/sbin/rtcwake
 #usr/share/man/man1/colcrt.1
 #usr/share/man/man1/colrm.1
 #usr/share/man/man1/column.1
+#usr/share/man/man1/copyfilerange.1
+#usr/share/man/man1/coresched.1
 #usr/share/man/man1/dmesg.1
 #usr/share/man/man1/eject.1
 #usr/share/man/man1/enosys.1
@@ -271,6 +287,7 @@ usr/sbin/rtcwake
 #usr/share/man/man1/fallocate.1
 #usr/share/man/man1/fincore.1
 #usr/share/man/man1/flock.1
+#usr/share/man/man1/getino.1
 #usr/share/man/man1/getopt.1
 #usr/share/man/man1/hardlink.1
 #usr/share/man/man1/hexdump.1
@@ -302,6 +319,7 @@ usr/sbin/rtcwake
 #usr/share/man/man1/scriptlive.1
 #usr/share/man/man1/scriptreplay.1
 #usr/share/man/man1/setpgid.1
+#usr/share/man/man1/setpriv.1
 #usr/share/man/man1/setsid.1
 #usr/share/man/man1/setterm.1
 #usr/share/man/man1/taskset.1

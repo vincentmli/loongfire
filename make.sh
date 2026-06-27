@@ -1500,6 +1500,8 @@ build_system() {
 	lfsmake2 --enable-toolchain sysvinit
 	lfsmake2 --enable-toolchain tar
 	lfsmake2 --enable-toolchain texinfo
+	lfsmake2 --enable-toolchain libcap
+	lfsmake2 --enable-toolchain libcap-ng
 	lfsmake2 --enable-toolchain util-linux
 	lfsmake2 --enable-toolchain vim
 	lfsmake2 --enable-toolchain e2fsprogs
@@ -1539,8 +1541,6 @@ build_system() {
 	lfsmake2 ninja
 	lfsmake2 meson
 	lfsmake2 pam
-	lfsmake2 libcap
-	lfsmake2 libcap-ng
 	lfsmake2 libpcap
 	lfsmake2 ppp
 	lfsmake2 pptp
