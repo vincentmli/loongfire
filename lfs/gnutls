@@ -73,7 +73,8 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	cd $(DIR_APP) && ./configure \
 					--prefix=/usr \
 					--without-p11-kit \
-					--disable-openssl-compatibility
+					--disable-openssl-compatibility \
+					--with-default-trust-store-file=/etc/ssl/certs/ca-bundle.crt
 	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install
 	@rm -rf $(DIR_APP)
