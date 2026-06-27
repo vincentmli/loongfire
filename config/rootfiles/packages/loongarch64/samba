@@ -823,6 +823,8 @@ usr/lib/python3.10/site-packages/samba/xattr_tdb.cpython-310.so
 usr/lib/python3.10/site-packages/talloc.cpython-310.so
 usr/lib/python3.10/site-packages/tdb.cpython-310.so
 usr/lib/python3.10/site-packages/tevent.py
+usr/lib/security
+usr/lib/security/pam_winbind.so
 #usr/lib/samba
 usr/lib/samba/idmap
 usr/lib/samba/idmap/ad.so

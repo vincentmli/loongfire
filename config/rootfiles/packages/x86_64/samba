@@ -1026,6 +1026,7 @@ usr/lib/samba/vfs/virusfilter.so
 usr/lib/samba/vfs/widelinks.so
 usr/lib/samba/vfs/worm.so
 usr/lib/samba/vfs/xattr_tdb.so
+usr/lib/security
 usr/lib/security/pam_winbind.so
 #usr/libexec/samba
 usr/libexec/samba/rpcd_classic
