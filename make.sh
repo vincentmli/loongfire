@@ -1534,6 +1534,7 @@ build_system() {
 	lfsmake2 python3-docutils
 	lfsmake2 python3-flit
 	lfsmake2 python3-more_itertools
+	lfsmake2 python3-poetry-core
 	lfsmake2 cython
 	lfsmake2 ninja
 	lfsmake2 meson
