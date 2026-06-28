@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2022  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -35,7 +35,7 @@ DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 
 PROG       = guardian
-PAK_VER    = 27
+PAK_VER    = 28
 
 DEPS       = perl-inotify2 perl-Net-IP
 
@@ -94,7 +94,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 
 	# Create config directory and create files.
 	-mkdir -pv /var/ipfire/guardian
-	chown nobody.nobody /var/ipfire/guardian
+	chown nobody:nobody /var/ipfire/guardian
 
 	# Create directory and file for logging.
 	-mkdir -pv /var/log/guardian
