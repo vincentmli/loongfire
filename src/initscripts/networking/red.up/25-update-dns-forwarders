@@ -1,4 +1,4 @@
 #!/bin/bash
 
-# Update DNS forwarders
-exec /etc/init.d/unbound update-forwarders
+# Reload DNS
+exec /etc/init.d/knot-resolver reload
