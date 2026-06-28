@@ -2,7 +2,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -83,6 +83,10 @@ restore_backup() {
 	# certificates being left in directory after a restore
 	rm -f /var/ipfire/ovpn/certs/*
 
+	# remove all previous blacklist entries from urlfilter
+	# to prevent any clashes between symlinks and files
+	rm -Rf /var/ipfire/urlfilter/blacklists/*
+
 	# Extract backup
 	if ! tar xvzpf "${filename}" -C / \
 			--exclude-from="/var/ipfire/backup/exclude" \
@@ -108,13 +112,24 @@ restore_backup() {
 		-s /bin/false			\
 		-u 52 dhcpcd
 
-	# create unbound user
-	groupadd -g 103 unbound
-	useradd -c 'unbound User'	\
-		-d /var/empty		\
-		-g unbound		\
-		-s /bin/false		\
-		-u 103 unbound
+	# Remove any unbound directory that is restored
+	rm -Rf /etc/unbound/
+
+	# Create Knot Resolver group
+	if ! getent group knot-resolver &>/dev/null; then
+		groupadd -g 120 knot-resolver
+	fi
+
+	# Create Knot Resolver user
+	if ! getent passwd knot-resolver &>/dev/null; then
+		useradd \
+			-c "Knot Resolver User" \
+			-d /var/empty \
+			-g knot-resolver \
+			-s /bin/false \
+			-u 120 \
+			knot-resolver
+	fi
 
 	# Run converters
 
