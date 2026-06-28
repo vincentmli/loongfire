@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2023  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -56,11 +56,8 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	sed -e "s/@VERSION@/$(PAKFIRE_VERSION)/g" \
 		< $(DIR_APP)/pakfire.conf \
 		> $(DIR_APP)/etc/pakfire.conf
-	chown root.root $(DIR_APP) -R
+	chown root:root $(DIR_APP) -R
 	chmod 755 $(DIR_APP)/pakfire
-	touch /var/log/pakfire.log
-	chown root.nobody /var/log/pakfire.log
-	chmod 644 /var/log/pakfire.log
 	ln -sf ../../var/log/pakfire /opt/pakfire/logs
 	ln -sf ../../var/cache/pakfire /opt/pakfire/cache
 	@$(POSTBUILD)
