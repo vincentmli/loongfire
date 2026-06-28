@@ -895,6 +895,7 @@
 'dns no tls hostname given' => '没有输入TLS主机名。',
 'dns proxy server' => 'DNS代理服务器',
 'dns recursor mode' => '递归模式',
+'dns resolver' => 'DNS 解析器',
 'dns saved' => '保存成功!',
 'dns saved txt' => '输入的两个DNS服务器地址已成功保存。<br />您必须重新启动或重新连接，更改才能生效!',
 'dns server' => 'DNS服务器',

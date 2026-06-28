@@ -898,6 +898,7 @@
 'dns no tls hostname given' => 'No TLS hostname given.',
 'dns proxy server' => 'DNS Proxy Server',
 'dns recursor mode' => 'Recursor Mode',
+'dns resolver' => 'DNS Resolver',
 'dns saved' => 'Successfully saved!',
 'dns saved txt' => 'The two entered DNS server addresses have been saved successfully.<br />You have to reboot or reconnect that the changes have effect!',
 'dns servers' => 'DNS Servers',

@@ -71,8 +71,8 @@ $querry[1] = 'hour' unless defined $querry[1];
 			"process" => "fcron",
 		},
 
-		# DNS Proxy
-		$Lang::tr{'dns proxy server'} => {
+		# DNS Resolver
+		$Lang::tr{'dns resolver'} => {
 			"process" => "kresd",
 		},
 
