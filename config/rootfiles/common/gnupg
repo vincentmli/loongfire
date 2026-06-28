@@ -2,6 +2,7 @@ usr/bin/dirmngr
 usr/bin/dirmngr-client
 usr/bin/gpg
 usr/bin/gpg-agent
+usr/bin/gpg-authcode-sign.sh
 usr/bin/gpg-card
 usr/bin/gpg-connect-agent
 usr/bin/gpg-mail-tube
@@ -75,7 +76,10 @@ usr/sbin/applygnupgdefaults
 #usr/share/gnupg/help.txt
 #usr/share/gnupg/help.zh_CN.txt
 #usr/share/gnupg/help.zh_TW.txt
-#usr/share/gnupg/sks-keyservers.netCA.pem
+#usr/share/gnupg/mail-tube.de.txt
+#usr/share/gnupg/mail-tube.txt
+#usr/share/gnupg/wks-utils.de.txt
+#usr/share/gnupg/wks-utils.txt
 #usr/share/info/gnupg.info
 #usr/share/info/gnupg.info-1
 #usr/share/info/gnupg.info-2
