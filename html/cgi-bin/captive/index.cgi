@@ -30,6 +30,7 @@ use HTML::Template;
 #use CGI::Carp 'fatalsToBrowser';
 
 require '/var/ipfire/general-functions.pl';
+require "${General::swroot}/header.pl";
 require "${General::swroot}/lang.pl";
 
 # Load the most appropriate language from the browser configuration
@@ -167,7 +168,7 @@ if ($settings{'AUTH'} eq "COUPON") {
 	$tmpl->param(L_HEADING => $Lang::tr{'Captive terms'});
 }
 
-$tmpl->param(TITLE => $settings{'TITLE'});
+$tmpl->param(TITLE => &Header::escape($settings{'TITLE'}));
 $tmpl->param(COLOR => $settings{'COLOR'});
 $tmpl->param(ERROR => $errormessage);
 
@@ -224,12 +225,14 @@ sub getterms() {
 
 	open(my $handle, "<:utf8", "/var/ipfire/captive/terms.txt");
 	while(<$handle>) {
-		$_ = HTML::Entities::decode_entities($_);
 		push(@terms, $_);
 	}
 	close($handle);
 
 	my $terms = join("\n", @terms);
+
+	# Escape the string
+	$terms = &Header::escape($terms);
 
 	# Format paragraphs
 	$terms =~ s/\n\n/<\/p>\n<p>/g;
