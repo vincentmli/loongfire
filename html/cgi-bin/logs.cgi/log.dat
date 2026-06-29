@@ -12,8 +12,8 @@
 use strict;
 
 # enable only the following on debugging purpose
-#use warnings;
-#use CGI::Carp 'fatalsToBrowser';
+use warnings;
+use CGI::Carp 'fatalsToBrowser';
 
 require '/var/ipfire/general-functions.pl';
 require "${General::swroot}/lang.pl";
@@ -59,6 +59,7 @@ my %sections = (
         'ddns' => '(ddns\[\d+\]:)',
         'dhcp' => '(dhcpd: )',
         'dma' => '(dma: |dma\[.*\]: |postfix/\w*\[\d*\]: )',
+        'dns' => '(knot_resolver.*: |supervisord: |kresd\[.*\]: |unbound: \[.*?\])',
         'guardian' => '(guardian\[.*\]: )',
         'haproxy' => '(haproxy\[.*?\]: )',
         'ipblocklist' => '(ipblocklist: )',
@@ -76,7 +77,6 @@ my %sections = (
         'suricata' => '(suricata: )',
         'squid' => '(squid\[.*\]: |squid: )',
         'ssh' => '(sshd(?:\(.*\))?\[.*\]: |sshd-session(?:\(.*\))?\[.*\]:)',
-        'unbound' => '(unbound: \[.*?\])(.*:.*$)',
         'urlfilter bl' => '(installpackage\[urlfilter\]: )',
         'wireless' => '(hostapd:|kernel: ath.*:|kernel: wifi[0-9]:)',
 		'zabbix_agentd' => '(zabbix_agentd\[.*?\]: )'
@@ -94,6 +94,7 @@ my %trsections = (
         'ddns' => "$Lang::tr{'dynamic dns'}",
         'dhcp' => "$Lang::tr{'dhcp server'}",
         'dma' => 'Mail',
+	'dns' => $Lang::tr{'dns title'},
         'guardian' => "$Lang::tr{'guardian'}",
         'haproxy' => 'HAProxy',
         'ipblocklist' => "$Lang::tr{'ipblocklist'}",
@@ -111,7 +112,6 @@ my %trsections = (
         'suricata' => "$Lang::tr{'intrusion detection'}",
         'squid' => "$Lang::tr{'web proxy'}",
         'ssh' => 'SSH',
-        'unbound' => 'DNS: Unbound',
         'urlfilter bl' => 'URLFilter Blacklist',
         'wireless' => 'Wireless',
 		'zabbix_agentd' => 'Zabbix Agent'
@@ -404,7 +404,7 @@ foreach $_ (@log)
 	$day =~ tr / /0/;
 	my $time = $cgiparams{'DAY'} ? "$2" : "$day/$2" ;
 	my $sec = $3;
-	my $data = &Header::cleanhtml($4, 'y');
+	my $data = &Header::escape($4);
 
 	print <<END;
 		<tr>
