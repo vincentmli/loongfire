@@ -488,4 +488,7 @@ sub SortDataFile
 #
 sub BuildConfiguration {
     &General::system('/usr/local/bin/rebuildhosts');
+
+    # Reload DNS
+    &General::system_background("/usr/local/bin/dnsctrl", "reload");
 }
