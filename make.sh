@@ -2307,6 +2307,7 @@ check_rootfiles_for_arch() {
 		cmake
 		gdb
 		liburcu
+		luajit
 		ovmf
 		qemu
 		rust-crc32fast
