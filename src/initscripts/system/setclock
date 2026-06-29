@@ -24,6 +24,36 @@
 
 CLOCKPARAMS=
 
+# Restore log time
+# This is a fallback mechanism for systems without or with broken RTCs which
+# will reset the system clock to at least the timestamp of the last log file
+# modification date.
+restore_log_time() {
+	local file="/var/log/messages"
+
+	# Cannot restore the log time if the file does not exist
+	if [ ! -e "${file}" ]; then
+		return 0
+	fi
+
+	# Fetch the log timestamp
+	local t_log="$(stat --format="%Y" "${file}")"
+
+	# Fetch the current system time
+	local t_sys="$(date "+%s")"
+
+	# If the log time greater than the system time, we update the system time
+	if [ -n "${t_log}" -a -n "${t_sys}" -a "${t_log}" -gt "${t_sys}" ]; then
+		boot_mesg "The clock has been reset to the last log access" "${WARNING}"
+
+		# Set the time
+		date -s "@${t_log}" >/dev/null
+		evaluate_retval
+	fi
+
+	return 0
+}
+
 case ${1} in
 	start)
 
@@ -45,20 +75,9 @@ case ${1} in
 		fi
 
 		hwclock --hctosys ${CLOCKPARAMS} &>/dev/null
-		date
 
-		if [ -e /var/log/messages ]; then
-			LOGTIMESTAMP=`stat --format "%y" /var/log/messages`
-			LOGTIME=`date +%s -d "$LOGTIMESTAMP"`
-			SYSTIME=`date +%s`
-			if [ $SYSTIME -lt $LOGTIME ]; then
-				boot_mesg "Warning! clock runs later than last log access. Check battery/rtc!"
-				date -s "$LOGTIMESTAMP"
-				echo_warning;
-			else
-				echo_ok;
-			fi
-		fi
+		# Restore the log time if the system clock is behind time
+		restore_log_time
 		;;
 
 	stop)
