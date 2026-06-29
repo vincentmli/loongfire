@@ -88,3 +88,5 @@ HOME=/
 # Cleanup the collectd RRD (graphs)
 %weekly * * /bin/find /var/log/rrd -mtime +365 -type f -name '*.rrd' -delete -o -type d -empty -delete
 
+# Update RPZs
+%hourly,random *	/usr/local/bin/update-rpzs
