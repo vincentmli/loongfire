@@ -135,6 +135,9 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
 		&General::system("/usr/local/bin/dnsfwctrl", "sync");
 	}
 
+	# Sync RPZs
+	&General::system_background("/usr/local/bin/dnsctrl", "sync-rpzs");
+
 # Save changed zone ACL
 } elsif ($cgiparams{'ACTION'} eq "$Lang::tr{'update'}") {
 	my %tmphash;
@@ -192,6 +195,9 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
 		if ($global_settings{'ENABLE_XDP'} eq "on") {
 			&General::system("/usr/local/bin/dnsfwctrl", "sync");
 		}
+
+	        # Reload DNS
+		&General::system_background("/usr/local/bin/dnsctrl", "reload");
 	}
 
 # Save changed custom domains to allow or block
@@ -279,6 +285,8 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
 			&General::system("/usr/local/bin/dnsfwctrl", "custom-sync");
 		}
 
+		# Reload DNS
+		&General::system_background("/usr/local/bin/dnsctrl", "reload");
 	}
 }
 
