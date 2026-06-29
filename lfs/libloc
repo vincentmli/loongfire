@@ -24,8 +24,8 @@
 
 include Config
 
-VER        = 0.9.18
-DB_DATE    = 2025-03-11
+VER        = 0.9.19
+DB_DATE    = 2026-06-02
 DB_TIME    = 03:45
 
 THISAPP    = libloc-$(VER)
@@ -44,8 +44,8 @@ objects = $(DL_FILE) \
 $(DL_FILE)                    = https://source.ipfire.org/releases/libloc/$(DL_FILE)
 location-$(DB_DATE).db.xz     = https://location.ipfire.org/databases/1/archive/location-$(DB_DATE)-$(DB_TIME).db.xz
 
-$(DL_FILE)_BLAKE2 = ccb730684c98756ef318f0cd5698b42ee4a997083811025ac5bf650798efb70dca97e1638b3f20da5d7b38a204fe5214a87fa7b61b8b70d71e6c8ad0577b0839
-location-$(DB_DATE).db.xz_BLAKE2 = adce971179f19c28906842ac08e5b90d55f73d91e0ffa27f98777c1ce8882dc9c4d1df1e9d45e06cf829e010a927f973d98830105c3aca58a86be7a172974861
+$(DL_FILE)_BLAKE2 = 1eb8cc427bfe7cf5c52640d725d3c564b61fab85190ac516f7ac6245ac05f3202841f9059b62acc9f68ba8c63687b03dc636ea58e0f2341b76e815445c0f347e
+location-$(DB_DATE).db.xz_BLAKE2 = 6def3003559dc1c6489ae4e9ea35cc69577687af26e7d0419f15daae1752d55137c855ed0397ed0c746255035c948f2e507db6543a4eaf1244e3bea9fab64742
 
 install : $(TARGET)
 
@@ -81,17 +81,15 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 
 	# https://lists.ipfire.org/pipermail/development/2022-November/014763.html
 	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/libloc-0.9.18-Revert-Install-Perl-files-to-Perl-vendor-directory.patch
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/libloc-0.9.18_gettext-0.25_fix.patch
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/libloc-0.9.18_Fix_backtracking_after_no_match_was_found_at_the_end_of_the_tree.patch
 	cd $(DIR_APP) && ./autogen.sh
 	cd $(DIR_APP) && ./configure \
-		--prefix=/usr \
-		--libdir=/usr/lib \
-		--sysconfdir=/etc \
-		--localstatedir=/var \
-		--disable-man-pages \
-		--with-database-path=/var/lib/location/database.db \
-		--without-systemd
+			--prefix=/usr \
+			--libdir=/usr/lib \
+			--sysconfdir=/etc \
+			--localstatedir=/var \
+			--disable-man-pages \
+			--with-database-path=/var/lib/location/database.db \
+			--without-systemd
 	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install
 
