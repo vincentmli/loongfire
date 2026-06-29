@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Sync the system time
+if [ -r "/var/ipfire/time/settime.conf" ]; then
+	# Try the configured time servers
+	if /usr/local/bin/settime $(</var/ipfire/time/settime.conf); then
+		exit 0
+	fi
+fi
+
+# If there is no time server configuration or the sync failed,
+# we will try to sync using the IPFire time service. This is needed
+# to get DNSSEC to work if we are REALLY far away.
+exec /usr/local/bin/settime 81.3.27.46
