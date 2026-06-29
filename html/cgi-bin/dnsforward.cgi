@@ -71,8 +71,8 @@ if ($cgiparams{'ACTION'} eq $Lang::tr{'add'})
 	my @forward_servers = split(/\,/, $cgiparams{'FORWARD_SERVERS'});
 	foreach my $forward_server (@forward_servers) {
 		# Check if the settings for the forward server are valid.
-		unless(&General::validip($forward_server) || &General::validfqdn($forward_server)) {
-			$errormessage = "$Lang::tr{'invalid ip or hostname'}: $forward_server";
+		unless(&General::validip($forward_server)) {
+			$errormessage = "$Lang::tr{'invalid ip address'}: $forward_server";
 			last;
 		}
 	}
@@ -88,7 +88,7 @@ if ($cgiparams{'ACTION'} eq $Lang::tr{'add'})
 		$cgiparams{'FORWARD_SERVERS'} = join("|", @forward_servers);
 
 	    # Check if a remark has been entered.
-	    $cgiparams{'REMARK'} = &Header::cleanhtml($cgiparams{'REMARK'});
+	    $cgiparams{'REMARK'} = &Header::escape($cgiparams{'REMARK'});
 
 		# Set to off if not enabled
 		if (!$cgiparams{'DISABLE_DNSSEC'}) {
@@ -123,6 +123,9 @@ if ($cgiparams{'ACTION'} eq $Lang::tr{'add'})
 			$cgiparams{'ID'} = $cgiparams{'EDITING'};
 		}
 	}
+
+	# Reload DNS
+	&General::system_background("/usr/local/bin/dnsctrl", "reload");
 }
 
 ###
@@ -139,6 +142,9 @@ if ($cgiparams{'ACTION'} eq $Lang::tr{'remove'})
 		unless ($cgiparams{'ID'} eq $id) { print FILE "$line"; }
 	}
 	close(FILE);
+
+	# Reload DNS
+	&General::system_background("/usr/local/bin/dnsctrl", "reload");
 }
 
 ###
@@ -164,6 +170,9 @@ if ($cgiparams{'ACTION'} eq $Lang::tr{'toggle enable disable'})
 		}
 	}
 	close(FILE);
+
+	# Reload DNS
+	&General::system_background("/usr/local/bin/dnsctrl", "reload");
 }
 
 ###
@@ -319,7 +328,7 @@ foreach my $line (@current)
 		$col="bgcolor='${Header::colouryellow}'"; }
 	elsif ($disable_dnssec eq 'on') {
 		print "<tr>";
-		$col="bgcolor='${Header::colourred}' style='color: white'"; }
+		$col="bgcolor='${Header::colourred}' style='color: black'"; }
 	elsif ($id % 2) {
 		print "<tr>";
 		$col="bgcolor='$color{'color22'}'"; }
