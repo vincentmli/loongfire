@@ -1,0 +1,53 @@
+#!/bin/sh
+###############################################################################
+#                                                                             #
+# IPFire.org - An Open Source Firewall                                        #
+# Copyright (C) 2026  IPFire Team  <info@ipfire.org>                          #
+#                                                                             #
+# This program is free software: you can redistribute it and/or modify        #
+# it under the terms of the GNU General Public License as published by        #
+# the Free Software Foundation, either version 3 of the License, or           #
+# (at your option) any later version.                                         #
+#                                                                             #
+# This program is distributed in the hope that it will be useful,             #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of              #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               #
+# GNU General Public License for more details.                                #
+#                                                                             #
+# You should have received a copy of the GNU General Public License           #
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.       #
+#                                                                             #
+###############################################################################
+
+main() {
+	local args=(
+		# Wait for one second only
+		"+timeout=1"
+
+		# Don't retry
+		"+retry=0"
+
+		# Query the local DNS service
+		"@127.0.0.1"
+
+		# Query for localhost
+		"A" "localhost."
+	)
+
+	local timeout=120
+	local i=0
+
+	while [ "${i}" -lt "${timeout}" ]; do
+		if kdig "${args[@]}" >/dev/null 2>&1; then
+			return 0
+		fi
+
+		# Increment i
+		(( i++ ))
+	done
+
+	# Fail
+	return 1
+}
+
+main "$@" || exit $?
