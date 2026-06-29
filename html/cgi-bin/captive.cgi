@@ -119,7 +119,7 @@ if ($cgiparams{'ACTION'} eq $Lang::tr{'save'}) {
 	$settings{'ENABLE_GREEN'}		= $cgiparams{'ENABLE_GREEN'};
 	$settings{'ENABLE_BLUE'}		= $cgiparams{'ENABLE_BLUE'};
 	$settings{'AUTH'}				= $cgiparams{'AUTH'};
-	$settings{'TITLE'}			= &Header::escape($cgiparams{'TITLE'});
+	$settings{'TITLE'}			= $cgiparams{'TITLE'};
 	$settings{'COLOR'}			= $cgiparams{'COLOR'};
 	$settings{'SESSION_TIME'}		= $cgiparams{'SESSION_TIME'};
 
@@ -133,7 +133,6 @@ if ($cgiparams{'ACTION'} eq $Lang::tr{'save'}) {
 		&General::writehash("$settingsfile", \%settings);
 
 		# Save terms
-		$cgiparams{'TERMS'} = &Header::escape($cgiparams{'TERMS'});
 		open(FH, ">:utf8", "/var/ipfire/captive/terms.txt") or die("$!");
 		print FH $cgiparams{'TERMS'};
 		close(FH);
@@ -367,7 +366,7 @@ print<<END;
 			$Lang::tr{'Captive title'}
 		</td>
 		<td>
-			<input type='text' name='TITLE' value="$settings{'TITLE'}" size='40'>
+			<input type='text' name='TITLE' value="@{[ &Header::escape($settings{'TITLE'}) ]}" size='40'>
 		</td>
 	</tr>
 	<tr>
@@ -404,7 +403,7 @@ print <<END;
 	<tr>
 		<td>$Lang::tr{'Captive terms'}</td>
 		<td>
-			<textarea cols="50" rows="10" name="TERMS">$terms</textarea>
+			<textarea cols="50" rows="10" name="TERMS">@{[ &Header::escape($terms) ]}</textarea>
 		</td>
 	</tr>
 	<tr>
@@ -789,7 +788,7 @@ sub generate_pdf() {
 			$f_subheadline->translate($cx, ($y + $h - $cy) / 2.4 + $cy);
 
 			if ($settings{'TITLE'}) {
-				$f_headline->text_center(decode("utf8", $settings{'TITLE'}));
+				$f_headline->text_center(decode("utf8", &Header::escape($settings{'TITLE'})));
 				$f_subheadline->text_center(decode("utf8", $Lang::tr{'Captive WiFi coupon'}));
 			} else {
 				$f_headline->text_center(decode("utf8", $Lang::tr{'Captive WiFi coupon'}));
