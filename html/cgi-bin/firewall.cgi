@@ -2375,9 +2375,6 @@ sub saverule
 			#print"6";
 		}
 		$fwdfwsettings{'ruleremark'}=~ s/,/;/g;
-		utf8::decode($fwdfwsettings{'ruleremark'});
-		$fwdfwsettings{'ruleremark'}=&Header::escape($fwdfwsettings{'ruleremark'});
-		$fwdfwsettings{'PROT'}=&Header::escape($fwdfwsettings{'PROT'});
 		if ($fwdfwsettings{'updatefwrule'} ne 'on'){
 			my $key = &General::findhasharraykey ($hash);
 			$$hash{$key}[0]  = $fwdfwsettings{'RULE_ACTION'};
