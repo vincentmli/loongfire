@@ -65,21 +65,21 @@ my $output = '';
 
 &Header::openbox('100%', 'left', $Lang::tr{'routing table entries'});
 $output = `/sbin/ip route show`;
-$output = &Header::cleanhtml($output,"y");
+$output = &Header::escape($output);
 print "<pre>$output</pre>\n";
 &Header::closebox();
 
 $output = `/sbin/ip route list table 220`;
 if ( $output ) {
 	&Header::openbox('100%', 'left', $Lang::tr{'ipsec routing table entries'});
-	$output = &Header::cleanhtml($output,"y");
+	$output = &Header::escape($output);
 	print "<pre>$output</pre>\n";
 	&Header::closebox()
 }
 
 &Header::openbox('100%', 'left', $Lang::tr{'arp table entries'});
 $output = `/sbin/ip neigh show`;
-$output = &Header::cleanhtml($output,"y");
+$output = &Header::escape($output);
 print "<pre>$output</pre>\n";
 &Header::closebox();
 

@@ -258,8 +258,8 @@ sub viewkey
     my @ssh_keygen = &General::system_output("/usr/bin/ssh-keygen", "-l", "-f", "$key");
 
     my @temp = split(/ /, $ssh_keygen[0]);
-    my $keysize = &Header::cleanhtml($temp[0],"y");
-    my $fingerprint = &Header::cleanhtml($temp[1],"y");
+    my $keysize = &Header::escape($temp[0]);
+    my $fingerprint = &Header::escape($temp[1]);
     print "<tr><td><code>$key</code></td><td align='center'>$name</td><td><code>$fingerprint</code></td><td align='center'>$keysize</td></tr>\n";
   }
 }

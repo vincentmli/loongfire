@@ -84,7 +84,7 @@ my $rrddir       = "/var/log/rrd/wio";
 my $refreshbox   = '<meta http-equiv="refresh" content="0;url=/cgi-bin/wio.cgi">';
 my $sortstring   = '^IPADR|^HOST';
 my $ovpnaddon    = "/var/ipfire/ovpn";
-my $ovpnpid      = "/var/run/openvpn.pid";
+my $ovpnpid      = "/var/run/openvpn-rw.pid";
 my $vpnpid       = "/var/run/charon.pid";
 my $redactive    = "/var/ipfire/red/active";
 my $redip        = '-';
@@ -1364,8 +1364,8 @@ foreach $key (keys %ovpnconfighash) {
 		}
 		else {
 			foreach (@ovpnstatus) {
-				if ( $_ =~ /^(.+),(\d+\.\d+\.\d+\.\d+\:\d+),(\d+),(\d+),(.+)/ ) {
-					@match = split (m/^(.+),(\d+\.\d+\.\d+\.\d+\:\d+),(\d+),(\d+),(.+)/, $_);
+				if ( $_ =~ /^(.+),(.+\:\d+\.\d+\.\d+\.\d+\:\d+),(\d+),(\d+),(.+)/ ) {
+					@match = split (m/^(.+),(.+\:\d+\.\d+\.\d+\.\d+\:\d+),(\d+),(\d+),(.+)/, $_);
 					$match[1] =~ s/[_]/ /g;
 				}
 
@@ -1374,8 +1374,8 @@ foreach $key (keys %ovpnconfighash) {
 					$ovpntime = &WIO::contime($match[5], "ovpn");
 				}
 
-				if ( $_ =~ /^(\d+\.\d+\.\d+\.\d+),(.+),(\d+\.\d+\.\d+\.\d+\:\d+),(.+)/ ) {
-					@match = split(m/^(\d+\.\d+\.\d+\.\d+),(.+),(\d+\.\d+\.\d+\.\d+\:\d+),(.+)/, $_);
+				if ( $_ =~ /^(\d+\.\d+\.\d+\.\d+),(.+),(.+\:\d+\.\d+\.\d+\.\d+\:\d+),(.+)/ ) {
+					@match = split(m/^(\d+\.\d+\.\d+\.\d+),(.+),(.+\:\d+\.\d+\.\d+\.\d+\:\d+),(.+)/, $_);
 				}
 
 				if ( $match[1] ne "Virtual Address" && $match[2] eq $ovpnclt ) {
@@ -1852,7 +1852,7 @@ print"
 ";
 
 $output = `/sbin/ip neigh list`;
-$output = &Header::cleanhtml($output,"y");
+$output = &Header::escape($output);
 
 my $arpcnt = 0;
 

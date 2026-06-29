@@ -388,7 +388,7 @@ END
 &Header::closebox();
 
 my $output = `/sbin/ip route show table static`;
-$output = &Header::cleanhtml($output,"y");
+$output = &Header::escape($output);
 
 if ( $output != "" ) {
 	&Header::openbox('100%', 'left', $Lang::tr{'routing table entries'});

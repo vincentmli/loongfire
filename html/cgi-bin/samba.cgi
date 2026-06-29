@@ -153,7 +153,7 @@ if ($errormessage)
 	}
 
 if ($message) {
-	$message = &Header::cleanhtml($message);
+	$message = &Header::escape($message);
 	$message =~ s/\n/<br>/g;
 
 	&Header::openbox('100%', 'left', $Lang::tr{'messages'});
@@ -653,7 +653,7 @@ END
 &Header::openbox('100%', 'left', $Lang::tr{'status'});
 
 my $status = qx(/usr/local/bin/sambactrl smbstatus);
-$status = &Header::cleanhtml($status);
+$status = &Header::escape($status);
 
 print <<END;
 	<small>

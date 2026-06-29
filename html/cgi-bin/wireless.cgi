@@ -331,7 +331,7 @@ foreach my $line (@current)
 	if ($temp[3] eq 'on') { $gif = 'on.gif'; $toggle='off'; $gdesc=$Lang::tr{'click to disable'};}
 		else { $gif = 'off.gif'; $toggle='on'; $gdesc=$Lang::tr{'click to enable'};}
 
-	my $remark    = &Header::cleanhtml($temp[4]);
+	my $remark    = &Header::escape($temp[4]);
 	my $col="";
 
 	if ($cgiparams{'ACTION'} eq 'edit' && $cgiparams{'ID'} eq $id) {
@@ -462,7 +462,7 @@ END
 	my $id = 0;
 	foreach my $key (sort blueleasesort keys %entries) {
 
-		my $hostname = &Header::cleanhtml($entries{$key}->{HOSTNAME},"y");
+		my $hostname = &Header::escape($entries{$key}->{HOSTNAME});
 		my $col="";
 
 		if ($id % 2) {

@@ -190,7 +190,7 @@ if(!$skip)
       # box
       while ( $content[0] =~ /^\s*$/ ) { shift @content; }
       while ( $content[$#content] =~ /^\s*$/ ) { pop @content; }
-      foreach $_ (@content) { $_ =~ s/\s*$//; print &Header::cleanhtml($_,"y")."\n"; }
+      foreach $_ (@content) { $_ =~ s/\s*$//; print &Header::escape($_)."\n"; }
       print "\n</pre>";
       &Header::closebox();
     } elsif (/^\s*#+ LogWatch [^#]+[)] #+\s*$/) {

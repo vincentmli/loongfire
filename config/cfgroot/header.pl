@@ -336,11 +336,8 @@ sub openbox {
 	my $width = shift;
 	my $align = shift;
 
-	# Escape the title using cleanhtml which handles UTF-8 correctly
-	my $title = shift;
-	if ($title) {
-		$title = &Header::cleanhtml($title, "y");
-	}
+	# Escale the title
+	my $title = &Header::escape(shift);
 
 	my @classes = ("section", "is-box", @_);
 
@@ -630,7 +627,18 @@ sub getcgihash {
 
 sub escape($) {
 	my $s = shift;
-	return HTML::Entities::encode_entities($s);
+
+	# Decode from UTF-8 as HTML::Entitites::encode_entities
+	# does not support it.
+	$s = &Encode::decode("UTF-8", $s);
+
+	# Escape any HTML entities
+	$s = &HTML::Entities::encode_entities($s);
+
+	# Encode back to UTF-8
+	$s = &Encode::encode("UTF-8", $s);
+
+	return $s;
 }
 
 sub normalize($) {
@@ -643,18 +651,6 @@ sub normalize($) {
 	$s =~ s/\s+/\-/g;
 
 	return $s;
-}
-
-sub cleanhtml {
-	my $outstring =$_[0];
-	$outstring =~ tr/,/ / if not defined $_[1] or $_[1] ne 'y';
-	# decode the UTF-8 text so that characters with diacritical marks such as
-	# umlauts are treated correctly by the escape command
-	$outstring = &Encode::decode("UTF-8",$outstring);
-	$outstring = escape($outstring);
-	# encode the text back to UTF-8 after running the escape command
-	$outstring = &Encode::encode("UTF-8",$outstring);
-	return $outstring;
 }
 
 sub connectionstatus
@@ -769,7 +765,7 @@ END
     my $col = "";
 	my $divider_printed = 0;
     foreach my $key (sort leasesort keys %entries) {
-		my $hostname = &cleanhtml($entries{$key}->{HOSTNAME},"y");
+		my $hostname = &escape($entries{$key}->{HOSTNAME});
 		my $hostname_print = $hostname;
 		if($hostname_print eq "") { #print blank space if no hostname is found
 			$hostname_print = "&nbsp;&nbsp;&nbsp;";

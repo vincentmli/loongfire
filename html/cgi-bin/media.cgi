@@ -202,7 +202,7 @@ sub diskbox {
 	}
 
 	my $smart = `/usr/local/bin/smartctrl $disk`;
-	$smart = &Header::cleanhtml($smart);
+	$smart = &Header::escape($smart);
 	print <<END
 <br /><input type="button" onClick="swapVisibility('smart_$disk')" value="$Lang::tr{'smart information'}" />
 <div id='smart_$disk' style='display: none'>

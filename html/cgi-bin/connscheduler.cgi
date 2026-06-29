@@ -186,7 +186,7 @@ if ( ($cgiparams{'ACTION'} eq 'add') || ($cgiparams{'ACTION'} eq 'update') )
   $CONNSCHED::config[$i]{'DAYSTYPE'} = lc($cgiparams{'ACTION_DAYSTYPE'});
   $CONNSCHED::config[$i]{'DAYS'} = $l_days;
   $CONNSCHED::config[$i]{'WEEKDAYS'} = $l_weekdays;
-  $CONNSCHED::config[$i]{'COMMENT'} = &Header::cleanhtml($cgiparams{'ACTION_COMMENT'});
+  $CONNSCHED::config[$i]{'COMMENT'} = &Header::escape($cgiparams{'ACTION_COMMENT'});
 
   &CONNSCHED::WriteConfig;
 }

@@ -677,7 +677,7 @@ END
 
 	my $key = &General::findhasharraykey (\%cahash);
 	$cahash{$key}[0] = $cgiparams{'CA_NAME'};
-	$cahash{$key}[1] = &Header::cleanhtml(getsubjectfromcert ("${General::swroot}/ca/$cgiparams{'CA_NAME'}cert.pem"));
+	$cahash{$key}[1] = &Header::escape(getsubjectfromcert ("${General::swroot}/ca/$cgiparams{'CA_NAME'}cert.pem"));
 	&General::writehasharray("${General::swroot}/vpn/caconfig", \%cahash);
 
 	&General::system('/usr/local/bin/ipsecctrl', 'R');
@@ -697,7 +697,7 @@ END
 		&Header::openbigbox('100%', 'left', '', '');
 		&Header::openbox('100%', 'left', "$Lang::tr{'ca certificate'}:");
 		my @output = &General::system_output("/usr/bin/openssl", "x509", "-text", "-in", "${General::swroot}/ca/$cahash{$cgiparams{'KEY'}}[0]cert.pem");
-		my $output = &Header::cleanhtml(join("", @output) ,"y");
+		my $output = &Header::escape(join("", @output));
 		print "<pre>$output</pre>\n";
 		&Header::closebox();
 		print "<div align='center'><a href='/cgi-bin/vpnmain.cgi'>$Lang::tr{'back'}</a></div>";
@@ -824,7 +824,7 @@ END
 		&Header::openbox('100%', 'left', "$Lang::tr{'host certificate'}:");
 		@output = &General::system_output("/usr/bin/openssl", "x509", "-text", "-in", "${General::swroot}/certs/hostcert.pem");
 	}
-	my $output = &Header::cleanhtml(join("", @output) ,"y");
+	my $output = &Header::escape(join("", @output));
 	print "<pre>$output</pre>\n";
 	&Header::closebox();
 	print "<div align='center'><a href='/cgi-bin/vpnmain.cgi'>$Lang::tr{'back'}</a></div>";
@@ -1520,7 +1520,7 @@ END
 		&Header::openbigbox('100%', 'left', '', '');
 		&Header::openbox('100%', 'left', "$Lang::tr{'cert'}:");
 		my @output = &General::system_output("/usr/bin/openssl", "x509", "-text", "-in", "${General::swroot}/certs/$confighash{$cgiparams{'KEY'}}[1]cert.pem");
-		my $output = &Header::cleanhtml(join("", @output) ,"y");
+		my $output = &Header::escape(join("", @output));
 		print "<pre>$output</pre>\n";
 		&Header::closebox();
 		print "<div align='center'><a href='/cgi-bin/vpnmain.cgi'>$Lang::tr{'back'}</a></div>";
@@ -1724,7 +1724,7 @@ END
 		}
 
 	} elsif ($cgiparams{'ACTION'} eq $Lang::tr{'save'}) {
-		$cgiparams{'REMARK'} = &Header::cleanhtml($cgiparams{'REMARK'});
+		$cgiparams{'REMARK'} = &Header::escape($cgiparams{'REMARK'});
 		if ($cgiparams{'TYPE'} !~ /^(host|net)$/) {
 			$errormessage = $Lang::tr{'connection type is invalid'};
 			goto VPNCONF_ERROR;
@@ -1973,7 +1973,7 @@ END
 		if (!$errormessage) {
 			&General::log("charon", "Moving cacert...");
 			#If CA have new subject, add it to our list of CA
-			my $casubject = &Header::cleanhtml(getsubjectfromcert ('/tmp/newcacert'));
+			my $casubject = &Header::escape(getsubjectfromcert ('/tmp/newcacert'));
 			my @names;
 			foreach my $x (keys %cahash) {
 				$casubject='' if ($cahash{$x}[1] eq $casubject);
@@ -1988,7 +1988,7 @@ END
 					my $idx=0;
 					while (grep(/Imported-$idx/, @names) ) {$idx++};
 					$cgiparams{'CA_NAME'}="Imported-$idx";
-					$cgiparams{'CERT_NAME'}=&Header::cleanhtml(getCNfromcert ('/tmp/newhostcert'));
+					$cgiparams{'CERT_NAME'}=&Header::escape(getCNfromcert ('/tmp/newhostcert'));
 
 					unless(move("/tmp/newcacert", "${General::swroot}/ca/$cgiparams{'CA_NAME'}cert.pem")) {
 						$errormessage = "$Lang::tr{'certificate file move failed'}: $!";
@@ -3584,7 +3584,7 @@ EOF
 	my $col1="bgcolor='$color{'color22'}'";
 	my $col2="bgcolor='$color{'color20'}'";
 	if (-f "${General::swroot}/ca/cacert.pem") {
-		my $casubject = &Header::cleanhtml(getsubjectfromcert ("${General::swroot}/ca/cacert.pem"));
+		my $casubject = &Header::escape(getsubjectfromcert ("${General::swroot}/ca/cacert.pem"));
 		print <<END
 		<tr>
 		<td class='base' $col1>$Lang::tr{'root certificate'}</td>
@@ -3616,7 +3616,7 @@ END
 	}
 
 	if (-f "${General::swroot}/certs/hostcert.pem") {
-		my $hostsubject = &Header::cleanhtml(getsubjectfromcert ("${General::swroot}/certs/hostcert.pem"));
+		my $hostsubject = &Header::escape(getsubjectfromcert ("${General::swroot}/certs/hostcert.pem"));
 
 		print <<END
 		<tr>

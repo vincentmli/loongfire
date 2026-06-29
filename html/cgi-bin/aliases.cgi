@@ -158,7 +158,7 @@ if ($settings{'ACTION'} eq $Lang::tr{'toggle enable disable'}) {
 if ($settings{'ACTION'} eq $Lang::tr{'add'}) {
     # Validate inputs
     if (! &General::validip($settings{'IP'})) {$errormessage = "invalid ip"};
-    $settings{'NAME'} = &Header::cleanhtml($settings{'NAME'});
+    $settings{'NAME'} = &Header::escape($settings{'NAME'});
 
     # Make sure we haven't duplicated an alias or RED
     my $spacer='';

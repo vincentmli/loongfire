@@ -191,7 +191,7 @@ END
 
 	print "<pre>\n";
 	foreach my $line (@lines) {
-		print &Header::cleanhtml($line,"y");
+		print &Header::escape($line);
 	}
 	print "</pre>\n";
 	&Header::closebox();

@@ -465,8 +465,8 @@ foreach $_ (@log)
 	$url =~ /(^.{0,60})/;
 	my $part = $1;
 	unless (length($part) < 60) { $part = "${part}..."; }
-	$url = &Header::cleanhtml($url,"y");
-	$part = &Header::cleanhtml($part,"y");
+	$url = &Header::escape($url);
+	$part = &Header::escape($part);
 	if ($cgiparams{'DAY'}==0) {			# full month
 	    $DAYdt = sprintf ("%.02d/",$DAYdt);
 	} else {

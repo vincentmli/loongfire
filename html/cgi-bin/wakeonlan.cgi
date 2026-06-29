@@ -307,7 +307,7 @@ for $i ( 0 .. $#wol_devices )
 {
   my $wol_mac = $wol_devices[$i]{'MAC'};
   my $wol_iface = $wol_devices[$i]{'IFace'};
-  my $wol_txt = &Header::cleanhtml($wol_devices[$i]{'Comment'});
+  my $wol_txt = &Header::escape($wol_devices[$i]{'Comment'});
 
   if ( (($cgiparams{'ACTION'} eq 'edit') || ($cgiparams{'ACTION'} eq 'update')) && ($i == $cgiparams{'ID'}) )
   {

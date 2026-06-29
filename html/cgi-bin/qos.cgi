@@ -556,7 +556,7 @@ elsif ($qossettings{'ACTION'} eq $Lang::tr{'status'} )
 	if ($qossettings{'ENABLED'} eq 'on'){
 		my $output = "";
 		my @output = &General::system_output("/usr/local/bin/qosctrl", "status");
-		$output = &Header::cleanhtml(join("", @output), "y");
+		$output = &Header::escape(join("", @output));
 		print "<pre>$output</pre>\n";
 	} else { print "$Lang::tr{'QoS not enabled'}"; }
 	&Header::closebox();

@@ -45,7 +45,6 @@ $timesettings{'UPDATE_METHOD'} = 'manually';
 $timesettings{'UPDATE_VALUE'} = '0';
 $timesettings{'UPDATE_PERIOD'} = '';
 $timesettings{'ENABLECLNTP'} = 'off';
-$timesettings{'ENABLESETONBOOT'} = 'off';
 
 &Header::getcgihash(\%timesettings);
 
@@ -162,7 +161,7 @@ ERROR:
 
 # To enter an ' into a pushbutton solution is to use &#039; in it's definition
 # but returned value when pressed is ' not the code. Cleanhtml recode the ' to enable comparison.
-$timesettings{'ACTION'} = &Header::cleanhtml ($timesettings{'ACTION'});
+$timesettings{'ACTION'} = &Header::escape ($timesettings{'ACTION'});
 if ($timesettings{'ACTION'} eq $Lang::tr{'set time now'} && $timesettings{'ENABLENTP'} eq 'on')
 {
 	&General::system('/usr/bin/touch', "/var/lock/time/settimenow");
@@ -178,7 +177,6 @@ if ($timesettings{'VALID'} eq '')
 	$timesettings{'UPDATE_PERIOD'} = 'daily';
 	$timesettings{'NTP_ADDR_1'} = '0.ipfire.pool.ntp.org';
 	$timesettings{'NTP_ADDR_2'} = '1.ipfire.pool.ntp.org';
-	$timesettings{'ENABLESETONBOOT'} = 'off';
 }
 
 unless ($errormessage) {
@@ -208,10 +206,6 @@ $checked{'ENABLENTP'}{$timesettings{'ENABLENTP'}} = "checked='checked'";
 $checked{'ENABLECLNTP'}{'off'} = '';
 $checked{'ENABLECLNTP'}{'on'} = '';
 $checked{'ENABLECLNTP'}{$timesettings{'ENABLECLNTP'}} = "checked='checked'";
-
-$checked{'ENABLESETONBOOT'}{'off'} = '';
-$checked{'ENABLESETONBOOT'}{'on'} = '';
-$checked{'ENABLESETONBOOT'}{$timesettings{'ENABLESETONBOOT'}} = "checked='checked'";
 
 $checked{'UPDATE_METHOD'}{'manually'} = '';
 $checked{'UPDATE_METHOD'}{'periodically'} = '';
@@ -280,10 +274,6 @@ print <<END
 <tr>
 	<td>&nbsp;</td>
 	<td class='base' colspan='4'><input type='checkbox' name='ENABLECLNTP' $checked{'ENABLECLNTP'}{'on'} /> $Lang::tr{'clenabled'}</td>
-</tr>
-<tr>
-	<td>&nbsp;</td>
-	<td class='base' colspan='4'><input type='checkbox' name='ENABLESETONBOOT' $checked{'ENABLESETONBOOT'}{'on'} /> $Lang::tr{'Set time on boot'}</td>
 </tr>
 </table>
 END

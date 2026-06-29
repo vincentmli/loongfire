@@ -1679,7 +1679,7 @@ END
 	}
     }
 
-    $casubject    = &Header::cleanhtml($casubject);
+    $casubject    = &Header::escape($casubject);
 
     my $key = &General::findhasharraykey (\%cahash);
     $cahash{$key}[0] = $cgiparams{'CA_NAME'};
@@ -1700,7 +1700,7 @@ END
 	&Header::openbigbox('100%', 'LEFT', '', $errormessage);
 	&Header::openbox('100%', 'LEFT', "$Lang::tr{'ca certificate'}:");
 	my @output = &General::system_output("/usr/bin/openssl", "x509", "-text", "-in", "${General::swroot}/ovpn/ca/$cahash{$cgiparams{'KEY'}}[0]cert.pem");
-	my $output = &Header::cleanhtml(join("", @output),"y");
+	my $output = &Header::escape(join("", @output));
 	print "<pre>$output</pre>\n";
 	&Header::closebox();
 	print "<div align='center'><a href='/cgi-bin/ovpnmain.cgi'>$Lang::tr{'back'}</a></div>";
@@ -1812,7 +1812,7 @@ END
 	&Header::openbox('100%', 'LEFT', "$Lang::tr{'host certificate'}:");
 	@output = &General::system_output("/usr/bin/openssl", "x509", "-text", "-in", "${General::swroot}/ovpn/certs/servercert.pem");
     }
-    my $output = &Header::cleanhtml(join("", @output), "y");
+    my $output = &Header::escape(join("", @output));
     print "<pre>$output</pre>\n";
     &Header::closebox();
     print "<div align='center'><a href='/cgi-bin/ovpnmain.cgi'>$Lang::tr{'back'}</a></div>";
@@ -2611,7 +2611,7 @@ END
 	&Header::openbigbox('100%', 'LEFT', '', '');
 	&Header::openbox('100%', 'LEFT', "$Lang::tr{'certificate'}:");
 	my @output = &General::system_output("/usr/bin/openssl", "x509", "-text", "-in", "${General::swroot}/ovpn/certs/$confighash{$cgiparams{'KEY'}}[1]cert.pem");
-	my $output = &Header::cleanhtml(join("", @output), "y");
+	my $output = &Header::escape(join("", @output));
 	print "<pre>$output</pre>\n";
 	&Header::closebox();
 	print "<div align='center'><a href='/cgi-bin/ovpnmain.cgi'>$Lang::tr{'back'}</a></div>";
@@ -2676,7 +2676,7 @@ END
 		my @output = <FILE>;
 		close(FILE);
 
-		my $output = &Header::cleanhtml(join("", @output),"y");
+		my $output = &Header::escape(join("", @output));
 		print "<pre>$output</pre>\n";
 		&Header::closebox();
 		print "<div align='center'><a href='/cgi-bin/ovpnmain.cgi'>$Lang::tr{'back'}</a></div>";
@@ -2699,7 +2699,7 @@ END
 	&Header::openbigbox('100%', 'LEFT', '', '');
 	&Header::openbox('100%', 'LEFT', "$Lang::tr{'crl'}:");
 	my @output = &General::system_output("/usr/bin/openssl", "crl", "-text", "-noout", "-in", "${General::swroot}/ovpn/crls/cacrl.pem");
-	my $output = &Header::cleanhtml(join("", @output), "y");
+	my $output = &Header::escape(join("", @output));
 	print "<pre>$output</pre>\n";
 	&Header::closebox();
 	print "<div align='center'><a href='/cgi-bin/ovpnmain.cgi'>$Lang::tr{'back'}</a></div>";
@@ -3727,7 +3727,7 @@ if ($confighash{$cgiparams{'KEY'}}) {
 		$cgiparams{'TLSAUTH'}		= $confighash{$cgiparams{'KEY'}}[41];
 		$cgiparams{'OTP_STATE'}		= $confighash{$cgiparams{'KEY'}}[43];
 	} elsif ($cgiparams{'ACTION'} eq $Lang::tr{'save'}) {
-	$cgiparams{'REMARK'} = &Header::cleanhtml($cgiparams{'REMARK'});
+	$cgiparams{'REMARK'} = &Header::escape($cgiparams{'REMARK'});
 
 # CCD check iroute field and convert it to decimal
 if ($cgiparams{'TYPE'} eq 'host') {
@@ -5224,6 +5224,9 @@ END
 					$Lang::tr{'remark'}
 				</th>
 				<th width='10%'>
+					$Lang::tr{'ccd subnet'}
+				</th>
+				<th width='10%'>
 					$Lang::tr{'status'}
 				</th>
 				<th width='5%' colspan='8'>
@@ -5290,6 +5293,9 @@ END
 
 		# Show remarks
 		print "<td>$confighash{$key}[25]</td>";
+
+		# Show subnet
+		print "<td class='text-center'>$confighash{$key}[32]</td>";
 
 		my $connstatus = "DISCONNECTED";
 
