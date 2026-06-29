@@ -3248,6 +3248,7 @@
 'wlanap band' => '频段',
 'wlanap band 2.4ghz' => '2.4 GHz',
 'wlanap band 5ghz' => '5 GHz',
+'wlanap band 6ghz' => '6 GHz',
 'wlanap broadcast ssid' => '广播SSID',
 'wlanap channel' => '频道',
 'wlanap client isolation' => '客户端隔离',

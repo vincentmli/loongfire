@@ -3234,6 +3234,7 @@
 'wlanap band' => 'Band',
 'wlanap band 2.4ghz' => '2.4 GHz',
 'wlanap band 5ghz' => '5 GHz',
+'wlanap band 6ghz' => '6 GHz',
 'wlanap channel' => 'Channel',
 'wlanap client isolation' => 'Client Isolation',
 'wlanap configuration' => 'Wireless Access Point Configuration',

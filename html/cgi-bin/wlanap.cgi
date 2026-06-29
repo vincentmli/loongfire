@@ -97,7 +97,7 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
 	}
 
 	# Validate BAND
-	unless ($cgiparams{'BAND'} =~ m/^[25]g$/) {
+	unless ($cgiparams{'BAND'} =~ m/^[256]g$/) {
 		$errormessage .= "$Lang::tr{'wlanap invalid band'}<br />";
 	}
 
@@ -357,6 +357,9 @@ print <<END;
 				<td>$Lang::tr{'wlanap band'}</td>
 				<td>
 					<select name='BAND'>
+						<option value="6g" $selected{'BAND'}{'6g'}>
+							$Lang::tr{'wlanap band 6ghz'}
+						</option>
 						<option value="5g" $selected{'BAND'}{'5g'}>
 							$Lang::tr{'wlanap band 5ghz'}
 						</option>
