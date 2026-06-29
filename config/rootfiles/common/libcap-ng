@@ -12,6 +12,8 @@ usr/lib/libdrop_ambient.so.0
 usr/lib/libdrop_ambient.so.0.0.0
 #usr/lib/pkgconfig/libcap-ng.pc
 #usr/share/aclocal/cap-ng.m4
+#usr/share/bash-completion
+#usr/share/bash-completion/completions
 #usr/share/bash-completion/completions/libcap-ng.bash_completion
 #usr/share/man/man3/capng_apply.3
 #usr/share/man/man3/capng_apply_caps_fd.3
