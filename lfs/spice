@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2018  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -26,7 +26,7 @@ include Config
 
 SUMMARY    = A remote display system built for virtual environments
 
-VER        = 0.15.0
+VER        = 0.16.0
 
 THISAPP    = spice-$(VER)
 DL_FILE    = $(THISAPP).tar.bz2
@@ -34,7 +34,7 @@ DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = spice
-PAK_VER    = 7
+PAK_VER    = 8
 
 DEPS       = opus
 
@@ -48,7 +48,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = ca17a94054a1bd5dd526eea34e17af69557f16b02a7bc97ae758ea1c2edac698dc85bf77cd551928206790841c8acd1de6eda354f86231c223e9211e6f30889a
+$(DL_FILE)_BLAKE2 = 09bda6480c72a82aef775e12a1034f0194e99ae754d98456cd73de90be067b22e4210a536515266b2f298364f77fa0839546631b54f79074318f486d9a669aa0
 
 install : $(TARGET)
 
@@ -81,7 +81,9 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	cd $(DIR_SRC) && tar jxf $(DIR_DL)/$(DL_FILE)
-	cd $(DIR_APP) && ./configure --prefix=/usr --disable-celt051
+	cd $(DIR_APP) && ./configure \
+				--prefix=/usr \
+				--disable-celt051
 	cd $(DIR_APP) && make $(MAKETUNING) $(EXTRA_MAKE)
 	cd $(DIR_APP) && make install
 	@rm -rf $(DIR_APP)
