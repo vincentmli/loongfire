@@ -125,6 +125,7 @@ write_config() {
 	local he_phy_flags=0
 	local eht_mac_flags=0
 	local eht_phy_flags=0
+	local channel_offset
 
 	# Set some default BAND if none is set
 	if [ -z "${CONFIG["BAND"]}" ]; then
@@ -174,6 +175,12 @@ write_config() {
 					break
 				fi
 				;;
+
+			"* 7115.0 MHz"*)
+				if [ "${CONFIG["BAND"]}" = "6g" ]; then
+					break
+				fi
+				;;
 		esac
 	done <<<"$(iw phy "${phy}" info)"
 
@@ -181,6 +188,9 @@ write_config() {
 	local vht_caps=()
 	local he_caps=()
 	local eht_caps=()
+
+	# Clear [HT40+][HT40-]
+	ht_flags="$(( ht_flags & ~0x0002 ))"
 
 	# HT Capabilities
 	for flag in ${!HT_CAPS[@]}; do
@@ -326,6 +336,16 @@ write_config() {
 		esac
 	fi
 
+	# Set channel offset
+	case "${CONFIG["BAND"]}" in
+		6g)
+			channel_offset=1
+			;;
+		*)
+			channel_offset=0
+			;;
+	esac
+
 	# Header
 	echo "# Automatically generated configuration"
 	echo "# DO NOT EDIT"
@@ -364,8 +384,32 @@ write_config() {
 	local enable_n=0
 
 	case "${CONFIG["MODE"]}" in
-		HT*|VHT*|HE*|EHT*)
+		HT20|VHT20|HE20|EHT20)
 			enable_n=1
+			;;
+
+		*40|*80|*160|*320)
+			enable_n=1
+
+			case "${CONFIG["BAND"]}" in
+				6g|5g)
+					case "$(( ((${CONFIG["CHANNEL"]} / 4) + channel_offset) % 2 ))" in
+						0)
+							ht_caps+=( "[HT40-]" )
+							;;
+						1)
+							ht_caps+=( "[HT40+]" )
+							;;
+					esac
+					;;
+				2g)
+					if [ "${CONFIG["CHANNEL"]}" -lt 7 ]; then
+						ht_caps+=( "[HT40+]" )
+					else
+						ht_caps+=( "[HT40-]" )
+					fi
+					;;
+			esac
 			;;
 	esac
 
@@ -385,7 +429,7 @@ write_config() {
 
 			# Compute the channel segment index
 			if [ "${CONFIG["CHANNEL"]}" -gt 0 ]; then
-				case "$(( (${CONFIG["CHANNEL"]} / 4) % 2 ))" in
+				case "$(( ((${CONFIG["CHANNEL"]} / 4) + channel_offset) % 2 ))" in
 					0)
 						vht_oper_centr_freq_seg0_idx="$(( ${CONFIG["CHANNEL"]} - 2 ))"
 						;;
@@ -403,7 +447,7 @@ write_config() {
 
 			# Compute the channel segment index
 			if [ "${CONFIG["CHANNEL"]}" -gt 0 ]; then
-				case "$(( (${CONFIG["CHANNEL"]} / 4) % 4 ))" in
+				case "$(( ((${CONFIG["CHANNEL"]} / 4) + channel_offset) % 4 ))" in
 					0)
 						vht_oper_centr_freq_seg0_idx="$(( ${CONFIG["CHANNEL"]} - 6 ))"
 						;;
@@ -427,15 +471,46 @@ write_config() {
 
 			# Compute the channel segment index
 			if [ "${CONFIG["CHANNEL"]}" -gt 0 ]; then
-				case "${CONFIG["CHANNEL"]}" in
-					36|40|44|48|52|56|60|64)
-						vht_oper_centr_freq_seg0_idx=50
+				case "${CONFIG["BAND"]}" in
+					# 6 GHz
+					6g)
+						case "${CONFIG["CHANNEL"]}" in
+							1|5|9|13|17|21|25|29)
+								vht_oper_centr_freq_seg0_idx=15
+								;;
+							33|37|41|45|49|53|57|61)
+								vht_oper_centr_freq_seg0_idx=47
+								;;
+							65|69|73|77|81|85|89|93)
+								vht_oper_centr_freq_seg0_idx=79
+								;;
+							97|101|105|109|113|117|121|125)
+								vht_oper_centr_freq_seg0_idx=111
+								;;
+							129|133|137|141|145|149|153|157)
+								vht_oper_centr_freq_seg0_idx=143
+								;;
+							161|165|169|173|177|181|185|189)
+								vht_oper_centr_freq_seg0_idx=175
+								;;
+							193|197|201|205|209|213|217|221)
+								vht_oper_centr_freq_seg0_idx=207
+								;;
+						esac
 						;;
-					100|104|108|112|116|120|124|128)
-						vht_oper_centr_freq_seg0_idx=114
-						;;
-					149|153|157|161|165|169|173|177)
-						vht_oper_centr_freq_seg0_idx=163
+					# 5 GHz
+					5g)
+						case "${CONFIG["CHANNEL"]}" in
+							36|40|44|48|52|56|60|64)
+								vht_oper_centr_freq_seg0_idx=50
+								;;
+							100|104|108|112|116|120|124|128)
+								vht_oper_centr_freq_seg0_idx=114
+								;;
+							149|153|157|161|165|169|173|177)
+								vht_oper_centr_freq_seg0_idx=163
+								;;
+						esac
 						;;
 				esac
 			fi
@@ -459,6 +534,31 @@ write_config() {
 	local eht_oper_centr_freq_seg0_idx="${he_oper_centr_freq_seg0_idx}"
 
 	case "${CONFIG["MODE"]}" in
+		EHT320)
+			enable_be=1
+			eht_oper_chwidth=9
+
+			# Compute the channel segment index
+			case "${CONFIG["BAND"]}" in
+				6g)
+					case "${CONFIG["CHANNEL"]}" in
+						1|5|9|13|17|21|25|29|33|37|41|45|49|53|57|61)
+							eht_oper_centr_freq_seg0_idx=31
+							;;
+						65|69|73|77|81|85|89|93|97|101|105|109|113|117|121|125)
+							eht_oper_centr_freq_seg0_idx=95
+							;;
+						129|133|137|141|145|149|153|157|161|165|169|173|177|181|185|189)
+							eht_oper_centr_freq_seg0_idx=159
+							;;
+						193|197|201|205|209|213|217|221)
+							eht_oper_centr_freq_seg0_idx=191
+							;;
+					esac
+					;;
+			esac
+			;;
+
 		EHT*)
 			enable_be=1
 			;;
@@ -466,13 +566,57 @@ write_config() {
 
 	# Set hardware mode
 	case "${CONFIG["BAND"]}" in
-		5g)
+		6g|5g)
 			echo "hw_mode=a"
 			;;
 		2g)
 			echo "hw_mode=g"
 			;;
 	esac
+
+	# Adjust settings for 6 GHz
+	case "${CONFIG["BAND"]}" in
+		6g)
+			# Indoor AP
+			echo "he_6ghz_reg_pwr_type=0"
+
+			# Disable 802.11n/ac
+			enable_n=0
+			enable_ac=0
+
+			# Enable 802.11w management frame protection
+			CONFIG["IEEE80211W"]="on"
+
+			# Send FILS Discovery frames every 20 TUs (~20 ms)
+			# for faster AP detection by the clients
+			echo "fils_discovery_min_interval=20"
+			echo "fils_discovery_max_interval=20"
+			;;
+	esac
+
+	local op_class=
+
+	# Configure global operating class
+	case "${CONFIG["BAND"]}" in
+		6g)
+			case "${CONFIG["MODE"]}" in
+				EHT320)
+					op_class=137
+					;;
+				HE20|EHT20)
+					op_class=131
+					;;
+				HE*|EHT*)
+					op_class="$(( 132 + vht_oper_chwidth ))"
+					;;
+			esac
+			;;
+	esac
+
+	# Set global operating class
+	if [ -n "${op_class}" ]; then
+		echo "op_class=${op_class}"
+	fi
 
 	# Enable 802.11be?
 	if [ "${enable_be}" -eq 1 ]; then
@@ -500,6 +644,10 @@ write_config() {
 		if [ ${#he_caps[@]} -gt 0 ]; then
 			printf "%s\n" "${he_caps[@]}"
 		fi
+
+		# The antenna patterns don't change
+		he_6ghz_rx_ant_pat=1
+		he_6ghz_tx_ant_pat=1
 	fi
 
 	# Enable 802.11ac?
@@ -683,6 +831,11 @@ case "${1}" in
 			boot_mesg "Failed to generate configuration"
 			echo_failure
 			exit 1
+		fi
+
+		# Force setting the regulatory domain
+		if [ -n "${CONFIG["COUNTRY"]}" ]; then
+			iw reg set "${CONFIG["COUNTRY"]}" &>/dev/null
 		fi
 
 		# Compose the command line
