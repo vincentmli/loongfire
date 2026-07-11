@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
 		exit(1);
 
 	if (argc < 2) {
-		fprintf(stderr, "\nNo argument given.\n\nddosctrl (start|stop|restart)\n\n");
+		fprintf(stderr, "\nNo argument given.\n\nxdpdnsctrl (start|stop|restart|reload|status)\n\n");
 		exit(1);
 	}
 
@@ -29,10 +29,12 @@ int main(int argc, char *argv[]) {
 		safe_system("/etc/rc.d/init.d/xdpdns stop");
 	} else if (strcmp(argv[1], "restart") == 0) {
 		safe_system("/etc/rc.d/init.d/xdpdns restart");
+	} else if (strcmp(argv[1], "reload") == 0) {
+		safe_system("/etc/rc.d/init.d/xdpdns reload");
 	} else if (strcmp(argv[1], "status") == 0) {
 		safe_system("/etc/rc.d/init.d/xdpdns status");
 	} else {
-		fprintf(stderr, "\nBad argument given.\n\nxdpdnsctrl (start|stop|restart|status)\n\n");
+		fprintf(stderr, "\nBad argument given.\n\nxdpdnsctrl (start|stop|restart|reload|status)\n\n");
 		exit(1);
 	}
 
