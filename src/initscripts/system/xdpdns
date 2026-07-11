@@ -3,7 +3,7 @@
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
 # Copyright (C) 2007-2022  IPFire Team  <info@ipfire.org>                     #
-# Copyright (C) 2024-2025  LoongFire <vincent.mc.li@gmail.com>                #
+# Copyright (C) 2024-2026  LoongFire <vincent.mc.li@gmail.com>                #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -26,22 +26,58 @@
 eval $(/usr/local/bin/readhash /var/ipfire/xdpdns/settings)
 
 domainfile="/var/ipfire/xdpdns/domainfile"
+allowlist_file="/var/ipfire/xdpdns/allowlist_file"  # NEW: Allowlist file
+map_pin_path="/sys/fs/bpf/xdp-dns-denylist"
 
 load_dnsblock () {
         /usr/sbin/xdp-loader status green0 | grep -w 'xdp_dns_denylist'
         if [ $? -ne 0 ]; then
-                xdp-loader load green0 -P 60 -p /sys/fs/bpf/xdp-dns-denylist -n xdp_dns_denylist /usr/lib/bpf/xdp_dns.bpf.o
+                xdp-loader load green0 -P 60 -p ${map_pin_path} -n xdp_dns_denylist /usr/lib/bpf/xdp_dns.bpf.o
                 if [ $? -ge 1 ]; then
                         boot_mesg "Native mode not supported, try SKB"
-                        xdp-loader load green0 -m skb -P 60 -p /sys/fs/bpf/xdp-dns-denylist -n xdp_dns_denylist /usr/lib/bpf/xdp_dns.bpf.o
+                        xdp-loader load green0 -m skb -P 60 -p ${map_pin_path} -n xdp_dns_denylist /usr/lib/bpf/xdp_dns.bpf.o
                 fi
-		# allow WUI nobody with permission to update map
-		chown -R nobody /sys/fs/bpf/xdp-dns-denylist
-		# add domain to domain_denylist map
-		while IFS= read -r line; do
-			xdp_dns /sys/fs/bpf/xdp-dns-denylist/domain_denylist add $line
-		done < $domainfile
-
+		
+		# Allow WUI nobody with permission to update maps
+		chown -R nobody ${map_pin_path}
+		
+		# Load denylist domains
+		boot_mesg "Loading denylist domains..."
+		if [ -f "$domainfile" ]; then
+			while IFS= read -r line; do
+				# Skip empty lines and comments
+				[ -z "$line" ] && continue
+				echo "$line" | grep -q "^#" && continue
+				
+				xdp_dns -m ${map_pin_path}/domain_denylist add "$line"
+				if [ $? -eq 0 ]; then
+					boot_mesg "Added $line to denylist"
+				else
+					boot_mesg "Failed to add $line to denylist"
+				fi
+			done < "$domainfile"
+		else
+			boot_mesg "No denylist file found at $domainfile"
+		fi
+		
+		# Load allowlist domains
+		boot_mesg "Loading allowlist domains..."
+		if [ -f "$allowlist_file" ]; then
+			while IFS= read -r line; do
+				# Skip empty lines and comments
+				[ -z "$line" ] && continue
+				echo "$line" | grep -q "^#" && continue
+				
+				xdp_dns -m ${map_pin_path}/domain_allowlist add "$line"
+				if [ $? -eq 0 ]; then
+					boot_mesg "Added $line to allowlist"
+				else
+					boot_mesg "Failed to add $line to allowlist"
+				fi
+			done < "$allowlist_file"
+		else
+			boot_mesg "No allowlist file found at $allowlist_file"
+		fi
         fi
 }
 
@@ -50,36 +86,99 @@ unload_dnsblock () {
         if [ $? -eq 0 ]; then
                 prog_id=$(xdp-loader status green0 | grep 'xdp_dns_denylist' | awk '{print $4}')
                 /usr/sbin/xdp-loader unload -i $prog_id green0
+                
+                # Clean up pinned maps if they exist
+                if [ -d "${map_pin_path}" ]; then
+                        boot_mesg "Removing pinned maps..."
+                        rm -rf ${map_pin_path}
+                fi
         else
                 boot_mesg "Error xdp_dns_denylist not loaded!"
+        fi
+}
+
+reload_dnsblock () {
+        boot_mesg "Reloading xdp-dns-denylist configuration..."
+        
+        # Check if program is loaded
+        /usr/sbin/xdp-loader status green0 | grep -w 'xdp_dns_denylist' > /dev/null
+        if [ $? -eq 0 ]; then
+                # Reload denylist
+                if [ -f "$domainfile" ]; then
+                        boot_mesg "Reloading denylist..."
+                        # Clear existing denylist entries
+                        # Note: We can't easily clear all entries without iterating
+                        # For now, we'll just add/update entries
+                        while IFS= read -r line; do
+                                [ -z "$line" ] && continue
+                                echo "$line" | grep -q "^#" && continue
+                                
+                                xdp_dns -m ${map_pin_path}/domain_denylist add "$line"
+                        done < "$domainfile"
+                fi
+                
+                # Reload allowlist
+                if [ -f "$allowlist_file" ]; then
+                        boot_mesg "Reloading allowlist..."
+                        while IFS= read -r line; do
+                                [ -z "$line" ] && continue
+                                echo "$line" | grep -q "^#" && continue
+                                
+                                xdp_dns -m ${map_pin_path}/domain_allowlist add "$line"
+                        done < "$allowlist_file"
+                fi
+                
+                boot_mesg "Reload completed"
+        else
+                boot_mesg "xdp_dns_denylist not loaded! Starting..."
+                load_dnsblock
         fi
 }
 
 is_xdpdns_attached () {
         /usr/sbin/xdp-loader status green0 | grep -w 'xdp_dns_denylist' >> /dev/null
         if [ $? -eq 0 ]; then
-		echo "xdp_dns_denylist is attached to green0"
+                echo "xdp_dns_denylist is attached to green0"
+                
+                # Show statistics
+                echo ""
+                echo "Domain lists:"
+                echo "  Denylist:"
+                xdp_dns -m ${map_pin_path}/domain_denylist list 2>/dev/null || echo "    (unable to read denylist)"
+                echo ""
+                echo "  Allowlist:"
+                xdp_dns -m ${map_pin_path}/domain_allowlist list 2>/dev/null || echo "    (unable to read allowlist)"
         else
-		echo "xdp_dns_denylist is not attached to green0"
+                echo "xdp_dns_denylist is not attached to green0"
         fi
 }
-
 
 case "$1" in
 	start)
 		boot_mesg -n "Starting xdp-dns-denylist..."
 		if [ "$ENABLE_DNSBLOCK" == "on" ]; then
 			load_dnsblock
-			loadproc -b xdp_dns_log /sys/fs/bpf/xdp-dns-denylist/dns_ringbuf
+			loadproc -b xdp_dns_log ${map_pin_path}/dns_ringbuf
+			boot_mesg "xdp-dns-denylist started successfully" ${SUCCESS}
+		else
+			boot_mesg "xdp-dns-denylist is disabled in settings" ${FAILURE}
 		fi
 		;;
 
 	stop)
 		boot_mesg "Stopping xdp-dns-denylist..."
-		if [ "$ENABLE_DNSBLOCK" == "off" ]; then
+		if [ "$ENABLE_DNSBLOCK" == "on" ]; then
 			unload_dnsblock
 			killproc xdp_dns_log
+			boot_mesg "xdp-dns-denylist stopped successfully" ${SUCCESS}
+		else
+			boot_mesg "xdp-dns-denylist is already disabled" ${FAILURE}
 		fi
+		;;
+
+	reload)
+		boot_mesg "Reloading xdp-dns-denylist configuration..."
+		reload_dnsblock
 		;;
 
 	status)
@@ -93,7 +192,7 @@ case "$1" in
 		;;
 
 	*)
-		echo "Usage: $0 {start|stop|restart}"
+		echo "Usage: $0 {start|stop|restart|reload|status}"
 		exit 1
 		;;
 esac
