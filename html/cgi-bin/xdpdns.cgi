@@ -42,9 +42,11 @@ my %mainsettings = ();
 my %settings=();
 my %checked=();
 my $errormessage='';
+my $successmessage='';
 my $setting = "${General::swroot}/main/settings";
 my $xdpdnssettingfile = "${General::swroot}/xdpdns/settings";
 my $xdpdnsdomainfile = "${General::swroot}/xdpdns/domainfile";
+my $xdpdnsallowlistfile = "${General::swroot}/xdpdns/allowlist_file";  # Allowlist file
 
 # Read configuration file.
 
@@ -58,20 +60,34 @@ $settings{'ACTION'} = '';
 
 $settings{'KEY1'} = '';                 # point record for ACTION
 $settings{'domainName'} = '';
-my @nosaved=('domainName', 'KEY1', 'SORT_domainNameLIST');
+$settings{'listType'} = 'denylist';     # Track which list we're editing
+my @nosaved=('domainName', 'KEY1', 'SORT_domainNameLIST', 'listType');
 
 #Define each field that can be used to sort columns
 my $sortstring='^domainName';
 $settings{'SORT_domainNameLIST'} = 'domainName';
 
-# Load multiline data
+# Load multiline data for denylist
 our @current = ();
 if (open(FILE, "$xdpdnsdomainfile")) {
     @current = <FILE>;
     close (FILE);
 }
 
+# Load multiline data for allowlist
+our @allowlist_current = ();
+if (open(FILE, "$xdpdnsallowlistfile")) {
+    @allowlist_current = <FILE>;
+    close (FILE);
+}
+
 &Header::getcgihash(\%settings);
+
+# FIX: Handle list type change before other actions
+if ($settings{'ACTION'} eq 'change_list') {
+    # Just keep the listType that was passed in
+    # Nothing else to do - the listType will be preserved
+}
 
 if ($settings{'ACTION'} eq $Lang::tr{'save'})
 {
@@ -82,17 +98,28 @@ if ($settings{'ACTION'} eq $Lang::tr{'save'})
 	if ($settings{'ENABLE_DNSBLOCK'} eq 'on') {
 		&General::system('/usr/bin/touch', "${General::swroot}/xdpdns/enablexdpdns");
 		&General::system('/usr/local/bin/xdpdnsctrl', 'start');
+		$successmessage = $Lang::tr{'xdpdns started'};
 	} else {
 		&General::system('/usr/local/bin/xdpdnsctrl', 'stop');
 		unlink "${General::swroot}/xdpdns/enablexdpdns";
+		$successmessage = $Lang::tr{'xdpdns stopped'};
 	}
 
 }
 
-if ($settings{'ACTION'} eq $Lang::tr{'add'}) {
+# Handle reload action
+if ($settings{'ACTION'} eq $Lang::tr{'reload'}) {
+    &General::system('/usr/local/bin/xdpdnsctrl', 'reload');
+    &General::log($Lang::tr{'xdpdns reloaded'});
+    $successmessage = $Lang::tr{'xdpdns reloaded'};
+}
 
-        #Check for already existing routing entry
-        foreach my $line (@current) {
+if ($settings{'ACTION'} eq $Lang::tr{'add'}) {
+        my $list_ref = ($settings{'listType'} eq 'allowlist') ? \@allowlist_current : \@current;
+        my $file = ($settings{'listType'} eq 'allowlist') ? $xdpdnsallowlistfile : $xdpdnsdomainfile;
+
+        #Check for already existing entry
+        foreach my $line (@$list_ref) {
                 chomp($line);                           # remove newline
                 #Same domain already used?
                 if($line eq $settings{'domainName'} && $settings{'KEY1'} eq ''){
@@ -103,12 +130,12 @@ if ($settings{'ACTION'} eq $Lang::tr{'add'}) {
 
     unless ($errormessage) {
         if ($settings{'KEY1'} eq '') { #add or edit ?
-            unshift (@current, "$settings{'domainName'}\n");
-            &General::log($Lang::tr{'xdpdns domain added'});
+            unshift (@$list_ref, "$settings{'domainName'}\n");
+            &General::log("$settings{'listType'}: $Lang::tr{'xdpdns domain added'}");
         } else {
-            @current[$settings{'KEY1'}] = "$settings{'domainName'}\n";
+            @$list_ref[$settings{'KEY1'}] = "$settings{'domainName'}\n";
             $settings{'KEY1'} = '';       # End edit mode
-            &General::log($Lang::tr{'xdpdns domain changed'});
+            &General::log("$settings{'listType'}: $Lang::tr{'xdpdns domain changed'}");
         }
 
         &CreateDomain(%settings);
@@ -116,23 +143,28 @@ if ($settings{'ACTION'} eq $Lang::tr{'add'}) {
         # Write changes to config file.
         &SortDataFile;                          # sort newly added/modified entry
 
+        $successmessage = "Domain '$settings{'domainName'}' added to $settings{'listType'}";
         #map ($settings{$_}='' ,@nosaved);      # Clear fields
     }
 }
 
 if ($settings{'ACTION'} eq $Lang::tr{'remove'}) {
+    my $list_ref = ($settings{'listType'} eq 'allowlist') ? \@allowlist_current : \@current;
+    my $file = ($settings{'listType'} eq 'allowlist') ? $xdpdnsallowlistfile : $xdpdnsdomainfile;
 
-    my $line = @current[$settings{'KEY1'}];     # KEY1 is the index in current
+    my $line = @$list_ref[$settings{'KEY1'}];     # KEY1 is the index in current
     chomp($line);
     $settings{'domainName'}=$line;
 
     &DeleteDomain(%settings);
 
-    splice (@current,$settings{'KEY1'},1);              # Delete line
-    open(FILE, ">$xdpdnsdomainfile") or die "$xdpdnsdomainfile open error";
-    print FILE @current;
+    splice (@$list_ref,$settings{'KEY1'},1);              # Delete line
+    open(FILE, ">$file") or die "$file open error";
+    print FILE @$list_ref;
     close(FILE);
     $settings{'KEY1'} = '';                             # End remove mode
+    
+    $successmessage = "Domain '$line' removed from $settings{'listType'}";
 }
 
 ##  Check if sorting is asked
@@ -159,6 +191,13 @@ if ($ENV{'QUERY_STRING'} =~ /$sortstring/ ) {
 if ($settings{'ACTION'} eq '' ) { # First launch from GUI
     # Place here default value when nothing is initialized
     $settings{'domainName'} = '';
+    $settings{'listType'} = 'denylist';
+}
+
+# FIX: Ensure listType is properly set after any action
+# If listType is not set or empty, default to denylist
+if (!$settings{'listType'} || $settings{'listType'} eq '') {
+    $settings{'listType'} = 'denylist';
 }
 
 &Header::openpage($Lang::tr{'xdpdns'}, 1, '');
@@ -168,6 +207,12 @@ if ($settings{'ACTION'} eq '' ) { # First launch from GUI
 if ($errormessage) {
 	&Header::openbox('100%', 'left', $Lang::tr{'error messages'});
 	print "<font class='base' color=red>$errormessage&nbsp;</font>\n";
+	&Header::closebox();
+}
+
+if ($successmessage) {
+	&Header::openbox('100%', 'left', $Lang::tr{'success messages'});
+	print "<font class='base' color=green>$successmessage&nbsp;</font>\n";
 	&Header::closebox();
 }
 
@@ -209,22 +254,56 @@ END
 print "</form> </table>\n";
 
 &Header::closebox();
-#
 
+# List type selector
+&Header::openbox('100%', 'left', $Lang::tr{'xdpdns list selection'});
+
+# FIX: Properly set the selected option based on listType
+my $denylist_selected = ($settings{'listType'} eq 'denylist') ? "selected='selected'" : "";
+my $allowlist_selected = ($settings{'listType'} eq 'allowlist') ? "selected='selected'" : "";
+
+print <<END;
+<table width='100%'>
+<tr>
+    <td class='base'><b>$Lang::tr{'xdpdns select list'}:</b></td>
+    <td>
+        <form method='post' action='$ENV{'SCRIPT_NAME'}'>
+        <input type='hidden' name='ACTION' value='change_list' />
+        <select name='listType' onchange='this.form.submit()'>
+            <option value='denylist' $denylist_selected>$Lang::tr{'xdpdns denylist'}</option>
+            <option value='allowlist' $allowlist_selected>$Lang::tr{'xdpdns allowlist'}</option>
+        </select>
+        </form>
+    </td>
+    <td align='right'>
+        <form method='post' action='$ENV{'SCRIPT_NAME'}'>
+        <input type='hidden' name='ACTION' value='$Lang::tr{'reload'}' />
+        <input type='hidden' name='listType' value='$settings{'listType'}' />
+        <input type='submit' value='$Lang::tr{'reload'}' />
+        </form>
+    </td>
+</tr>
+</table>
+END
+
+&Header::closebox();
+
+# Display domain list based on selected type
 my $buttontext = $Lang::tr{'add'};
 if ($settings{'KEY1'} ne '') {
     $buttontext = $Lang::tr{'update'};
-    &Header::openbox('100%', 'left', $Lang::tr{'xdpdns domain edit'});
+    &Header::openbox('100%', 'left', "$Lang::tr{'xdpdns domain edit'} - $settings{'listType'}");
 } else {
-    &Header::openbox('100%', 'left', $Lang::tr{'xdpdns domain add'});
+    &Header::openbox('100%', 'left', "$Lang::tr{'xdpdns domain add'} - $settings{'listType'}");
 }
 
-my @INTERFACES = ("red0", "green0");
+# Use the appropriate list reference for display
+my $display_list_ref = ($settings{'listType'} eq 'allowlist') ? \@allowlist_current : \@current;
 
-#Edited line number (KEY1) passed until cleared by 'save' or 'remove' or 'new sort order'
 print <<END;
 <form method='post' action='$ENV{'SCRIPT_NAME'}'>
 <input type='hidden' name='KEY1' value='$settings{'KEY1'}' />
+<input type='hidden' name='listType' value='$settings{'listType'}' />
 <table width='100%'>
 <tr>
     <td class='base'>$Lang::tr{'xdpdns domain name'}:&nbsp;</td>
@@ -243,7 +322,7 @@ END
 
 &Header::closebox();
 
-&Header::openbox('100%', 'left', $Lang::tr{'xdpdns domain entries'});
+&Header::openbox('100%', 'left', "$Lang::tr{'xdpdns domain entries'} - $settings{'listType'}");
 
 print <<END;
 
@@ -255,24 +334,16 @@ print <<END;
 END
 
 #
-# Print each line of @current list
+# Print each line of the selected list
 #
 
 my $key = 0;
 my $col="";
-foreach my $line (@current) {
+foreach my $line (@$display_list_ref) {
     chomp($line);                               # remove newline
 
-    #Choose icon for checkbox
-    my $gif = '';
-    my $gdesc = '';
-    if ($line ne '' ) {
-        $gif = 'on.gif';
-        $gdesc = $Lang::tr{'click to disable'};
-    } else {
-        $gif = 'off.gif';
-        $gdesc = $Lang::tr{'click to enable'};
-    }
+    #Skip empty lines
+    next if ($line eq '');
 
     #Colorize each line
     if ($settings{'KEY1'} eq $key) {
@@ -289,8 +360,9 @@ foreach my $line (@current) {
 <td align='center' $col>
 <form method='post' action='$ENV{'SCRIPT_NAME'}'>
 <input type='hidden' name='ACTION' value='$Lang::tr{'toggle enable disable'}' />
-<input type='image' name='$Lang::tr{'toggle enable disable'}' src='/images/$gif' alt='$gdesc' title='$gdesc' />
+<input type='image' name='$Lang::tr{'toggle enable disable'}' src='/images/delete.gif' alt='$Lang::tr{'remove'}' title='$Lang::tr{'remove'}' />
 <input type='hidden' name='KEY1' value='$key' />
+<input type='hidden' name='listType' value='$settings{'listType'}' />
 </form>
 </td>
 
@@ -299,6 +371,7 @@ foreach my $line (@current) {
 <input type='hidden' name='ACTION' value='$Lang::tr{'remove'}' />
 <input type='image' name='$Lang::tr{'remove'}' src='/images/delete.gif' alt='$Lang::tr{'remove'}' title='$Lang::tr{'remove'}' />
 <input type='hidden' name='KEY1' value='$key' />
+<input type='hidden' name='listType' value='$settings{'listType'}' />
 </form>
 </td>
 </tr>
@@ -314,12 +387,6 @@ print <<END;
 <table>
 <tr>
     <td class='boldbase'>&nbsp;<b>$Lang::tr{'legend'}:&nbsp;</b></td>
-    <td><img src='/images/on.gif' alt='$Lang::tr{'click to disable'}' /></td>
-    <td class='base'>$Lang::tr{'click to disable'}</td>
-    <td>&nbsp;&nbsp;</td>
-    <td><img src='/images/off.gif' alt='$Lang::tr{'click to enable'}' /></td>
-    <td class='base'>$Lang::tr{'click to enable'}</td>
-    <td>&nbsp;&nbsp;</td>
     <td><img src='/images/delete.gif' alt='$Lang::tr{'remove'}' /></td>
     <td class='base'>$Lang::tr{'remove'}</td>
 </tr>
@@ -374,9 +441,13 @@ sub SortDataFile
         }
     }
 
+    # Determine which file to sort based on listType
+    my $file = ($settings{'listType'} eq 'allowlist') ? $xdpdnsallowlistfile : $xdpdnsdomainfile;
+    my $list_ref = ($settings{'listType'} eq 'allowlist') ? \@allowlist_current : \@current;
+
     #Use an associative array (%entries)
     my $key = 0;
-    foreach my $line (@current) {
+    foreach my $line (@$list_ref) {
         chomp( $line); #remove newline because can be on field 5 or 6 (addition of REMARK)
 
         # Build a pair 'Field Name',value for each of the data dataline.
@@ -389,7 +460,7 @@ sub SortDataFile
         $entries{$record->{KEY}} = $record;             # add this to a hash of hashes
     }
 
-    open(FILE, ">$xdpdnsdomainfile") or die "$xdpdnsdomainfile open error";
+    open(FILE, ">$file") or die "$file open error";
 
     # Each field value is printed , with the newline ! Don't forget separator and order of them.
     foreach my $entry (sort fixedleasesort keys %entries) {
@@ -397,28 +468,31 @@ sub SortDataFile
     }
 
     close(FILE);
-    # Reload sorted  @current
-    open (FILE, "$xdpdnsdomainfile");
-    @current = <FILE>;
+    # Reload sorted list
+    open (FILE, "$file");
+    @$list_ref = <FILE>;
     close (FILE);
 }
 
 sub manageDomain {
     my ($action, %settings) = @_;
-    my $map_path = "/sys/fs/bpf/xdp-dns-denylist/domain_denylist";
+    my $map_path;
+
+    # Determine which map to use based on listType
+    if ($settings{'listType'} eq 'allowlist') {
+        $map_path = "/sys/fs/bpf/xdp-dns-denylist/domain_allowlist";
+    } else {
+        $map_path = "/sys/fs/bpf/xdp-dns-denylist/domain_denylist";
+    }
 
     # Initialize variables
-    my @xdpdns_options;
     my $command = 'xdp_dns';
-
     my $domain = $settings{'domainName'};
 
-    push(@xdpdns_options, $map_path, $action, $domain);
-
     #debug and display output in UI
-    #my @output  = &General::system_output($command, @xdpdns_options);
+    #my @output  = &General::system_output($command, '-m', $map_path, $action, $domain);
     #$errormessage = join('', @output);
-    &General::system($command, @xdpdns_options);
+    &General::system($command, '-m', $map_path, $action, $domain);
 
 }
 
