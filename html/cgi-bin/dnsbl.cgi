@@ -44,6 +44,10 @@ my $dnsbl;
 my @custom_allowed_domains = ();
 my @custom_blocked_domains = ();
 
+# Arrays for informational and error messages
+my @infomessages = ();
+my @errormessages = ();
+
 # File which contains the available filtering categories.
 my $dnsbl_json_file = "${General::swroot}/dns/dnsbl.json";
 
@@ -83,8 +87,6 @@ if ($json_file) {
 	$dnsbl = decode_json($json_file);
 }
 
-my @errormessages = ();
-
 &Header::showhttpheaders();
 
 #Get GUI values
@@ -92,19 +94,41 @@ my @errormessages = ();
 
 # Handle XDP setting save
 if ($cgiparams{'ACTION'} eq "save_xdp") {
-	# Update XDP setting - fix: handle unchecked checkbox properly
+	my $xdp_was_enabled = (exists($global_settings{'ENABLE_XDP'}) && $global_settings{'ENABLE_XDP'} eq "on");
+	my $xdp_enabled = 0;
+	
+	# Update XDP setting
 	if (defined($cgiparams{'ENABLE_XDP'}) && $cgiparams{'ENABLE_XDP'} eq "on") {
+		$xdp_enabled = 1;
 		$global_settings{'ENABLE_XDP'} = "on";
 	} else {
-		# Checkbox is unchecked or not present - set to off
 		$global_settings{'ENABLE_XDP'} = "off";
 	}
 	
-	# Write global settings preserving all existing settings
+	# Write global settings
 	&write_global_settings();
 	
-	# Restart DNS service to apply XDP settings
-	&General::system("/usr/local/bin/dnsfwctrl", "restart");
+	# Control services based on XDP state
+	if ($xdp_enabled && !$xdp_was_enabled) {
+		# XDP was just enabled
+		# 1. Stop knot-resolver DNS filtering
+		&General::system("/usr/local/bin/dnsctrl", "stop");
+		
+		# 2. Start dnsfwctrl with XDP
+		&General::system("/usr/local/bin/dnsfwctrl", "start");
+		
+		push(@infomessages, $Lang::tr{'dnsbl xdp enabled'});
+		
+	} elsif (!$xdp_enabled && $xdp_was_enabled) {
+		# XDP was just disabled
+		# 1. Stop dnsfwctrl
+		&General::system("/usr/local/bin/dnsfwctrl", "stop");
+		
+		# 2. Start knot-resolver DNS filtering
+		&General::system("/usr/local/bin/dnsctrl", "start");
+		
+		push(@infomessages, $Lang::tr{'dnsbl xdp disabled'});
+	}
 }
 
 # Save settings on main page.
@@ -131,12 +155,17 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
 	# Write config hash.
 	&writesettings("$settings_file", \%tmphash);
 
-	if ($global_settings{'ENABLE_XDP'} eq "on") {
-		&General::system("/usr/local/bin/dnsfwctrl", "sync");
-	}
-
-	# Sync RPZs
+	# Sync RPZs - this will update the list files
 	&General::system_background("/usr/local/bin/dnsctrl", "sync-rpzs");
+	
+	# Update the running service based on XDP state
+	if (exists($global_settings{'ENABLE_XDP'}) && $global_settings{'ENABLE_XDP'} eq "on") {
+		# XDP is enabled - sync the BPF maps
+		&General::system("/usr/local/bin/dnsfwctrl", "sync");
+	} else {
+		# XDP is disabled - reload dnsctrl
+		&General::system_background("/usr/local/bin/dnsctrl", "reload");
+	}
 
 # Save changed zone ACL
 } elsif ($cgiparams{'ACTION'} eq "$Lang::tr{'update'}") {
@@ -192,12 +221,13 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
 		# Write the new ACL settings to settings file.
 		&writesettings("$settings_file", \%tmphash);
 
-		if ($global_settings{'ENABLE_XDP'} eq "on") {
+		if (exists($global_settings{'ENABLE_XDP'}) && $global_settings{'ENABLE_XDP'} eq "on") {
+			# XDP is enabled - sync the BPF maps
 			&General::system("/usr/local/bin/dnsfwctrl", "sync");
+		} else {
+			# XDP is disabled - reload dnsctrl
+			&General::system_background("/usr/local/bin/dnsctrl", "reload");
 		}
-
-	        # Reload DNS
-		&General::system_background("/usr/local/bin/dnsctrl", "reload");
 	}
 
 # Save changed custom domains to allow or block
@@ -281,12 +311,13 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
 		# Save the domains
 		&writesettings("$custom_domains_file", \%tmp);
 
-		if ($global_settings{'ENABLE_XDP'} eq "on") {
+		if (exists($global_settings{'ENABLE_XDP'}) && $global_settings{'ENABLE_XDP'} eq "on") {
+			# XDP is enabled - sync custom domains to BPF maps
 			&General::system("/usr/local/bin/dnsfwctrl", "custom-sync");
+		} else {
+			# XDP is disabled - reload dnsctrl
+			&General::system_background("/usr/local/bin/dnsctrl", "reload");
 		}
-
-		# Reload DNS
-		&General::system_background("/usr/local/bin/dnsctrl", "reload");
 	}
 }
 
@@ -294,7 +325,16 @@ if ($cgiparams{'ACTION'} eq "$Lang::tr{'save'}") {
 
 &Header::openbigbox('100%', 'left');
 
-# Display any error messages
+# Display info messages (green box)
+if (@infomessages) {
+	print "<div style='padding: 10px; margin: 10px 0; background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 4px; color: #155724;'>";
+	foreach my $msg (@infomessages) {
+		print "<div><strong>✓</strong> $msg</div>";
+	}
+	print "</div>";
+}
+
+# Display error messages (red box)
 &Header::errorbox(@errormessages);
 
 # Decide which page should be displayed.
@@ -338,11 +378,10 @@ sub write_global_settings() {
 	%global_settings = ();
 	&read_global_settings() if (-f "$global_settings_file");
 	
-	# Update XDP setting based on checkbox presence - FIXED
+	# Update XDP setting based on checkbox presence
 	if (defined($cgiparams{'ENABLE_XDP'}) && $cgiparams{'ENABLE_XDP'} eq "on") {
 		$global_settings{'ENABLE_XDP'} = "on";
 	} else {
-		# Checkbox is unchecked or not present - set to off
 		$global_settings{'ENABLE_XDP'} = "off";
 	}
 	
@@ -388,7 +427,9 @@ sub show_mainpage() {
 	# XDP Settings Box
 	&Header::openbox('100%', 'center', "XDP Acceleration Settings");
 	
-print <<END;
+	my $xdp_active = (exists($global_settings{'ENABLE_XDP'}) && $global_settings{'ENABLE_XDP'} eq "on");
+	
+	print <<END;
 	<form method='post' action='$ENV{'SCRIPT_NAME'}'>
 		<table width='100%' border='0' class='tbl'>
 			<tr>
@@ -398,6 +439,16 @@ print <<END;
 				<td width='95%'>
 					<strong>$Lang::tr{'dnsbl xdp enable'}</strong><br>
 					<small>$Lang::tr{'dnsbl xdp description'}</small>
+END
+
+	if ($xdp_active) {
+		print "<br><span style='color: green;'><strong>✓ $Lang::tr{'dnsbl xdp active'}</strong></span>\n";
+		print "<br><span style='color: #666;'><small>$Lang::tr{'dnsbl xdp dnsctrl stopped'}</small></span>\n";
+	} else {
+		print "<br><span style='color: #666;'><strong>$Lang::tr{'dnsbl xdp inactive'}</strong></span>\n";
+	}
+
+print <<END;
 				</td>
 			</tr>
 			<tr>
@@ -501,6 +552,14 @@ print <<END;
 END
 
 	&Header::closebox();
+	
+	# Show status information
+	if ($xdp_active) {
+		print "<div style='padding: 10px; margin-top: 10px; background-color: #f0f8ff; border-left: 4px solid #4CAF50;'>";
+		print "<strong>ℹ $Lang::tr{'dnsbl xdp info'}</strong><br>";
+		print "<span style='font-size: 0.9em;'>$Lang::tr{'dnsbl xdp info text'}</span>";
+		print "</div>";
+	}
 }
 
 #
