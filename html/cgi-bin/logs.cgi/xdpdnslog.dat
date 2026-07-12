@@ -176,7 +176,9 @@ while ($gzindex >=0 && $loop) {
 		#&General::log("reading $filestr");
 		READ:while (<FILE>) {
 			my $line = $_;
-			if ($line =~ /^${monthstr} ${daystr} ..:..:.. [\w\-]+ qname_logger\[\d+\]:.*$/) {
+			# UPDATED: Match both old and new log formats
+			if ($line =~ /^${monthstr} ${daystr} ..:..:.. [\w\-]+ xdp_dns_log\[\d+\]: DNS: (.*) \| Source: (.*) \| Status: (.*)$/ ||
+			    $line =~ /^${monthstr} ${daystr} ..:..:.. [\w\-]+ qname_logger\[\d+\]: Received qname: (.*) from source IP: (.*)$/) {
 				# when standart viewing, just keep in memory the correct slice
 				# it starts a '$start' and size is $viewport
 				# If export, then keep all lines...
@@ -220,13 +222,25 @@ if ($cgiparams{'ACTION'} eq $Lang::tr{'export'})
 
 	foreach $_ (@log)
 	{
-		/^... (..) (..:..:..) [\w\-]+ qname_logger\[\d+\]: Received qname: (.*) from source IP: (.*)$/;
-		my $day =  $1;
-		$day =~ tr / /0/;
-		my $time = $cgiparams{'DAY'} ? "$2" : "$day/$2" ;
-		my $domain = $3;
-		print "$time $domain $4\r\n";
-
+		# Try new format first
+		if (/^... (..) (..:..:..) [\w\-]+ xdp_dns_log\[\d+\]: DNS: (.*) \| Source: (.*) \| Status: (.*)$/) {
+			my $day =  $1;
+			$day =~ tr / /0/;
+			my $time = $cgiparams{'DAY'} ? "$2" : "$day/$2" ;
+			my $domain = $3;
+			my $srcaddr = $4;
+			my $status = $5;
+			print "$time $domain $srcaddr $status\r\n";
+		}
+		# Fall back to old format
+		elsif (/^... (..) (..:..:..) [\w\-]+ qname_logger\[\d+\]: Received qname: (.*) from source IP: (.*)$/) {
+			my $day =  $1;
+			$day =~ tr / /0/;
+			my $time = $cgiparams{'DAY'} ? "$2" : "$day/$2" ;
+			my $domain = $3;
+			my $srcaddr = $4;
+			print "$time $domain $srcaddr\r\n";
+		}
 	}
 	exit 0;
 }
@@ -326,6 +340,7 @@ print <<END
 	<th align='center' class='boldbase'><b>$Lang::tr{'time'}</b></th>
 	<th align='center' class='boldbase'><b>$Lang::tr{'domain name'}</b></th>
 	<th align='center' class='boldbase'><b>$Lang::tr{'source'}</b></th>
+	<th align='center' class='boldbase'><b>$Lang::tr{'status'}</b></th>
 </tr>
 END
 ;
@@ -334,14 +349,25 @@ END
 $lines = 0;
 foreach $_ (@log)
 {
-	my ($day, $time, $domain, $srcaddr);
-	if ($_ =~ /^... (..) (..:..:..) [\w\-]+ qname_logger\[\d+\]: Received qname: (.*) from source IP: (.*)$/) {
+	my ($day, $time, $domain, $srcaddr, $status);
+	
+	# Try new format first
+	if ($_ =~ /^... (..) (..:..:..) [\w\-]+ xdp_dns_log\[\d+\]: DNS: (.*) \| Source: (.*) \| Status: (.*)$/) {
 		$day =  $1;
 		$day =~ tr / /0/;
 		$time = $cgiparams{'DAY'} ? "$2" : "$day/$2" ;
 		$domain = $3;
 		$srcaddr = $4;
-
+		$status = $5;
+	}
+	# Fall back to old format
+	elsif ($_ =~ /^... (..) (..:..:..) [\w\-]+ qname_logger\[\d+\]: Received qname: (.*) from source IP: (.*)$/) {
+		$day =  $1;
+		$day =~ tr / /0/;
+		$time = $cgiparams{'DAY'} ? "$2" : "$day/$2" ;
+		$domain = $3;
+		$srcaddr = $4;
+		$status = "UNKNOWN";
 	}
 
 	my $col="";
@@ -353,11 +379,22 @@ foreach $_ (@log)
 		print "<tr>";
 		$col="bgcolor='$color{'color22'}'";
 	}
+	
+	# Color the status column based on the status
+	my $status_color = "black";
+	if ($status eq "ALLOWED (bypass chain)") {
+		$status_color = "green";
+	} elsif ($status eq "BLOCKED") {
+		$status_color = "red";
+	} elsif ($status eq "PASS (continuing chain)") {
+		$status_color = "blue";
+	}
+	
 	print <<END
-
 	<td align='center' $col>$time</td>
 	<td align='center' $col>$domain</td>
 	<td align='center' $col>$srcaddr</td>
+	<td align='center' $col><font color='$status_color'>$status</font></td>
 END
 	;
 	print <<END
@@ -411,4 +448,3 @@ END
 END
 	;
 }
-
