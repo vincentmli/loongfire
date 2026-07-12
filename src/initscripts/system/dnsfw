@@ -35,10 +35,10 @@ BPF_CUSTOM_MAP_PATH="/sys/fs/bpf/dns-fw/dns_fw_custom_map"
 load_dnsfw () {
         /usr/sbin/xdp-loader status green0 | grep -w 'dns_fw'
         if [ $? -ne 0 ]; then
-                xdp-loader load green0 -P 55 -p /sys/fs/bpf/dns-fw -n dns_fw /usr/lib/bpf/dns_fw.bpf.o
+                xdp-loader load green0 -P 65 -p /sys/fs/bpf/dns-fw -n dns_fw /usr/lib/bpf/dns_fw.bpf.o
                 if [ $? -ge 1 ]; then
                         boot_mesg "Native mode not supported, try SKB"
-                        xdp-loader load green0 -m skb -P 55 -p /sys/fs/bpf/dns-fw -n dns_fw /usr/lib/bpf/dns_fw.bpf.o
+                        xdp-loader load green0 -m skb -P 65 -p /sys/fs/bpf/dns-fw -n dns_fw /usr/lib/bpf/dns_fw.bpf.o
                 fi
                 # allow WUI nobody with permission to update map
                 chown -R nobody /sys/fs/bpf/dns-fw
