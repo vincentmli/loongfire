@@ -108,11 +108,21 @@ if ($cgiparams{'ACTION'} eq "save_xdp") {
 	# Write global settings
 	&write_global_settings();
 	
+	# START XDP CHANGE: Toggle ENABLE_RPZ in dns/settings
+	if ($xdp_enabled) {
+		# XDP enabled → disable RPZ in knot-resolver
+		&set_rpz_state("off");
+	} else {
+		# XDP disabled → enable RPZ in knot-resolver
+		&set_rpz_state("on");
+	}
+	# END XDP CHANGE
+	
 	# Control services based on XDP state
 	if ($xdp_enabled && !$xdp_was_enabled) {
 		# XDP was just enabled
-		# 1. Stop knot-resolver DNS filtering
-		&General::system("/usr/local/bin/dnsctrl", "stop");
+		# 1. Reload knot-resolver to apply ENABLE_RPZ=off
+		&General::system("/usr/local/bin/dnsctrl", "reload");
 		
 		# 2. Start dnsfwctrl with XDP
 		&General::system("/usr/local/bin/dnsfwctrl", "start");
@@ -124,8 +134,8 @@ if ($cgiparams{'ACTION'} eq "save_xdp") {
 		# 1. Stop dnsfwctrl
 		&General::system("/usr/local/bin/dnsfwctrl", "stop");
 		
-		# 2. Start knot-resolver DNS filtering
-		&General::system("/usr/local/bin/dnsctrl", "start");
+		# 2. Reload knot-resolver to apply ENABLE_RPZ=on
+		&General::system("/usr/local/bin/dnsctrl", "reload");
 		
 		push(@infomessages, $Lang::tr{'dnsbl xdp disabled'});
 	}
@@ -396,6 +406,21 @@ sub write_global_settings() {
 }
 
 #
+## START XDP CHANGE: Helper function to set ENABLE_RPZ in dns/settings
+#
+sub set_rpz_state() {
+	my $state = shift;  # "on" or "off"
+	
+	my %settings = ();
+	&General::readhash("$global_settings_file", \%settings);
+	$settings{'ENABLE_RPZ'} = $state;
+	&General::writehash("$global_settings_file", \%settings);
+}
+#
+## END XDP CHANGE
+#
+
+#
 ## Function to display the main page.
 #
 sub show_mainpage() {
@@ -443,7 +468,7 @@ END
 
 	if ($xdp_active) {
 		print "<br><span style='color: green;'><strong>✓ $Lang::tr{'dnsbl xdp active'}</strong></span>\n";
-		print "<br><span style='color: #666;'><small>$Lang::tr{'dnsbl xdp dnsctrl stopped'}</small></span>\n";
+		print "<br><span style='color: #666;'><small>$Lang::tr{'dnsbl xdp rpzs disabled'}</small></span>\n";
 	} else {
 		print "<br><span style='color: #666;'><strong>$Lang::tr{'dnsbl xdp inactive'}</strong></span>\n";
 	}
