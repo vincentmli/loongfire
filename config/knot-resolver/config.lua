@@ -470,7 +470,18 @@ local function add_tag(views, subnet, tag)
 	end
 end
 
+-- ============================================================
+-- MODIFIED: load_rpzs() with ENABLE_RPZ check
+-- ============================================================
 function config.load_rpzs()
+	-- Check if RPZ is enabled in settings
+	local settings = config.load_settings("/var/ipfire/dns/settings")
+	if settings["ENABLE_RPZ"] == "off" then
+		-- Use log_debug with proper group constant
+		log_debug(ffi.C.LOG_GRP_HINT, "RPZ filtering disabled (XDP mode)")
+		return  -- Skip loading RPZs
+	end
+
 	local zones
 
 	-- Open the configuration
@@ -556,6 +567,7 @@ function config.load_rpzs()
 			0, policy.COMBINE({ policy.TAGS_ASSIGN(tags) })) == 0)
 	end
 end
+-- ============================================================
 
 local __policy_pass = {}
 local __policy_deny = {}
