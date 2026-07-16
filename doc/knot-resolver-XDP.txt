@@ -1,0 +1,230 @@
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                         DNS PACKET FLOW - LoongFire                                 │
+│                     with XDP_DNS_DENYLIST + XDP Acceleration                        │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════════════
+  MODE 1: XDP ACCELERATION DISABLED (xdp_dns_denylist runs, dns_fw disabled)
+═══════════════════════════════════════════════════════════════════════════════════════
+
+    ┌──────────┐     ┌─────────────────────────────────────────────────────────────────┐
+    │  Client  │     │                    XDP Layer (Kernel)                           │
+    │  (LAN)   │────▶│  ┌───────────────────────────────────────────────────────────┐ │
+    └──────────┘     │  │         xdp_dns_denylist (Pri 60) - ALWAYS RUNS          │ │
+                     │  │  ┌─────────────────────────────────────────────────────┐  │ │
+                     │  │  │  Check DNS query against denylist/allowlist maps   │  │ │
+                     │  │  │  ✅ Wildcard domain support (e.g., *.example.com)  │  │ │
+                     │  │  │  ✅ Full qualified domain name support             │  │ │
+                     │  │  └─────────────────────────────────────────────────────┘  │ │
+                     │  │              │                                            │ │
+                     │  │              ▼                                            │ │
+                     │  │  ┌─────────────────────────────────────────────────────┐  │ │
+                     │  │  │         Blocked?                                   │  │ │
+                     │  │  └─────────────────────────────────────────────────────┘  │ │
+                     │  │         │              │                                  │ │
+                     │  │         ▼              ▼                                  │ │
+                     │  │    ┌─────────┐   ┌─────────────────────────────────────┐ │ │
+                     │  │    │  DROP   │   │  XDP_REDIRECT to socket            │ │ │
+                     │  │    │ (Block) │   │  (BYPASSES all other XDP programs) │ │ │
+                     │  │    └─────────┘   └─────────────────────────────────────┘ │ │
+                     │  └───────────────────────────────────────────────────────────┘ │
+                     │                    │                                            │
+                     │                    ▼                                            │
+                     │  ┌───────────────────────────────────────────────────────────┐ │
+                     │  │         dns_fw (Pri 65) - DISABLED                       │ │
+                     │  │         (Not loaded when XDP=off)                        │ │
+                     │  └───────────────────────────────────────────────────────────┘ │
+                     │                    │                                            │
+                     │                    ▼                                            │
+                     │  ┌───────────────────────────────────────────────────────────┐ │
+                     │  │         xdp_tls_sni (Pri 70) - Unrelated                 │ │
+                     │  │         (Packet already redirected, so skipped)          │ │
+                     │  └───────────────────────────────────────────────────────────┘ │
+                     └─────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+                     ┌─────────────────────────────────────────────────────────────────┐
+                     │                    knot-resolver                                │
+                     │  ┌───────────────────────────────────────────────────────────┐ │
+                     │  │              Full Policy Processing                       │ │
+                     │  ├───────────────────────────────────────────────────────────┤ │
+                     │  │ 1. RPZ/DNSBL Blocklists  (ENABLE_RPZ=on)                │ │
+                     │  │ 2. SafeSearch Enforcement                                │ │
+                     │  │ 3. Custom Allow/Block Lists                              │ │
+                     │  │ 4. Hosts (/etc/hosts)                                    │ │
+                     │  │ 5. DHCP Leases                                           │ │
+                     │  │ 6. Forwarders                                            │ │
+                     │  │ 7. Cache Lookup                                          │ │
+                     │  └───────────────────────────────────────────────────────────┘ │
+                     └─────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+                     ┌─────────────────────────────────────────────────────────────────┐
+                     │                    Response to Client                           │
+                     └─────────────────────────────────────────────────────────────────┘
+
+    KEY FEATURES:
+    ✓ xdp_dns_denylist provides fast denylist/allowlist filtering
+    ✓ ✅ Wildcard domain support (e.g., *.example.com)
+    ✓ ✅ Full qualified domain name support
+    ✓ dns_fw is NOT loaded (XDP acceleration disabled)
+    ✓ knot-resolver handles ALL filtering (RPZs, SafeSearch, etc.)
+
+
+═══════════════════════════════════════════════════════════════════════════════════════
+  MODE 2: XDP ACCELERATION ENABLED (xdp_dns_denylist UNLOADED, dns_fw runs)
+═══════════════════════════════════════════════════════════════════════════════════════
+
+    ┌──────────┐     ┌─────────────────────────────────────────────────────────────────┐
+    │  Client  │     │                    XDP Layer (Kernel)                           │
+    │  (LAN)   │────▶│  ┌───────────────────────────────────────────────────────────┐ │
+    └──────────┘     │  │         xdp_dns_denylist (Pri 60) - UNLOADED              │ │
+    └──────────────────│         (Detached/stopped/disabled)                         │ │
+                     │  └───────────────────────────────────────────────────────────┘ │
+                     │                    │                                            │
+                     │                    ▼                                            │
+                     │  ┌───────────────────────────────────────────────────────────┐ │
+                     │  │         dns_fw (Pri 65) - ENABLED                         │ │
+                     │  │  ┌─────────────────────────────────────────────────────┐  │ │
+                     │  │  │  XDP DNS Filtering Acceleration                    │  │ │
+                     │  │  │  ⚠️ Full qualified domain name ONLY               │  │ │
+                     │  │  │  ❌ NO wildcard support (e.g., *.example.com)     │  │ │
+                     │  │  │  ✅ Exact domain matching only                     │  │ │
+                     │  │  └─────────────────────────────────────────────────────┘  │ │
+                     │  │              │                                            │ │
+                     │  │              ▼                                            │ │
+                     │  │  ┌─────────────────────────────────────────────────────┐  │ │
+                     │  │  │         Blocked?                                   │  │ │
+                     │  │  └─────────────────────────────────────────────────────┘  │ │
+                     │  │         │              │                                  │ │
+                     │  │         ▼              ▼                                  │ │
+                     │  │    ┌─────────┐   ┌─────────────────────────────────────┐ │ │
+                     │  │    │  DROP   │   │  XDP_PASS to socket                 │ │ │
+                     │  │    │ (Block) │   │  (forward to knot-resolver)         │ │ │
+                     │  │    └─────────┘   └─────────────────────────────────────┘ │ │
+                     │  └───────────────────────────────────────────────────────────┘ │
+                     │                    │                                            │
+                     │                    ▼                                            │
+                     │  ┌───────────────────────────────────────────────────────────┐ │
+                     │  │         xdp_tls_sni (Pri 70) - Unrelated                 │ │
+                     │  └───────────────────────────────────────────────────────────┘ │
+                     └─────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+                     ┌─────────────────────────────────────────────────────────────────┐
+                     │                    knot-resolver                                │
+                     │  ┌───────────────────────────────────────────────────────────┐ │
+                     │  │              Minimal Processing                           │ │
+                     │  ├───────────────────────────────────────────────────────────┤ │
+                     │  │ ✓ Hosts (/etc/hosts)                                    │ │
+                     │  │ ✓ DHCP Leases                                           │ │
+                     │  │ ✓ Forwarders                                            │ │
+                     │  │ ✓ Cache Lookup                                          │ │
+                     │  │ ✗ RPZ/DNSBL (ENABLE_RPZ=off - disabled)                 │ │
+                     │  │ ✗ SafeSearch (still works if enabled)                   │ │
+                     │  └───────────────────────────────────────────────────────────┘ │
+                     └─────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+                     ┌─────────────────────────────────────────────────────────────────┐
+                     │                    Response to Client                           │
+                     └─────────────────────────────────────────────────────────────────┘
+
+    KEY FEATURES:
+    ✓ xdp_dns_denylist is UNLOADED (doesn't run at all)
+    ✓ dns_fw handles DNSBL acceleration (XDP ON)
+    ⚠️ Full qualified domain name ONLY (no wildcard support)
+    ❌ Wildcard domains (e.g., *.example.com) NOT supported
+    ✓ knot-resolver handles only essential resolution
+    ✓ Very fast DNSBL filtering in kernel
+
+
+═══════════════════════════════════════════════════════════════════════════════════════
+                          COMPARISON TABLE
+═══════════════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────┬──────────────────────┬────────────────────────────────┐
+│          Feature            │   XDP DISABLED       │     XDP ENABLED                │
+├─────────────────────────────┼──────────────────────┼────────────────────────────────┤
+│ xdp_dns_denylist            │ ✅ RUNNING          │ ❌ UNLOADED                    │
+│ (Denylist/Allowlist)        │ (REDIRECT bypass)   │ (Not loaded)                   │
+├─────────────────────────────┼──────────────────────┼────────────────────────────────┤
+│ dns_fw (XDP Acceleration)   │ ❌ DISABLED         │ ✅ RUNNING                     │
+│                             │ (Not loaded)        │ (Processes all DNS packets)    │
+├─────────────────────────────┼──────────────────────┼────────────────────────────────┤
+│ Wildcard Domain Support     │ ✅ YES              │ ❌ NO                           │
+│ (e.g., *.example.com)       │ (xdp_dns_denylist) │ (dns_fw only exact matches)    │
+├─────────────────────────────┼──────────────────────┼────────────────────────────────┤
+│ Full Qualified Domain Name  │ ✅ YES              │ ✅ YES                         │
+├─────────────────────────────┼──────────────────────┼────────────────────────────────┤
+│ DNSBL Filtering Location    │ knot-resolver       │ XDP (dns_fw)                   │
+├─────────────────────────────┼──────────────────────┼────────────────────────────────┤
+│ SafeSearch                  │ knot-resolver       │ knot-resolver                  │
+├─────────────────────────────┼──────────────────────┼────────────────────────────────┤
+│ Custom Allow/Block          │ knot-resolver       │ knot-resolver                  │
+├─────────────────────────────┼──────────────────────┼────────────────────────────────┤
+│ DNSSEC Support              │ ✅ Full             │ ⚠️ Limited (not in XDP path)    │
+├─────────────────────────────┼──────────────────────┼────────────────────────────────┤
+│ IPv6 Support                │ ✅ Full             │ ⚠️ Limited (not in XDP path)    │
+├─────────────────────────────┼──────────────────────┼────────────────────────────────┤
+│ ENABLE_RPZ setting          │ "on"                │ "off"                          │
+├─────────────────────────────┼──────────────────────┼────────────────────────────────┤
+│ XDP Program Priority        │ Pri 60 only         │ Pri 65 only                    │
+├─────────────────────────────┼──────────────────────┼────────────────────────────────┤
+│ Performance                 │ Good                │ ⚡ Excellent (kernel bypass)    │
+├─────────────────────────────┼──────────────────────┼────────────────────────────────┤
+│ Mode Toggle                 │ N/A                 │ Zero Downtime ✅                │
+└─────────────────────────────┴──────────────────────┴────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════════════
+                    WHY BOTH XDP PROGRAMS ARE MUTUALLY EXCLUSIVE
+═══════════════════════════════════════════════════════════════════════════════════════
+
+    ┌─────────────────────────────────────────────────────────────────────────────────┐
+    │  Reason 1: XDP_REDIRECT bypass                                                 │
+    │  ───────────────────────────────────────────────────────────────────────────── │
+    │  xdp_dns_denylist uses XDP_REDIRECT which sends packets directly to the       │
+    │  socket, bypassing ALL subsequent XDP programs on the same interface.         │
+    │                                                                                 │
+    │  Result: When xdp_dns_denylist runs, dns_fw receives ZERO packets.             │
+    └─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────────────────────────────────────────────────────────────────────┐
+    │  Reason 2: Wildcard vs. Exact Match                                            │
+    │  ───────────────────────────────────────────────────────────────────────────── │
+    │  xdp_dns_denylist: ✅ Supports wildcard domains (e.g., *.example.com)          │
+    │  dns_fw:           ❌ Only supports full qualified domain names (exact match)  │
+    │                                                                                 │
+    │  Result: xdp_dns_denylist is MORE CAPABLE, so we use it when XDP=off.          │
+    │          dns_fw is used when we want XDP acceleration (but lose wildcards).    │
+    └─────────────────────────────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════════════
+                    WHY KEEP XDP ACCELERATION IF WILDCARDS ARE LOST?
+═══════════════════════════════════════════════════════════════════════════════════════
+
+    ┌─────────────────────────────────────────────────────────────────────────────────┐
+    │  Performance vs. Features Trade-off                                            │
+    │  ───────────────────────────────────────────────────────────────────────────── │
+    │                                                                                 │
+    │  XDP DISABLED:                                                                  │
+    │  ├── xdp_dns_denylist (wildcard support)                                       │
+    │  └── knot-resolver handles all filtering (slowest but most capable)            │
+    │                                                                                 │
+    │  XDP ENABLED:                                                                   │
+    │  ├── dns_fw handles DNSBL (fast kernel bypass)                                 │
+    │  ├── ⚠️  Only exact domain matches (no wildcards)                              │
+    │  └── knot-resolver handles minimal resolution (fastest)                        │
+    │                                                                                 │
+    │  Use Case for XDP ENABLED:                                                     │
+    │  - High-traffic environments (10,000+ QPS)                                     │
+    │  - DNSBL lists with exact domains only                                         │
+    │  - No wildcard domain requirements                                             │
+    │                                                                                 │
+    │  Use Case for XDP DISABLED:                                                    │
+    │  - Moderate traffic (< 10,000 QPS)                                             │
+    │  - Need wildcard domain support                                                │
+    │  - More complex filtering rules                                                │
+    └─────────────────────────────────────────────────────────────────────────────────┘
