@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 6.3.0
+VER        = 6.4.0
 
 THISAPP    = knot-resolver-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
@@ -40,7 +40,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 5745be9d031d58e7a9175d29307fb7453b76a6ef65a3b9970b9e5c256a38b2f13e5f4eb5bd126c44e4263b5dbebef2f5addf9c495c80e4a8d4ebe5c2169c0a9c
+$(DL_FILE)_BLAKE2 = dbe67ea0ad3484aba912406f960568c2c92630910863eaf33aeba9b15dce0279810a7df8844aa7d5617f1055de957445042a80c7479972f185bbfff457e96e1d
 
 install : $(TARGET)
 
@@ -70,7 +70,7 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/knot-resolver-6.3-policy-add-flag-to-force-TCP.patch
+	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/knot-resolver-6.4.0-1854.patch
 	cd $(DIR_APP) && meson setup \
 		--prefix=/usr \
 		-Duser=knot-resolver \
