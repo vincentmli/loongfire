@@ -444,6 +444,11 @@ sub show_nameservers () {
 		$dns_status_col = "${Header::colourred}";
 	}
 
+	# Show if we are running in recursor mode
+	if (scalar %dns_servers == 0) {
+		$dns_status_string .= " - $Lang::tr{'dns recursor mode'}";
+	}
+
 	print <<END;
 		<table width='100%'>
 			<tr>
