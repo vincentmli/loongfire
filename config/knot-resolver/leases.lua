@@ -1,5 +1,9 @@
 -- Load modules
+local ffi = require("ffi")
 local sqlite3 = require("lsqlite3")
+
+-- Get access to the C interface
+local C = ffi.C
 
 local DB_PATH = "/var/lib/knot-resolver/leases.db"
 local TTL = 60
@@ -9,14 +13,6 @@ local db
 local sql_fwd
 local sql_rev
 
-local function log_error(s)
-	print(s)
-end
-
-local function log_debug(s)
-	print(s)
-end
-
 -- Initializes the module
 function M.init()
 	-- Open the database
@@ -24,7 +20,7 @@ function M.init()
 
 	-- Fail if we cannot open the database
 	if not db then
-		log_error("leases: Failed to open " .. DB_PATH)
+		log_error(C.LOG_GRP_RESOLVER, "leases: Failed to open " .. DB_PATH)
 		return -1
 	end
 
@@ -129,7 +125,7 @@ function M.answer()
 
 		-- Log action
 		log_debug(
-			string.format("Called for %s (%d)", qname, qtype)
+			C.LOG_GRP_RESOLVER, string.format("Called for %s (%d)", qname, qtype)
 		)
 
 		local answer = {}
