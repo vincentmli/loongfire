@@ -324,6 +324,12 @@ iptables_init() {
 		iptables -A GUIINPUT -i "${GREEN_DEV}" -p tcp --dport 444 -j ACCEPT
 	fi
 
+        # Drop any messages to syslog
+	iptables -N SYSLOG
+	iptables -A SYSLOG -p udp --dport 514 -j DROP
+	iptables -A SYSLOG -p tcp --dport 514 -j DROP
+	iptables -A INPUT -j SYSLOG
+
 	# WIRELESS chains
 	iptables -N WIRELESSINPUT
 	iptables -A INPUT -m conntrack --ctstate NEW -j WIRELESSINPUT
