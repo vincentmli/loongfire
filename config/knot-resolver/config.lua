@@ -327,27 +327,25 @@ function config.load_safesearch(settings)
 		end
 	end
 
-	-- Enable Googe Safe Search
-	for i, tld in ipairs(GOOGLE_TLDS) do
-		local name = string.format("google.%s", tld)
+        -- Enable Googe Safe Search
+        for i, tld in ipairs(GOOGLE_TLDS) do
+                add({ string.format("www.google.%s", tld) }, "forcesafesearch.google.com")
+        end
 
-		add({ name, "www." .. name}, "forcesafesearch.google.com")
-	end
+        -- Enable Bing Strict Search
+        add({ "www.bing.com" }, "strict.bing.com")
 
-	-- Enable Bing Strict Search
-	add({ "bing.com", "www.bing.com" }, "strict.bing.com")
+        -- Enable DuckDuckGo Safe Search
+        add({ "www.duckduckgo.com" }, "safe.duckduckgo.com")
 
-	-- Enable DuckDuckGo Safe Search
-	add({ "duckduckgo.com", "www.duckduckgo.com" }, "safe.duckduckgo.com")
+        -- Enable Yandex Family Search
+        add({ "www.yandex.com" }, "familysearch.yandex.com")
+        add({ "www.yandex.ru" }, "familysearch.yandex.ru")
 
-	-- Enable Yandex Family Search
-	add({ "yandex.com", "www.yandex.com" }, "familysearch.yandex.com")
-	add({ "yandex.ru", "www.yandex.ru" }, "familysearch.yandex.ru")
-
-	-- Enable YouTube Safe Search
-	if settings["ENABLE_SAFE_SEARCH_YOUTUBE"] == "on" then
-		add({ "youtube.com", "www.youtube.com" }, "restrictmoderate.youtube.com")
-	end
+        -- Enable YouTube Safe Search
+        if settings["ENABLE_SAFE_SEARCH_YOUTUBE"] == "on" then
+                add({ "m.youtube.com", "www.youtube.com" }, "restrictmoderate.youtube.com")
+        end
 
 	-- Create a new zone
 	rrs = ffi.new("struct kr_rule_zonefile_config")
