@@ -101,6 +101,11 @@ main() {
 			done
 		done
 	done
+
+	# Update the linker cache again (just in case)
+	ldconfig
+
+	return 0
 }
 
 main "$@" || exit $?
