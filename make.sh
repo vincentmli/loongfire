@@ -2529,6 +2529,8 @@ CFLAGS=(
 case "${BUILD_ARCH}" in
 	aarch64)
 		CFLAGS+=(
+			"-march=armv8-a"
+			"-mtune=generic"
 			"-mbranch-protection=standard"
 		)
 		;;
