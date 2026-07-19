@@ -87,7 +87,8 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 			--no-system-jsoncpp \
 			--no-system-librhash \
 			--no-system-libuv \
-			--docdir=/share/doc/cmake
+			--docdir=/share/doc/cmake \
+			--parallel=$(PARALLELISM)
 	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install
 	@rm -rf $(DIR_APP)
