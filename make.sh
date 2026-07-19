@@ -2533,6 +2533,17 @@ case "${BUILD_ARCH}" in
 		)
 		;;
 
+        riscv64)
+		CFLAGS+=(
+			# Build for RVA22/23
+			"-march=rv64gc"
+			"-mabi=lp64d"
+
+			# Optimise of out-of-order execution
+			"-mtune=generic-ooo"
+		)
+		;;
+
 	x86_64)
 		CFLAGS+=(
 			"-m64" "-mtune=generic" "-fcf-protection=full"
