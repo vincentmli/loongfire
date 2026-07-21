@@ -572,8 +572,7 @@ sub parse_configuration($$) {
 
 			# AllowedIPs
 			} elsif ($key eq "AllowedIPs") {
-				my @networks = split(/,/, $val);
-
+				my @networks = split(/\s*,\s*/, $val);
 				# Check if all networks are valid
 				foreach my $network (@networks) {
 					# Skip any IPv6 networks
