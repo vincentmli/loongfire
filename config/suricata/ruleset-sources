@@ -160,6 +160,17 @@ our %Providers = (
 		sid_range => ["2610000", "2619999"],
 	},
 
+	# julioliraup/Antiphishing protect against phishing attack
+	julioliraup_antiphishing => {
+		summary => "julioliraup/Antiphishing",
+		website => "https://github.com/julioliraup/Antiphishing",
+		tr_string => "julioliraup/Antiphishing for protect against phishing attack",
+		requires_subscription => "False",
+		dl_url => "https://raw.githubusercontent.com/julioliraup/Antiphishing/refs/heads/main/antiphishing.tar.gz",
+		dl_type => "archive",
+		sid_range => ["6000000", "6100000"],
+	},
+
 	ipfire_dbl => {
 		summary => "IPFire DBL - Domain Blocklist",
 		website => "https://www.ipfire.org/dbl/",
