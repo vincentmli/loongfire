@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 33.0
+VER        = 35.1
 
 THISAPP    = protobuf-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -40,7 +40,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 5d456c000117b590dea5b7e721a8b8d00d9e7067ba2156f082e4959a17fcf8d4f2e306f90335aad97e1a94dfd2491544d67cb29670f0022034fde574140a8066
+$(DL_FILE)_BLAKE2 = d18d5c73537c0c08a729ebc91039d77a6e939c17f41c2a73c14cd165eb10113758e0dee812482045c19d34a1e839f6a316801ca367d971d43d13cb4403a27997
 
 install : $(TARGET)
 
@@ -72,6 +72,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 	cd $(DIR_APP) && cmake . \
 				-D CMAKE_INSTALL_PREFIX=/usr \
+				-D CMAKE_BUILD_TYPE=Release \
 				-D protobuf_BUILD_TESTS=OFF \
 				-D protobuf_BUILD_SHARED_LIBS=ON \
 				-D protobuf_ABSL_PROVIDER=package
