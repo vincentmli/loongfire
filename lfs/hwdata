@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 0.406
+VER        = 0.409
 
 THISAPP    = hwdata-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -42,7 +42,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 49f001a36d83af15c6532a346593f07d2bee596ee544781787657321a6d4f1d1c9addf0d1b68fdafae72212bdf0c0d4b82de6f8c09c1dfb346c149421a604858
+$(DL_FILE)_BLAKE2 = 49f9d31b7c0d16466e85b5af03d6457a4fd0d79769018d5440801efadb8fb55aa0dc978401141adafadc082b795f6da0f791e9b64c2766439b90e799b3ee7c10
 
 install : $(TARGET)
 
