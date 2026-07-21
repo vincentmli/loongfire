@@ -30,7 +30,8 @@ case "$1" in
 
 	stop)
 		boot_mesg "Stopping avahi..."
-		/usr/sbin/avahi-daemon -k
+		/usr/sbin/avahi-daemon -k &>/dev/null
+		evaluate_retval
 		;;
 
 	reload)
