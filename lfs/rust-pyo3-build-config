@@ -79,7 +79,6 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	fi; \
 
 	cd $(DIR_APP) && $(CARGO_PREPARE)
-	cd $(DIR_APP) && $(CARGO_BUILD)
 	cd $(DIR_APP) && $(CARGO_INSTALL)
 	@rm -rf $(DIR_APP)
 	@$(POSTBUILD)
