@@ -104,6 +104,9 @@ function grub_install() {
 		aarch64)
 			arches="arm64-efi"
 			;;
+		loongarch64)
+			arches="loongarch64-efi"
+			;;
 		x86_64)
 			arches="i386-pc x86_64-efi"
 			;;

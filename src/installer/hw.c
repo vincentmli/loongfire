@@ -114,7 +114,9 @@ struct hw* hw_init() {
 		snprintf(hw->arch, sizeof(hw->arch), "%s", uname_data.machine);
 
 	// Should we install in EFI mode?
-	if ((strcmp(hw->arch, "x86_64") == 0) || (strcmp(hw->arch, "aarch64") == 0))
+	if ((strcmp(hw->arch, "x86_64") == 0) ||
+	    (strcmp(hw->arch, "aarch64") == 0) ||
+	    (strcmp(hw->arch, "loongarch64") == 0))
 		hw->efi = 1;
 
 	return hw;
