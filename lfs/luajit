@@ -34,7 +34,12 @@ include Config
 # git remote add plctlab https://github.com/plctlab/LuaJIT.git
 # git fetch pcltlab
 # git diff $(COMMIT)..plctlab/v2.1-riscv64 \
-#   > luajit-2.1-$(COMMIT)707c12b-riscv64.patch
+#   > luajit-2.1-$(COMMIT)-riscv64.patch
+#
+# git remote add loongson https://github.com/loongson/LuaJIT.git
+# git fetch loongson
+# git diff $(COMMIT)..loongson/v2.1-loongarch64 \
+#   > luajit-2.1-$(COMMIT)-loongarch64.patch
 
 VER        = 2.1-$(COMMIT)
 COMMIT     = 707c12b
@@ -83,7 +88,13 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
+	# Apply architecture-specific patches
+ifeq ($(BUILD_ARCH), riscv64)
 	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/luajit-2.1-707c12b-riscv64.patch
+endif
+ifeq ($(BUILD_ARCH), loongarch64)
+	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/luajit-2.1-707c12b-loongarch64.patch
+endif
 	cd $(DIR_APP) && make amalg \
 		PREFIX="/usr" BUILDMODE=dynamic Q= TARGET_STRIP=" @:" \
 		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" $(MAKETUNING)
