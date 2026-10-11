@@ -107,8 +107,17 @@ function grub_install() {
 		loongarch64)
 			arches="loongarch64-efi"
 			;;
+		riscv64)
+			arches="riscv64-efi"
+			;;
 		x86_64)
 			arches="i386-pc x86_64-efi"
+			;;
+
+		# Fail if the architecture is not supported
+		*)
+			echo "Unsupported architecture: $(uname -m)" >&2
+			return 1
 			;;
 	esac
 
@@ -133,20 +142,30 @@ function grub_install() {
 				;;
 		esac
 
+		local installed="false"
+
 		local removable
-		for removable in "--removable" ""; do
+		for removable in "" "--removable"; do
 			if grub-install ${GRUB_INSTALL_ARGS} ${args} \
 					${removable} "${device}" &>/dev/null; then
-				echo "Install GRUB on ${device} successfully" >&2
-				return 0
+				installed="true"
 			fi
 
 			# Do not try to install with --removable for non-efi architectures
 			[[ "${arch}" =~ \-efi$ ]] || break
 		done
+
+		# Fail if GRUB could not be installed in any way, but
+		# carry on with the next architecture if it could
+		if [ "${installed}" != "true" ]; then
+			echo "Could not install GRUB (${arch}) on ${device}" >&2
+			return 1
+		fi
+
+		echo "GRUB (${arch}) installed successfully on ${device}" >&2
 	done
 
-	return 1
+	return 0
 }
 
 function main() {
