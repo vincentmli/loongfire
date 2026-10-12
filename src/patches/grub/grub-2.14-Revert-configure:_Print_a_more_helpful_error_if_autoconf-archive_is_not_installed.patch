@@ -1,0 +1,15 @@
+diff -Naur grub-2.14.orig/configure.ac grub-2.14/configure.ac
+--- grub-2.14.orig/configure.ac	2026-05-05 17:09:38.251922592 +0200
++++ grub-2.14/configure.ac	2026-05-05 17:32:27.405733625 +0200
+@@ -1794,11 +1794,6 @@
+ # Defined in acinclude.m4.
+ grub_ASM_USCORE
+ grub_PROG_TARGET_CC
+-
+-# The error message produced by autoconf if autoconf-archive is not installed is
+-# quite misleading and not very helpful. So, try point people in the right direction.
+-m4_ifndef([AX_CHECK_LINK_FLAG], [m4_fatal([autoconf-archive is missing. You must install it to generate the configure script.])])
+-
+ if test "x$TARGET_APPLE_LINKER" != x1 ; then
+ grub_PROG_OBJCOPY_ABSOLUTE
+ fi
