@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 9.0
+VER        = 9.2
 
 THISAPP    = nano-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
@@ -40,7 +40,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 6df92e9f1b0ba8c2ec3dfdd8b4605a34c08f33c747746d8d3b4145894f0cc64b705c59f2b5aee120050eb32292adf78bf267c568a266c17e2f99e48026d38106
+$(DL_FILE)_BLAKE2 = b8f5aedbb296654817eac82723a6ae6323b2710d225152ee6356fefe5e692958236a00ab4c7fd5abff71b84c3c023afc06854e4e216b80879c48ce94486c4b89
 
 install : $(TARGET)
 
