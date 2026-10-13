@@ -486,7 +486,7 @@ prepareenv() {
 	esac
 
 	# Setup ccache cache size
-	execute --chroot ccache --max-size="${CCACHE_CACHE_SIZE}"
+	execute --chroot ccache --max-size="${CCACHE_CACHE_SIZE}" >/dev/null 2>&1
 }
 
 entershell() {
