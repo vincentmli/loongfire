@@ -26,7 +26,7 @@ include Config
 
 SUMMARY    = Versatile tool for fast incremental file transfer
 
-VER        = 3.4.4
+VER        = 3.5.1
 
 THISAPP    = rsync-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -34,7 +34,7 @@ DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = rsync
-PAK_VER    = 24
+PAK_VER    = 26
 
 DEPS       = libxxhash
 
@@ -48,7 +48,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = f4eec8d1077e1cc7eec8cd39dcac4643f7608231f5aa6390cb53104efa1602873a333d9e6cba5d1bb2aeff6c3bf9bccd80370a2105a9cc982b49aae9f39f3bde
+$(DL_FILE)_BLAKE2 = 513d03ddadf484424c90755f8d3a947993fdbac3fd7e7b2cdc675e25096f376d7086318be904efd32071d4ba27a06bdaf2875a2086e94f7bd5a7cc9fbdf065ef
 
 install : $(TARGET)
 
