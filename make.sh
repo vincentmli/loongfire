@@ -266,54 +266,6 @@ print_build_summary() {
 	print_status DONE
 }
 
-# Launches a timer process as a co-process
-launch_timer() {
-	# Do nothing if the timer is already running
-	if [ -n "${TIMER_PID}" ]; then
-		return 0
-	fi
-
-	# Don't launch the timer when we are not on a terminal
-	if ! is_terminal; then
-		return 0
-	fi
-
-	# Launch the co-process
-	coproc TIMER { "${0}" "__timer" "$$"; }
-
-	# Register the signal handlers
-	trap "__timer_event" SIGUSR1
-	trap "terminate_timer" EXIT
-}
-
-# Terminates a previously launched timer
-terminate_timer() {
-	if [ -n "${TIMER_PID}" ]; then
-		kill -TERM "${TIMER_PID}"
-	fi
-}
-
-# The timer main loop
-__timer() {
-	local pid="${1}"
-
-	# Send SIGUSR1 to the main process once a second
-	# If the parent process has gone away, we will terminate.
-	while sleep 1; do
-		if ! kill -USR1 "${pid}" &>/dev/null; then
-			break
-		fi
-	done
-
-	return 0
-}
-
-# Called when the timer triggers
-# This function does nothing, but is needed interrupt the wait call
-__timer_event() {
-	return 0
-}
-
 exiterror() {
 	# Dump logfile
 	if [ -n "${LOGFILE}" ] && [ -e "${LOGFILE}" ]; then
@@ -575,7 +527,6 @@ execute() {
 	local chroot="false"
 	local command=()
 	local interactive="false"
-	local timer
 	local network="false"
 
 	# Collect environment variables
@@ -735,10 +686,6 @@ execute() {
 				)
 				;;
 
-			--timer=*)
-				timer="${1#--timer=}"
-				;;
-
 			-*)
 				echo "Unknown argument: ${1}" >&2
 				return 2
@@ -851,11 +798,6 @@ execute() {
 			;;
 
 		false)
-			# Launch the timer if needed
-			if [ -n "${timer}" ]; then
-				launch_timer
-			fi
-
 			# Dispatch the command to the background
 			{
 				"${execute[@]}" >> "${LOGFILE}" 2>&1 </dev/null
@@ -872,17 +814,6 @@ execute() {
 				r="$?"
 
 				case "${r}" in
-					# Code means that we have received SIGUSR1 from the timer
-					138)
-						# Call the timer callback
-						if [ -n "${timer}" ]; then
-							"${timer}"
-						fi
-
-						# Go back and wait
-						continue
-						;;
-
 					# Ignore SIGWINCH
 					156)
 						continue
@@ -892,10 +823,8 @@ execute() {
 				break
 			done
 
-			# Call the timer callback at least once
-			if [ -n "${timer}" ]; then
-				"${timer}"
-			fi
+			# Print the total runtime
+			print_runtime "$(( SECONDS - t ))"
 	esac
 
 	return "${r}"
@@ -947,7 +876,7 @@ lfsmake1() {
 		exiterror "Downloading ${pkg}"
 	fi
 
-	if ! make_pkg --timer="update_runtime" "${pkg}" TOOLCHAIN=1 ROOT="${BUILD_DIR}" b2 install "$@"; then
+	if ! make_pkg "${pkg}" TOOLCHAIN=1 ROOT="${BUILD_DIR}" b2 install "$@"; then
 		print_status FAIL
 
 		exiterror "Building ${pkg}"
@@ -989,8 +918,7 @@ lfsmake2() {
         fi
 
         # Run install on the package
-        if ! make_pkg --chroot --timer="update_runtime" \
-                        "${args[@]}" "${pkg}" b2 install "$@"; then
+	if ! make_pkg --chroot "${args[@]}" "${pkg}" b2 install "$@"; then
                 print_status FAIL
 
                 exiterror "Building ${pkg}"
@@ -1008,17 +936,13 @@ ipfiredist() {
 	[ $? == 1 ] && return 0
 
 	# Run dist on the package
-	if ! make_pkg --chroot --timer="update_runtime" "${pkg}" dist "$@"; then
+	if ! make_pkg --chroot "${pkg}" dist "$@"; then
 		print_status FAIL
 
 		exiterror "Packaging ${pkg}"
 	fi
 
 	print_status DONE
-}
-
-update_runtime() {
-	print_runtime "$(( SECONDS - t ))"
 }
 
 qemu_is_required() {
@@ -2789,9 +2713,6 @@ check-manualpages)
 	else
 		print_status FAIL
 	fi
-	;;
-__timer)
-	__timer "${2}" || exit $?
 	;;
 *)
 	echo "Usage: $0 [OPTIONS] {build|check-manualpages|clean|downloadsrc|find-dependencies|gettoolchain|lang|shell|tail|toolchain|update-contributors|uploadsrc}"
