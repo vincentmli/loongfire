@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2024  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 2.6.4
+VER        = 2.10.0
 
 THISAPP    = kbd-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
@@ -42,7 +42,7 @@ $(DL_FILE)                            = $(DL_FROM)/$(DL_FILE)
 kbd-latarcyrheb-16-fixed.tar.bz2      = $(DL_FROM)/kbd-latarcyrheb-16-fixed.tar.bz2
 kbd-latsun-fonts.tar.bz2              = $(DL_FROM)/kbd-latsun-fonts.tar.bz2
 
-$(DL_FILE)_BLAKE2 = 25e55be0210c206c1f5eb0d85045bb1cbb2442cf88fb7eb28f7bbb8dd0d86473f48444fd9d80dfc624ce7ba8b39bfe1152ee6cf1877fab444e09600e93dae0ee
+$(DL_FILE)_BLAKE2 = 9a704246bbf5ea832a48ca77e98502bbe89e11d823fd49fbc5f190b86d0359bc25bb9ede417a4da5ebaa9e70d56a19681278f43cf9230ec35051a05c5a847af1
 kbd-latarcyrheb-16-fixed.tar.bz2_BLAKE2  = d5c701333b9eae7e0c467aebee5b2217c3225dee615622f77e501569f1464a8c32380b2d4a522730db74a909e1ea746e660ea6849bbf48195af22bda73858d1b
 kbd-latsun-fonts.tar.bz2_BLAKE2	         = c3def1192331a65f3edcf608ca164370d2db0c61444f71fc83bf35cb86d417ae92582180ace853a3cf93e569a83a42fca054fbadbf7f5986a1abd17e8bb6691f
 
