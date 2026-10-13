@@ -12,3 +12,4 @@ zabbix ALL=(ALL) NOPASSWD: /opt/pakfire/pakfire status, /usr/sbin/fping, /usr/sb
 zabbix ALL=(ALL) NOPASSWD: /usr/local/bin/openvpnctrl rw log, /usr/local/bin/wireguardctrl dump
 zabbix ALL=(ALL) NOPASSWD: /var/ipfire/zabbix_agentd/scripts/ipfire_certificate_detail.sh
 zabbix ALL=(ALL) NOPASSWD: /var/ipfire/zabbix_agentd/scripts/ipfire_services.pl
+zabbix ALL=(ALL) NOPASSWD: /usr/bin/curl -s --unix-socket /var/run/knot-resolver/kres-api.sock http\://localhost/metrics/json
