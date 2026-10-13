@@ -26,7 +26,7 @@ include Config
 
 SUMMARY    = Terminal multiplexer
 
-VER        = 3.6b
+VER        = 3.7c
 
 THISAPP    = tmux-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -34,7 +34,7 @@ DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = tmux
-PAK_VER    = 15
+PAK_VER    = 19
 
 DEPS       =
 
@@ -48,7 +48,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 75e8470fb5c5f893e9f5488e5029ae9c3c77a4bdf1a6b7fab9daced048b1f31b7977344f39e97a53efbc28fb05a68d82676ddcb661cd5eb6fb6bd6acc9ab64ee
+$(DL_FILE)_BLAKE2 = 854a27ad7fd2326057c516e60a88219548bbbf7001c01d1b64b83289b22c923a8b4c94f48971381d88cd8a6c9a15084c253742dfb155dd6e32aee97b78f9f68c
 
 install : $(TARGET)
 
@@ -81,7 +81,7 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar zxf $(DIR_DL)/$(DL_FILE)
-	${UPDATE_AUTOMAKE}
+	$(UPDATE_AUTOMAKE)
 	cd $(DIR_APP) && ./configure \
 				--prefix=/usr
 	cd $(DIR_APP) && make $(MAKETUNING)
