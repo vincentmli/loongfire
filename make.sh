@@ -528,6 +528,7 @@ execute() {
 	local command=()
 	local interactive="false"
 	local network="false"
+	local timer="false"
 
 	# Collect environment variables
 	local -A environ=(
@@ -686,6 +687,10 @@ execute() {
 				)
 				;;
 
+			--timer)
+				timer="true"
+				;;
+
 			-*)
 				echo "Unknown argument: ${1}" >&2
 				return 2
@@ -824,7 +829,9 @@ execute() {
 			done
 
 			# Print the total runtime
-			print_runtime "$(( SECONDS - t ))"
+			if [ "${timer}" = "true" ]; then
+				print_runtime "$(( SECONDS - t ))"
+			fi
 	esac
 
 	return "${r}"
@@ -876,7 +883,7 @@ lfsmake1() {
 		exiterror "Downloading ${pkg}"
 	fi
 
-	if ! make_pkg "${pkg}" TOOLCHAIN=1 ROOT="${BUILD_DIR}" b2 install "$@"; then
+	if ! make_pkg --timer "${pkg}" TOOLCHAIN=1 ROOT="${BUILD_DIR}" b2 install "$@"; then
 		print_status FAIL
 
 		exiterror "Building ${pkg}"
@@ -918,7 +925,7 @@ lfsmake2() {
         fi
 
         # Run install on the package
-	if ! make_pkg --chroot "${args[@]}" "${pkg}" b2 install "$@"; then
+	if ! make_pkg --chroot --timer "${args[@]}" "${pkg}" b2 install "$@"; then
                 print_status FAIL
 
                 exiterror "Building ${pkg}"
@@ -936,7 +943,7 @@ ipfiredist() {
 	[ $? == 1 ] && return 0
 
 	# Run dist on the package
-	if ! make_pkg --chroot "${pkg}" dist "$@"; then
+	if ! make_pkg --chroot --timer "${pkg}" dist "$@"; then
 		print_status FAIL
 
 		exiterror "Packaging ${pkg}"
