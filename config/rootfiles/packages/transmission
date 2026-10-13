@@ -10,9 +10,9 @@ usr/lib/systemd/system/transmission-daemon.service
 usr/share/transmission
 #usr/share/transmission/public_html
 #usr/share/transmission/public_html/images
+#usr/share/transmission/public_html/images/apple-touch-icon.png
 #usr/share/transmission/public_html/images/favicon.ico
-#usr/share/transmission/public_html/images/favicon.png
-#usr/share/transmission/public_html/images/webclip-icon.png
+#usr/share/transmission/public_html/images/favicon.svg
 #usr/share/transmission/public_html/index.html
 #usr/share/transmission/public_html/transmission-app.css
 #usr/share/transmission/public_html/transmission-app.css.LEGAL.txt
