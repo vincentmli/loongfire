@@ -1,4 +1,3 @@
-etc/ltrace.conf
 usr/bin/ltrace
 #usr/share/doc/ltrace
 #usr/share/doc/ltrace/COPYING
@@ -6,5 +5,13 @@ usr/bin/ltrace
 #usr/share/doc/ltrace/INSTALL
 #usr/share/doc/ltrace/README
 #usr/share/doc/ltrace/TODO
+#usr/share/ltrace
+usr/share/ltrace/libacl.so.conf
+usr/share/ltrace/libc.so-types.conf
+usr/share/ltrace/libc.so.conf
+usr/share/ltrace/libm.so.conf
+usr/share/ltrace/libpthread.so-types.conf
+usr/share/ltrace/libpthread.so.conf
+usr/share/ltrace/syscalls.conf
 #usr/share/man/man1/ltrace.1
 #usr/share/man/man5/ltrace.conf.5
