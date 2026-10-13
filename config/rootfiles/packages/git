@@ -65,6 +65,7 @@ usr/libexec/git-core/git-fmt-merge-msg
 usr/libexec/git-core/git-for-each-ref
 usr/libexec/git-core/git-for-each-repo
 usr/libexec/git-core/git-format-patch
+usr/libexec/git-core/git-format-rev
 usr/libexec/git-core/git-fsck
 usr/libexec/git-core/git-fsck-objects
 usr/libexec/git-core/git-fsmonitor--daemon
@@ -178,6 +179,7 @@ usr/libexec/git-core/git-update-ref
 usr/libexec/git-core/git-update-server-info
 usr/libexec/git-core/git-upload-archive
 usr/libexec/git-core/git-upload-pack
+usr/libexec/git-core/git-url-parse
 usr/libexec/git-core/git-var
 usr/libexec/git-core/git-verify-commit
 usr/libexec/git-core/git-verify-pack
@@ -319,6 +321,7 @@ usr/share/git-core/templates/info/exclude
 #usr/share/gitweb/static/git-logo.png
 #usr/share/gitweb/static/gitweb.css
 #usr/share/gitweb/static/gitweb.js
+#usr/share/locale/af/LC_MESSAGES/git.mo
 #usr/share/locale/bg/LC_MESSAGES/git.mo
 #usr/share/locale/ca/LC_MESSAGES/git.mo
 #usr/share/locale/de/LC_MESSAGES/git.mo
@@ -331,6 +334,9 @@ usr/share/git-core/templates/info/exclude
 #usr/share/locale/it/LC_MESSAGES/git.mo
 #usr/share/locale/ko/LC_MESSAGES/git.mo
 #usr/share/locale/pl/LC_MESSAGES/git.mo
+#usr/share/locale/pt_BR/LC_MESSAGES/git.mo
+#usr/share/locale/pt_PT
+#usr/share/locale/pt_PT/LC_MESSAGES
 #usr/share/locale/pt_PT/LC_MESSAGES/git.mo
 #usr/share/locale/ru/LC_MESSAGES/git.mo
 #usr/share/locale/sv/LC_MESSAGES/git.mo
