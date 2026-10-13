@@ -25,7 +25,7 @@ set daemon  60              # check services at 1-minute intervals
 ## omitted, Monit will use 'user' facility by default. If you want to log to
 ## a standalone log file instead, specify the full path to the log file
 #
-set logfile syslog facility log_daemon
+set log syslog facility log_daemon
 #
 #
 ## Set the location of the Monit lock file which stores the process id of the
