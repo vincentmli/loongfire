@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 2026.02.04
+VER        = 2026.05.30
 #            https://mirrors.edge.kernel.org/pub/software/network/wireless-regdb/
 
 THISAPP    = wireless-regdb-$(VER)
@@ -42,7 +42,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 51b528effd27bef82337babc911e85586a105efce758264d52065b8b2137f08a803e0962ef07a600fec36fd110eecacd1b88d2569aa73ad2a289702164d88581
+$(DL_FILE)_BLAKE2 = 81aa422097580319e6088d0a52a2c4007696331df175c3aed1ce6b6c750e9b7bda08a4aa4ee6249abaa3f283f8a942803eefca8334020de68c33f5e7e35a57e0
 
 install : $(TARGET)
 
