@@ -1,0 +1,11 @@
+--- a/observium/scripts/agent-local/apache	Sun Oct  4 07:21:06 2015
++++ b/observium/scripts/agent-local/apache	Mon Jun 22 16:36:40 2026
+@@ -26,7 +26,7 @@
+         close INFILE;
+ } else {
+         # grab the status URL (fresh data)
+-        @data = split /(\n)/, LWP::Simple::get( 'http://localhost/server-status?auto' )
++        @data = split /(\n)/, LWP::Simple::get( 'http://localhost:81/server-status?auto' )
+                 or die "Data fetch failure.\n";
+ 
+         # write file

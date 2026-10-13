@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2024  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -34,9 +34,9 @@ DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/observium
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = observium-agent
-PAK_VER    = 4
+PAK_VER    = 6
 
-DEPS       = xinetd
+DEPS       = xinetd perl-Encode-Locale
 
 SERVICES   =
 
@@ -81,6 +81,7 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
+	cd $(DIR_APP) && patch -Np2 < $(DIR_SRC)/src/patches/observium/redirect_apache_localhost_to_port_81.patch
 
 	# Install xinet.d configuration
 	mkdir -pv /etc/xinetd.d
@@ -102,4 +103,3 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 
 	@rm -rf $(DIR_APP)
 	@$(POSTBUILD)
-
