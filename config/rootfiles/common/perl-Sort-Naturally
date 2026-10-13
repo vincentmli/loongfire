@@ -1,6 +1,6 @@
-usr/lib/perl5/site_perl/5.36.0/Sort
-usr/lib/perl5/site_perl/5.36.0/Sort/Naturally.pm
-#usr/lib/perl5/site_perl/5.36.0/xxxMACHINExxx-linux-thread-multi/auto/Sort
-#usr/lib/perl5/site_perl/5.36.0/xxxMACHINExxx-linux-thread-multi/auto/Sort/Naturally
-#usr/lib/perl5/site_perl/5.36.0/xxxMACHINExxx-linux-thread-multi/auto/Sort/Naturally/.packlist
+usr/lib/perl5/site_perl/5.42.2/Sort
+usr/lib/perl5/site_perl/5.42.2/Sort/Naturally.pm
+#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Sort
+#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Sort/Naturally
+#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Sort/Naturally/.packlist
 #usr/share/man/man3/Sort::Naturally.3
