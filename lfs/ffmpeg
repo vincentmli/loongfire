@@ -26,7 +26,7 @@ include Config
 
 SUMMARY	   = Library for working with various multimedia formats
 
-VER        = 8.1
+VER        = 9.0.1
 
 THISAPP    = ffmpeg-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
@@ -34,7 +34,7 @@ DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = ffmpeg
-PAK_VER    = 23
+PAK_VER    = 25
 
 DEPS       = sdl2 lame libvorbis
 
@@ -52,7 +52,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 3710f8d3d60f89e404e837d238d089bdd7fd3be9404014aa1f3d4dd8983f10c7fefd7f4b27996fb8cb664f54aa3417da67f4ea02c896fe1026383198c45f5b26
+$(DL_FILE)_BLAKE2 = 85b3b175211dfc013ae5df3ffd2bf2a1fd68f682f6b63d1a1a3aa431b7a8b5ef15c41108a6fa1ef2b15e6677f182ab02e48e0b56d3f301ef8e1777a473e8dd82
 
 install : $(TARGET)
 
