@@ -503,6 +503,7 @@ usr/lib/ossl-modules/legacy.so
 #usr/share/doc/openssl/html/man3/HMAC.html
 #usr/share/doc/openssl/html/man3/MD5.html
 #usr/share/doc/openssl/html/man3/MDC2_Init.html
+#usr/share/doc/openssl/html/man3/NAME_CONSTRAINTS_check.html
 #usr/share/doc/openssl/html/man3/NCONF_new_ex.html
 #usr/share/doc/openssl/html/man3/OBJ_nid2obj.html
 #usr/share/doc/openssl/html/man3/OCSP_REQUEST_new.html
@@ -515,6 +516,7 @@ usr/lib/ossl-modules/legacy.so
 #usr/share/doc/openssl/html/man3/OPENSSL_FILE.html
 #usr/share/doc/openssl/html/man3/OPENSSL_LH_COMPFUNC.html
 #usr/share/doc/openssl/html/man3/OPENSSL_LH_stats.html
+#usr/share/doc/openssl/html/man3/OPENSSL_armcap.html
 #usr/share/doc/openssl/html/man3/OPENSSL_config.html
 #usr/share/doc/openssl/html/man3/OPENSSL_fork_prepare.html
 #usr/share/doc/openssl/html/man3/OPENSSL_gmtime.html
@@ -848,6 +850,7 @@ usr/lib/ossl-modules/legacy.so
 #usr/share/doc/openssl/html/man3/UI_UTIL_read_pw.html
 #usr/share/doc/openssl/html/man3/UI_create_method.html
 #usr/share/doc/openssl/html/man3/UI_new.html
+#usr/share/doc/openssl/html/man3/X509V3_EXT_nconf_nid.html
 #usr/share/doc/openssl/html/man3/X509V3_EXT_print.html
 #usr/share/doc/openssl/html/man3/X509V3_get_d2i.html
 #usr/share/doc/openssl/html/man3/X509V3_set_ctx.html
@@ -3620,6 +3623,8 @@ usr/lib/ossl-modules/legacy.so
 #usr/share/man/man3/MDC2_Final.3ossl
 #usr/share/man/man3/MDC2_Init.3ossl
 #usr/share/man/man3/MDC2_Update.3ossl
+#usr/share/man/man3/NAME_CONSTRAINTS_check.3ossl
+#usr/share/man/man3/NAME_CONSTRAINTS_check_CN.3ossl
 #usr/share/man/man3/NAME_CONSTRAINTS_free.3ossl
 #usr/share/man/man3/NAME_CONSTRAINTS_new.3ossl
 #usr/share/man/man3/NAMING_AUTHORITY.3ossl
@@ -3790,6 +3795,7 @@ usr/lib/ossl-modules/legacy.so
 #usr/share/man/man3/OPENSSL_VERSION_TEXT.3ossl
 #usr/share/man/man3/OPENSSL_aligned_alloc.3ossl
 #usr/share/man/man3/OPENSSL_aligned_alloc_array.3ossl
+#usr/share/man/man3/OPENSSL_armcap.3ossl
 #usr/share/man/man3/OPENSSL_atexit.3ossl
 #usr/share/man/man3/OPENSSL_buf2hexstr.3ossl
 #usr/share/man/man3/OPENSSL_buf2hexstr_ex.3ossl
@@ -5676,6 +5682,7 @@ usr/lib/ossl-modules/legacy.so
 #usr/share/man/man3/SSL_VALUE_EVENT_HANDLING_MODE_IMPLICIT.3ossl
 #usr/share/man/man3/SSL_VALUE_EVENT_HANDLING_MODE_INHERIT.3ossl
 #usr/share/man/man3/SSL_VALUE_QUIC_IDLE_TIMEOUT.3ossl
+#usr/share/man/man3/SSL_VALUE_QUIC_MAX_PENDING_CONNS.3ossl
 #usr/share/man/man3/SSL_VALUE_QUIC_STREAM_BIDI_LOCAL_AVAIL.3ossl
 #usr/share/man/man3/SSL_VALUE_QUIC_STREAM_BIDI_REMOTE_AVAIL.3ossl
 #usr/share/man/man3/SSL_VALUE_QUIC_STREAM_UNI_LOCAL_AVAIL.3ossl
@@ -6233,6 +6240,8 @@ usr/lib/ossl-modules/legacy.so
 #usr/share/man/man3/USERNOTICE_new.3ossl
 #usr/share/man/man3/X509V3_EXT_d2i.3ossl
 #usr/share/man/man3/X509V3_EXT_i2d.3ossl
+#usr/share/man/man3/X509V3_EXT_nconf.3ossl
+#usr/share/man/man3/X509V3_EXT_nconf_nid.3ossl
 #usr/share/man/man3/X509V3_EXT_print.3ossl
 #usr/share/man/man3/X509V3_EXT_print_fp.3ossl
 #usr/share/man/man3/X509V3_add1_i2d.3ossl
