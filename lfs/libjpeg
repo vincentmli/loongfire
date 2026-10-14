@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 3.1.4.1
+VER        = 3.2.0
 
 THISAPP    = libjpeg-turbo-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -40,7 +40,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 7e38379b4e3bb168e6ec081be5852f9a7f4680929d42e5cccb0c00632130eee9200afdc9c2ed99250c3ddfc1cd8dd21f60da54e6c48157884c9173ae1b3f9a9f
+$(DL_FILE)_BLAKE2 = c50c985f8b870ab6467181f69e10f3ec2705cb349613b9178b293f136063e302087832d87f793b3d24ab721a2f5d76271760bd244d0766ab3b8cbe48ebf50cfa
 
 install : $(TARGET)
 

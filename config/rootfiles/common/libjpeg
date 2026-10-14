@@ -19,7 +19,7 @@ usr/lib/libjpeg.so.8
 usr/lib/libjpeg.so.8.3.2
 #usr/lib/libturbojpeg.so
 usr/lib/libturbojpeg.so.0
-usr/lib/libturbojpeg.so.0.4.0
+usr/lib/libturbojpeg.so.0.5.0
 #usr/lib/pkgconfig/libjpeg.pc
 #usr/lib/pkgconfig/libturbojpeg.pc
 #usr/share/doc/libjpeg-turbo
