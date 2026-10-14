@@ -19,16 +19,18 @@ usr/bin/udev-hwdb
 #usr/include/systemd/sd-dhcp-client.h
 #usr/include/systemd/sd-dhcp-duid.h
 #usr/include/systemd/sd-dhcp-lease.h
-#usr/include/systemd/sd-dhcp-option.h
 #usr/include/systemd/sd-dhcp-protocol.h
+#usr/include/systemd/sd-dhcp-relay.h
 #usr/include/systemd/sd-dhcp-server-lease.h
 #usr/include/systemd/sd-dhcp-server.h
 #usr/include/systemd/sd-dhcp6-client.h
 #usr/include/systemd/sd-dhcp6-lease.h
 #usr/include/systemd/sd-dhcp6-option.h
 #usr/include/systemd/sd-dhcp6-protocol.h
+#usr/include/systemd/sd-dlopen.h
 #usr/include/systemd/sd-dns-resolver.h
 #usr/include/systemd/sd-event.h
+#usr/include/systemd/sd-future.h
 #usr/include/systemd/sd-gpt.h
 #usr/include/systemd/sd-hwdb.h
 #usr/include/systemd/sd-id128.h
@@ -56,10 +58,10 @@ usr/bin/udev-hwdb
 #usr/include/systemd/sd-varlink.h
 #usr/lib/libsystemd.so
 usr/lib/libsystemd.so.0
-usr/lib/libsystemd.so.0.43.0
+usr/lib/libsystemd.so.0.44.0
 #usr/lib/libudev.so
 usr/lib/libudev.so.1
-usr/lib/libudev.so.1.7.13
+usr/lib/libudev.so.1.7.14
 #usr/lib/pkgconfig/libsystemd.pc
 #usr/lib/pkgconfig/libudev.pc
 usr/lib/udev
@@ -80,6 +82,7 @@ usr/lib/udev/hwdb.d/20-sdio-vendor-model.hwdb
 usr/lib/udev/hwdb.d/20-usb-classes.hwdb
 usr/lib/udev/hwdb.d/20-usb-vendor-model.hwdb
 usr/lib/udev/hwdb.d/20-vmbus-class.hwdb
+usr/lib/udev/hwdb.d/40-imds.hwdb
 usr/lib/udev/hwdb.d/60-autosuspend-chromiumos.hwdb
 usr/lib/udev/hwdb.d/60-autosuspend-fingerprint-reader.hwdb
 usr/lib/udev/hwdb.d/60-autosuspend.hwdb
@@ -92,6 +95,7 @@ usr/lib/udev/hwdb.d/60-tpm2.hwdb
 usr/lib/udev/hwdb.d/70-analyzers.hwdb
 usr/lib/udev/hwdb.d/70-av-production.hwdb
 usr/lib/udev/hwdb.d/70-cameras.hwdb
+usr/lib/udev/hwdb.d/70-debug-appliance.hwdb
 usr/lib/udev/hwdb.d/70-hardware-wallets.hwdb
 usr/lib/udev/hwdb.d/70-joystick.hwdb
 usr/lib/udev/hwdb.d/70-lights.hwdb
@@ -102,6 +106,7 @@ usr/lib/udev/hwdb.d/70-pointingstick.hwdb
 usr/lib/udev/hwdb.d/70-software-radio.hwdb
 usr/lib/udev/hwdb.d/70-sound-card.hwdb
 usr/lib/udev/hwdb.d/70-touchpad.hwdb
+usr/lib/udev/hwdb.d/70-vsock.hwdb
 usr/lib/udev/hwdb.d/80-ieee1394-unit-function.hwdb
 usr/lib/udev/hwdb.d/82-net-auto-link-local.hwdb
 usr/lib/udev/hwdb.d/README
