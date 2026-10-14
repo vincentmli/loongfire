@@ -95,13 +95,6 @@ my $menu = \%menuhash;
 %settings = ();
 my @URI = split('\?', $ENV{'REQUEST_URI'});
 
-### Make sure this is an SSL request
-if ($ENV{'SERVER_ADDR'} && $ENV{'HTTPS'} ne 'on') {
-    print "Status: 302 Moved\r\n";
-    print "Location: https://$ENV{'SERVER_ADDR'}:444/$ENV{'PATH_INFO'}\r\n\r\n";
-    exit 0;
-}
-
 ### Initialize environment
 &General::readhash("${swroot}/main/settings", \%settings);
 $hostname = $settings{'HOSTNAME'};
