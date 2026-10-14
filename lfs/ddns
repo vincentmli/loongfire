@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -24,11 +24,11 @@
 
 include Config
 
-VER        = 014
+VER        = 015
 
 THISAPP    = ddns-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
-DL_FROM    = https://source.ipfire.org/releases/ddns/
+DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 
@@ -40,7 +40,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 007bf9f062bc0dc5c8c7ea946dcfabd03faff5f5c1791e9141f01a7d80bbc899b3565bf5e69f44f66ebe39b3ab02b95e3f6e25daa145272cef6ce4bd7f2bd82c
+$(DL_FILE)_BLAKE2 = 8aa55f69ea2a3aa45f7ab243b4c198f82f397a7a4ea371e8945006a3db2ec428be8d6216f1fa6222a1297cc353634a50fd8b4ee56aacfa098df90630dbce7648
 
 install : $(TARGET)
 
@@ -70,12 +70,6 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
-
-	# Apply upstream patches.
-	cd $(DIR_APP) && patch -Np1 -i $(DIR_SRC)/src/patches/ddns-014-freednsafraid-fix-typo.patch
-	cd $(DIR_APP) && patch -Np1 -i $(DIR_SRC)/src/patches/ddns-system-Catch-exception-when-host-is-not-dual-stacked.patch
-	cd $(DIR_APP) && patch -Np1 -i $(DIR_SRC)/src/patches/ddns-014_gettext-0.25_fix.patch
-
 	cd $(DIR_APP) && [ -x "configure" ] || sh ./autogen.sh
 	cd $(DIR_APP) && \
 		PKG_CONFIG=false \
@@ -83,9 +77,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 			--prefix=/usr \
 			--sysconfdir=/var/ipfire \
 			--disable-manpages
-
 	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install
-
 	@rm -rf $(DIR_APP)
 	@$(POSTBUILD)
