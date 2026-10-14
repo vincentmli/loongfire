@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -26,7 +26,7 @@ include Config
 
 SUMMARY    = The Reliable, High Performance TCP/HTTP Load Balancer
 
-VER        = 3.2.15
+VER        = 3.4.3
 
 # From: https://www.haproxy.org/download/
 
@@ -36,7 +36,7 @@ DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = haproxy
-PAK_VER    = 34
+PAK_VER    = 36
 
 DEPS       =
 
@@ -54,7 +54,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 7b7dbb9d5b1e3da92d46b642c1cd69fbe5aae790706f7a3b0e55fae61d1078d7f33e094b200c450e32a609609c92f533f1c1237026ce4f03fe8d21a6736ce042
+$(DL_FILE)_BLAKE2 = 75e8edf463e1e9a53a17aee51ef5995c800fe8e1bc043bb08aee55eb528b937f382f2488a8c7e155bbe5fad979c268cbc427d9317ef2bc9ac117940e7ac5bdd0
 
 install : $(TARGET)
 
@@ -89,7 +89,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 
 	cd $(DIR_APP) && make $(MAKETUNING) CPU="generic" TARGET="linux-glibc" \
-		USE_LUA=1 USE_OPENSSL=1 USE_PCRE2=1 USE_PCRE2_JIT=1 USE_ZLIB=1 USE_REGPARM=1 \
+		USE_LUA=1 USE_OPENSSL=1 USE_PCRE2=1 USE_PCRE2_JIT=1 USE_ZLIB=1 \
 		LUA_LIB_NAME="lua" ADDINC="$(CFLAGS)" USE_LINUX_TPROXY=1 ADDLIB="$(LDFLAGS)"
 
 	cd $(DIR_APP) && make install-bin install-man PREFIX=/usr
