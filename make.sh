@@ -153,7 +153,12 @@ find_base() {
 }
 
 system_processors() {
-	getconf _NPROCESSORS_ONLN 2>/dev/null || echo "1"
+        # On some systems, the build system might run in a CPU affinity group
+        # which means that some CPUs are not available to be used. getconf will
+        # however report the total number which launches more processes than
+        # we want. nproc gets this right (without --all) so we will prefer
+        # nproc, but fall back to getconf.
+        nproc 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo "1"
 }
 
 system_memory() {
