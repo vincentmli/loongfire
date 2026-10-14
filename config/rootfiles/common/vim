@@ -41,6 +41,8 @@ usr/share/vim
 #usr/share/vim/vim92/autoload/RstFold.vim
 #usr/share/vim/vim92/autoload/ada.vim
 #usr/share/vim/vim92/autoload/adacomplete.vim
+#usr/share/vim/vim92/autoload/beancount.vim
+#usr/share/vim/vim92/autoload/beancountcomplete.vim
 #usr/share/vim/vim92/autoload/bitbake.vim
 #usr/share/vim/vim92/autoload/cargo
 #usr/share/vim/vim92/autoload/cargo.vim
@@ -131,6 +133,7 @@ usr/share/vim
 #usr/share/vim/vim92/colors/lunaperche.vim
 #usr/share/vim/vim92/colors/morning.vim
 #usr/share/vim/vim92/colors/murphy.vim
+#usr/share/vim/vim92/colors/novum.vim
 #usr/share/vim/vim92/colors/pablo.vim
 #usr/share/vim/vim92/colors/peachpuff.vim
 #usr/share/vim/vim92/colors/quiet.vim
@@ -152,6 +155,7 @@ usr/share/vim
 #usr/share/vim/vim92/compiler/bash.vim
 #usr/share/vim/vim92/compiler/bcc.vim
 #usr/share/vim/vim92/compiler/bdf.vim
+#usr/share/vim/vim92/compiler/bean_check.vim
 #usr/share/vim/vim92/compiler/biome.vim
 #usr/share/vim/vim92/compiler/cabal.vim
 #usr/share/vim/vim92/compiler/cargo.vim
@@ -196,6 +200,7 @@ usr/share/vim
 #usr/share/vim/vim92/compiler/haml.vim
 #usr/share/vim/vim92/compiler/hare.vim
 #usr/share/vim/vim92/compiler/hp_acc.vim
+#usr/share/vim/vim92/compiler/iar.vim
 #usr/share/vim/vim92/compiler/icc.vim
 #usr/share/vim/vim92/compiler/icon.vim
 #usr/share/vim/vim92/compiler/ifort.vim
@@ -475,7 +480,9 @@ usr/share/vim
 #usr/share/vim/vim92/ftplugin/awk.vim
 #usr/share/vim/vim92/ftplugin/bash.vim
 #usr/share/vim/vim92/ftplugin/basic.vim
+#usr/share/vim/vim92/ftplugin/bazelrc.vim
 #usr/share/vim/vim92/ftplugin/bdf.vim
+#usr/share/vim/vim92/ftplugin/beancount.vim
 #usr/share/vim/vim92/ftplugin/bicep-params.vim
 #usr/share/vim/vim92/ftplugin/bicep.vim
 #usr/share/vim/vim92/ftplugin/bindzone.vim
@@ -577,6 +584,7 @@ usr/share/vim
 #usr/share/vim/vim92/ftplugin/gitconfig.vim
 #usr/share/vim/vim92/ftplugin/gitignore.vim
 #usr/share/vim/vim92/ftplugin/gitrebase.vim
+#usr/share/vim/vim92/ftplugin/gitrevlist.vim
 #usr/share/vim/vim92/ftplugin/gitsendemail.vim
 #usr/share/vim/vim92/ftplugin/gleam.vim
 #usr/share/vim/vim92/ftplugin/go.vim
@@ -599,6 +607,8 @@ usr/share/vim
 #usr/share/vim/vim92/ftplugin/heex.vim
 #usr/share/vim/vim92/ftplugin/help.vim
 #usr/share/vim/vim92/ftplugin/hgcommit.vim
+#usr/share/vim/vim92/ftplugin/hip.vim
+#usr/share/vim/vim92/ftplugin/hlsl.vim
 #usr/share/vim/vim92/ftplugin/hlsplaylist.vim
 #usr/share/vim/vim92/ftplugin/hog.vim
 #usr/share/vim/vim92/ftplugin/hostconf.vim
@@ -610,6 +620,7 @@ usr/share/vim
 #usr/share/vim/vim92/ftplugin/hurl.vim
 #usr/share/vim/vim92/ftplugin/hyprlang.vim
 #usr/share/vim/vim92/ftplugin/i3config.vim
+#usr/share/vim/vim92/ftplugin/icalendar.vim
 #usr/share/vim/vim92/ftplugin/icon.vim
 #usr/share/vim/vim92/ftplugin/idris2.vim
 #usr/share/vim/vim92/ftplugin/indent.vim
@@ -621,12 +632,14 @@ usr/share/vim
 #usr/share/vim/vim92/ftplugin/javacc.vim
 #usr/share/vim/vim92/ftplugin/javascript.vim
 #usr/share/vim/vim92/ftplugin/javascriptreact.vim
+#usr/share/vim/vim92/ftplugin/jinja.vim
 #usr/share/vim/vim92/ftplugin/jjdescription.vim
 #usr/share/vim/vim92/ftplugin/jproperties.vim
 #usr/share/vim/vim92/ftplugin/jq.vim
 #usr/share/vim/vim92/ftplugin/json.vim
 #usr/share/vim/vim92/ftplugin/json5.vim
 #usr/share/vim/vim92/ftplugin/jsonc.vim
+#usr/share/vim/vim92/ftplugin/jsonld.vim
 #usr/share/vim/vim92/ftplugin/jsonnet.vim
 #usr/share/vim/vim92/ftplugin/jsp.vim
 #usr/share/vim/vim92/ftplugin/julia.vim
@@ -697,6 +710,7 @@ usr/share/vim
 #usr/share/vim/vim92/ftplugin/muttrc.vim
 #usr/share/vim/vim92/ftplugin/mysql.vim
 #usr/share/vim/vim92/ftplugin/nanorc.vim
+#usr/share/vim/vim92/ftplugin/nasm.vim
 #usr/share/vim/vim92/ftplugin/neomuttrc.vim
 #usr/share/vim/vim92/ftplugin/netrc.vim
 #usr/share/vim/vim92/ftplugin/nginx.vim
@@ -755,6 +769,7 @@ usr/share/vim
 #usr/share/vim/vim92/ftplugin/r.vim
 #usr/share/vim/vim92/ftplugin/racc.vim
 #usr/share/vim/vim92/ftplugin/racket.vim
+#usr/share/vim/vim92/ftplugin/radvd.vim
 #usr/share/vim/vim92/ftplugin/raku.vim
 #usr/share/vim/vim92/ftplugin/rasi.vim
 #usr/share/vim/vim92/ftplugin/readline.vim
@@ -767,6 +782,7 @@ usr/share/vim
 #usr/share/vim/vim92/ftplugin/rmd.vim
 #usr/share/vim/vim92/ftplugin/rnc.vim
 #usr/share/vim/vim92/ftplugin/rnoweb.vim
+#usr/share/vim/vim92/ftplugin/robot.vim
 #usr/share/vim/vim92/ftplugin/roc.vim
 #usr/share/vim/vim92/ftplugin/routeros.vim
 #usr/share/vim/vim92/ftplugin/rpl.vim
@@ -834,6 +850,7 @@ usr/share/vim
 #usr/share/vim/vim92/ftplugin/tiasm.vim
 #usr/share/vim/vim92/ftplugin/tidy.vim
 #usr/share/vim/vim92/ftplugin/tmux.vim
+#usr/share/vim/vim92/ftplugin/tolk.vim
 #usr/share/vim/vim92/ftplugin/toml.vim
 #usr/share/vim/vim92/ftplugin/treetop.vim
 #usr/share/vim/vim92/ftplugin/tt2html.vim
@@ -899,12 +916,14 @@ usr/share/vim
 #usr/share/vim/vim92/indent/awk.vim
 #usr/share/vim/vim92/indent/bash.vim
 #usr/share/vim/vim92/indent/basic.vim
+#usr/share/vim/vim92/indent/beancount.vim
 #usr/share/vim/vim92/indent/bib.vim
 #usr/share/vim/vim92/indent/bitbake.vim
 #usr/share/vim/vim92/indent/bpftrace.vim
 #usr/share/vim/vim92/indent/bst.vim
 #usr/share/vim/vim92/indent/bzl.vim
 #usr/share/vim/vim92/indent/c.vim
+#usr/share/vim/vim92/indent/cabal.vim
 #usr/share/vim/vim92/indent/cdl.vim
 #usr/share/vim/vim92/indent/ch.vim
 #usr/share/vim/vim92/indent/chaiscript.vim
@@ -954,6 +973,8 @@ usr/share/vim
 #usr/share/vim/vim92/indent/handlebars.vim
 #usr/share/vim/vim92/indent/hare.vim
 #usr/share/vim/vim92/indent/hcl.vim
+#usr/share/vim/vim92/indent/hip.vim
+#usr/share/vim/vim92/indent/hlsl.vim
 #usr/share/vim/vim92/indent/hog.vim
 #usr/share/vim/vim92/indent/html.vim
 #usr/share/vim/vim92/indent/htmldjango.vim
@@ -967,9 +988,11 @@ usr/share/vim
 #usr/share/vim/vim92/indent/json.vim
 #usr/share/vim/vim92/indent/json5.vim
 #usr/share/vim/vim92/indent/jsonc.vim
+#usr/share/vim/vim92/indent/jsonld.vim
 #usr/share/vim/vim92/indent/jsp.vim
 #usr/share/vim/vim92/indent/julia.vim
 #usr/share/vim/vim92/indent/just.vim
+#usr/share/vim/vim92/indent/karel.vim
 #usr/share/vim/vim92/indent/kdl.vim
 #usr/share/vim/vim92/indent/kotlin.vim
 #usr/share/vim/vim92/indent/krl.vim
@@ -1339,8 +1362,10 @@ usr/share/vim
 #usr/share/vim/vim92/syntax/baan.vim
 #usr/share/vim/vim92/syntax/bash.vim
 #usr/share/vim/vim92/syntax/basic.vim
+#usr/share/vim/vim92/syntax/bazelrc.vim
 #usr/share/vim/vim92/syntax/bc.vim
 #usr/share/vim/vim92/syntax/bdf.vim
+#usr/share/vim/vim92/syntax/beancount.vim
 #usr/share/vim/vim92/syntax/bib.vim
 #usr/share/vim/vim92/syntax/bindzone.vim
 #usr/share/vim/vim92/syntax/bitbake.vim
@@ -1458,6 +1483,7 @@ usr/share/vim
 #usr/share/vim/vim92/syntax/dylanintr.vim
 #usr/share/vim/vim92/syntax/dylanlid.vim
 #usr/share/vim/vim92/syntax/ecd.vim
+#usr/share/vim/vim92/syntax/ed.vim
 #usr/share/vim/vim92/syntax/edif.vim
 #usr/share/vim/vim92/syntax/editorconfig.vim
 #usr/share/vim/vim92/syntax/eiffel.vim
@@ -1513,6 +1539,7 @@ usr/share/vim
 #usr/share/vim/vim92/syntax/gitignore.vim
 #usr/share/vim/vim92/syntax/gitolite.vim
 #usr/share/vim/vim92/syntax/gitrebase.vim
+#usr/share/vim/vim92/syntax/gitrevlist.vim
 #usr/share/vim/vim92/syntax/gitsendemail.vim
 #usr/share/vim/vim92/syntax/gkrellmrc.vim
 #usr/share/vim/vim92/syntax/gleam.vim
@@ -1553,7 +1580,9 @@ usr/share/vim
 #usr/share/vim/vim92/syntax/hercules.vim
 #usr/share/vim/vim92/syntax/hex.vim
 #usr/share/vim/vim92/syntax/hgcommit.vim
+#usr/share/vim/vim92/syntax/hip.vim
 #usr/share/vim/vim92/syntax/hitest.vim
+#usr/share/vim/vim92/syntax/hlsl.vim
 #usr/share/vim/vim92/syntax/hlsplaylist.vim
 #usr/share/vim/vim92/syntax/hog.vim
 #usr/share/vim/vim92/syntax/hollywood.vim
@@ -1569,6 +1598,7 @@ usr/share/vim
 #usr/share/vim/vim92/syntax/i3config.vim
 #usr/share/vim/vim92/syntax/ia64.vim
 #usr/share/vim/vim92/syntax/ibasic.vim
+#usr/share/vim/vim92/syntax/icalendar.vim
 #usr/share/vim/vim92/syntax/icemenu.vim
 #usr/share/vim/vim92/syntax/icon.vim
 #usr/share/vim/vim92/syntax/idl.vim
@@ -1602,6 +1632,7 @@ usr/share/vim
 #usr/share/vim/vim92/syntax/json.vim
 #usr/share/vim/vim92/syntax/json5.vim
 #usr/share/vim/vim92/syntax/jsonc.vim
+#usr/share/vim/vim92/syntax/jsonld.vim
 #usr/share/vim/vim92/syntax/jsp.vim
 #usr/share/vim/vim92/syntax/julia.vim
 #usr/share/vim/vim92/syntax/just.vim
@@ -1668,6 +1699,7 @@ usr/share/vim
 #usr/share/vim/vim92/syntax/manual.vim
 #usr/share/vim/vim92/syntax/maple.vim
 #usr/share/vim/vim92/syntax/markdown.vim
+#usr/share/vim/vim92/syntax/marko.vim
 #usr/share/vim/vim92/syntax/masm.vim
 #usr/share/vim/vim92/syntax/mason.vim
 #usr/share/vim/vim92/syntax/master.vim
@@ -1813,6 +1845,7 @@ usr/share/vim
 #usr/share/vim/vim92/syntax/racc.vim
 #usr/share/vim/vim92/syntax/racket.vim
 #usr/share/vim/vim92/syntax/radiance.vim
+#usr/share/vim/vim92/syntax/radvd.vim
 #usr/share/vim/vim92/syntax/raku.vim
 #usr/share/vim/vim92/syntax/raml.vim
 #usr/share/vim/vim92/syntax/rapid.vim
@@ -1867,6 +1900,7 @@ usr/share/vim
 #usr/share/vim/vim92/syntax/services.vim
 #usr/share/vim/vim92/syntax/setserial.vim
 #usr/share/vim/vim92/syntax/sexplib.vim
+#usr/share/vim/vim92/syntax/sgf.vim
 #usr/share/vim/vim92/syntax/sgml.vim
 #usr/share/vim/vim92/syntax/sgmldecl.vim
 #usr/share/vim/vim92/syntax/sgmllnx.vim
@@ -1927,8 +1961,12 @@ usr/share/vim
 #usr/share/vim/vim92/syntax/srec.vim
 #usr/share/vim/vim92/syntax/srt.vim
 #usr/share/vim/vim92/syntax/ssa.vim
+#usr/share/vim/vim92/syntax/sshallowedsigners.vim
+#usr/share/vim/vim92/syntax/sshauthorizedkeys.vim
 #usr/share/vim/vim92/syntax/sshconfig.vim
 #usr/share/vim/vim92/syntax/sshdconfig.vim
+#usr/share/vim/vim92/syntax/sshknownhosts.vim
+#usr/share/vim/vim92/syntax/sshpublickey.vim
 #usr/share/vim/vim92/syntax/st.vim
 #usr/share/vim/vim92/syntax/stata.vim
 #usr/share/vim/vim92/syntax/stp.vim
@@ -1936,6 +1974,7 @@ usr/share/vim
 #usr/share/vim/vim92/syntax/structurizr.vim
 #usr/share/vim/vim92/syntax/stylus.vim
 #usr/share/vim/vim92/syntax/sudoers.vim
+#usr/share/vim/vim92/syntax/svelte.vim
 #usr/share/vim/vim92/syntax/svg.vim
 #usr/share/vim/vim92/syntax/svn.vim
 #usr/share/vim/vim92/syntax/swayconfig.vim
@@ -1975,6 +2014,7 @@ usr/share/vim
 #usr/share/vim/vim92/syntax/tilde.vim
 #usr/share/vim/vim92/syntax/tli.vim
 #usr/share/vim/vim92/syntax/tmux.vim
+#usr/share/vim/vim92/syntax/tolk.vim
 #usr/share/vim/vim92/syntax/toml.vim
 #usr/share/vim/vim92/syntax/tpp.vim
 #usr/share/vim/vim92/syntax/trasys.vim
@@ -2093,6 +2133,7 @@ usr/share/vim
 #usr/share/vim/vim92/tools/xcmdsrv_client.c
 #usr/share/vim/vim92/tutor
 #usr/share/vim/vim92/tutor/README.el.txt
+#usr/share/vim/vim92/tutor/README.it.txt
 #usr/share/vim/vim92/tutor/README.ru.txt
 #usr/share/vim/vim92/tutor/README.sv.txt
 #usr/share/vim/vim92/tutor/README.txt

@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 9.2.0526
+VER        = 9.2.1132
 
 THISAPP    = vim-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -44,7 +44,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 0768ae9f4649bd3f5629138505e35f9aa16a6b70977abd0ef1f1398141dca8ce5b0912dbbc5f5d87bc179ff67c542aed8ec1f751da49633b2066a2b973a1f4e9
+$(DL_FILE)_BLAKE2 = 7b0c2563c639295324c82fa3f1495710af8520e3617d3021023590d8185e987dd6644f98839ce1d9e31f96e29cdc765c0ff3657d35acb9aaca9dd0f9b0af3793
 
 install : $(TARGET)
 
