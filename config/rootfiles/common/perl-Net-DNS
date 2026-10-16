@@ -90,9 +90,9 @@ usr/lib/perl5/site_perl/5.42.2/Net/DNS/Resolver/os390.pm
 usr/lib/perl5/site_perl/5.42.2/Net/DNS/Text.pm
 usr/lib/perl5/site_perl/5.42.2/Net/DNS/Update.pm
 usr/lib/perl5/site_perl/5.42.2/Net/DNS/ZoneFile.pm
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Net
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Net/DNS
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Net/DNS/.packlist
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Net
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Net/DNS
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Net/DNS/.packlist
 #usr/share/man/man3/Net::DNS.3
 #usr/share/man/man3/Net::DNS::Domain.3
 #usr/share/man/man3/Net::DNS::DomainName.3

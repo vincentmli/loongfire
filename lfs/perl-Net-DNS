@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 1.55
+VER        = 1.57
 
 THISAPP    = Net-DNS-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -40,7 +40,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 65b916205c4281a2e8214179f9cecc9132d1f11f0913f9c032e3f532cd107b26f320f62e50ac05f4b2bb96fbcffe2f93e3ff70807ec356ed3b4b5699362789dd
+$(DL_FILE)_BLAKE2 = b177e850dbcf592c9da25413bb46b11b408fb9139fc65758dad1fd4bfc8e69184a2c9f294a737d52e20fdcff4973cfe214f8107d6219b5eac8144d674b325669
 
 install : $(TARGET)
 
