@@ -530,7 +530,7 @@ entershell() {
 	local PS1="ipfire build chroot (${BUILD_ARCH}) \u:\w\$ "
 
 	# Run an interactive shell
-	execute --chroot --interactive --network bash -i
+	execute --chroot --enable-toolchain --interactive --network bash -i
 }
 
 lfsmakecommoncheck() {
