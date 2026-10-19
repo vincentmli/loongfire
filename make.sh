@@ -271,24 +271,6 @@ print_build_summary() {
 	print_status DONE
 }
 
-cleanrd() {
-        if mountpoint "${BUILD_DIR}/usr/src" > /dev/null ; then
-                print_line "Unmount /usr/src ramdisk ..."
-                umount "${BUILD_DIR}/usr/src/cache"
-                umount "${BUILD_DIR}/usr/src/ccache"
-                umount "${BUILD_DIR}/usr/src/config"
-                umount "${BUILD_DIR}/usr/src/doc"
-                umount "${BUILD_DIR}/usr/src/html"
-                umount "${BUILD_DIR}/usr/src/images"
-                umount "${BUILD_DIR}/usr/src/log"
-                umount "${BUILD_DIR}/usr/src/lfs"
-                umount "${BUILD_DIR}/usr/src/po"
-                umount "${BUILD_DIR}/usr/src/src"
-                umount "${BUILD_DIR}/usr/src"
-                print_status DONE
-        fi
-}
-
 exiterror() {
 	# Dump logfile
 	if [ -n "${LOGFILE}" ] && [ -e "${LOGFILE}" ]; then
@@ -307,8 +289,6 @@ exiterror() {
 		print_line "${line}"
 		print_status FAIL
 	done
-
-	cleanrd
 
 	exit 1
 }
@@ -394,6 +374,16 @@ prepareenv() {
 	mkdir -p "${BUILD_DIR}/sys"
 	mkdir -p "${BUILD_DIR}/tmp"
 	mkdir -p "${BUILD_DIR}/usr/src"
+	mkdir -p "${BUILD_DIR}/usr/src/cache"
+	mkdir -p "${BUILD_DIR}/usr/src/ccache"
+	mkdir -p "${BUILD_DIR}/usr/src/config"
+	mkdir -p "${BUILD_DIR}/usr/src/doc"
+	mkdir -p "${BUILD_DIR}/usr/src/html"
+	mkdir -p "${BUILD_DIR}/usr/src/images"
+	mkdir -p "${BUILD_DIR}/usr/src/langs"
+	mkdir -p "${BUILD_DIR}/usr/src/lfs"
+	mkdir -p "${BUILD_DIR}/usr/src/log"
+	mkdir -p "${BUILD_DIR}/usr/src/src"
 
 	# Make BUILD_DIR a mountpoint
 	mount -o bind "${BUILD_DIR}" "${BUILD_DIR}"
@@ -417,26 +407,6 @@ prepareenv() {
 	# Create an empty /proc directory and make it a mountpoint
 	mkdir -p "${BUILD_DIR}/proc"
 	mount --bind "${BUILD_DIR}/proc" "${BUILD_DIR}/proc"
-
-        # Optionally make /usr/src a ramdisk for less disk I/O
-        if [ "${ENABLE_RAMDISK}" = "on" ]; then
-                print_line "Mounting /usr/src Ramdisk ..."
-                mount build_usr_src "${BUILD_DIR}/usr/src" \
-                        -t tmpfs -o size=8G,nr_inodes=1M,mode=1777
-                print_status DONE
-        fi
-
-        # Create directories in /usr/src
-        mkdir -p "${BUILD_DIR}/usr/src/cache"
-        mkdir -p "${BUILD_DIR}/usr/src/ccache"
-        mkdir -p "${BUILD_DIR}/usr/src/config"
-        mkdir -p "${BUILD_DIR}/usr/src/doc"
-        mkdir -p "${BUILD_DIR}/usr/src/html"
-        mkdir -p "${BUILD_DIR}/usr/src/images"
-        mkdir -p "${BUILD_DIR}/usr/src/lfs"
-        mkdir -p "${BUILD_DIR}/usr/src/log"
-        mkdir -p "${BUILD_DIR}/usr/src/po"
-        mkdir -p "${BUILD_DIR}/usr/src/src"
 
 	# Make all sources and proc available under lfs build
 	mount --bind     	/sys					"${BUILD_DIR}/sys"
@@ -2401,19 +2371,9 @@ SYSTEM_MEMORY="$(system_memory)"
 BUILD_ARCH="${HOST_ARCH}"
 CCACHE_CACHE_SIZE="4G"
 
-# Auto use ramdisk the host system more than 10GB of RAM or more
-if [ ${SYSTEM_MEMORY} -ge 10240 ]; then
-        ENABLE_RAMDISK="on"
-fi
-
 # Load configuration file
 if [ -f .config ]; then
 	source .config
-fi
-
-# Disable even enforced ramdisk if the system has less than 6GB of RAM
-if [ ${SYSTEM_MEMORY} -lt 6200 ]; then
-        ENABLE_RAMDISK="off"
 fi
 
 # Parse any command line options (not commands)
@@ -2540,22 +2500,6 @@ BUILDTARGET="${BUILD_ARCH}-pc-linux-gnu"
 # Use this as default PARALLELISM
 DEFAULT_PARALLELISM="${SYSTEM_PROCESSORS}"
 
-# Unpacked and Compiled kernel needs 4300GB on Ramdisk
-# and one thread around 850MB Ram
-if [ "${ENABLE_RAMDISK}" = "on" ]; then
-        if [ $DEFAULT_PARALLELISM -gt $(((${SYSTEM_MEMORY}-4500)/850)) ]; then
-                DEFAULT_PARALLELISM=$(((${SYSTEM_MEMORY}-4500)/850))
-        fi
-else
-        if [ $DEFAULT_PARALLELISM -gt $((${SYSTEM_MEMORY}/850)) ]; then
-                DEFAULT_PARALLELISM=$((${SYSTEM_MEMORY}/850))
-        fi
-fi
-
-if [ $DEFAULT_PARALLELISM -lt 1 ]; then
-        DEFAULT_PARALLELISM=1
-fi
-
 # Limit lauched ninja build jobs to computed parallel value
 NINJAJOBS="${DEFAULT_PARALLELISM}"
 
@@ -2638,9 +2582,6 @@ build)
 	check_changed_rootfiles
 
 	print_build_summary $(( SECONDS - START_TIME ))
-
-	cleanrd
-
 	;;
 build_package)
 	START_TIME="${SECONDS}"
@@ -2669,7 +2610,6 @@ shell)
 	# may be used to changed kernel settings
 	prepareenv --network
 	entershell
-	cleanrd
 	;;
 check)
 	check_changed_rootfiles
@@ -2716,7 +2656,6 @@ toolchain)
 	if ! compress_toolchain "${TOOLCHAIN}"; then
 		exiterror "Could not compress toolchain"
 	fi
-	cleanrd
 	;;
 
 gettoolchain)
