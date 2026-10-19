@@ -67,10 +67,6 @@ ifeq "$(ROOT)" ""
 	--disable-nls
   EXTRA_MAKE =
   EXTRA_INSTALL =
-ifeq "$(PASS)" "A"
-  TARGET = $(DIR_INFO)/$(THISAPP)-libatomic
-  ROOTFILE_APPEND = "-libatomic"
-endif
 else
 ifeq "$(PASS)" "1"
   TARGET = $(DIR_INFO)/$(THISAPP)-tools1
@@ -277,15 +273,6 @@ ifeq "$(PASS)" "L"
 	cd $(DIR_SRC)/gcc-build && make $(EXTRA_MAKE) $(MAKETUNING)
 	cd $(DIR_SRC)/gcc-build && make $(EXTRA_INSTALL) install
 else
-ifeq "$(PASS)" "A"
-	# libatomic pass
-	cd $(DIR_SRC)/gcc-build && \
-		$(EXTRA_ENV) \
-		$(DIR_APP)/libatomic/configure \
-			$(EXTRA_CONFIG)
-	cd $(DIR_SRC)/gcc-build && make $(EXTRA_MAKE)
-	cd $(DIR_SRC)/gcc-build && make $(EXTRA_INSTALL) install
-else
 	# The actual build.
 	cd $(DIR_SRC)/gcc-build && \
 		$(EXTRA_ENV) \
@@ -293,7 +280,6 @@ else
 			$(EXTRA_CONFIG)
 	cd $(DIR_SRC)/gcc-build && make $(EXTRA_MAKE) $(MAKETUNING)
 	cd $(DIR_SRC)/gcc-build && make $(EXTRA_INSTALL) install
-endif
 endif
 
 ifeq "$(TOOLCHAIN)" "1"

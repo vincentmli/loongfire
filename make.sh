@@ -1407,7 +1407,6 @@ build_system() {
 	lfsmake2 --enable-toolchain tzdata
 	lfsmake2 --enable-toolchain cleanup-toolchain
 	lfsmake2 --enable-toolchain zlib-ng
-	[ "${BUILD_ARCH}" = "riscv64" ] && lfsmake2 --enable-toolchain gcc PASS=A
 	lfsmake2 --enable-toolchain zstd
 	lfsmake2 --enable-toolchain autoconf
 	lfsmake2 --enable-toolchain autoconf-archive
