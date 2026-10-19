@@ -56,6 +56,7 @@ usr/bin/locale
 #usr/include/bits/argp-ldbl.h
 #usr/include/bits/atomic_wide_counter.h
 #usr/include/bits/byteswap.h
+#usr/include/bits/cloexec.h
 #usr/include/bits/cmathcalls.h
 #usr/include/bits/confname.h
 #usr/include/bits/cpu-set.h
@@ -4463,6 +4464,20 @@ usr/lib/locale
 #usr/lib/locale/hr_HR/LC_PAPER
 #usr/lib/locale/hr_HR/LC_TELEPHONE
 #usr/lib/locale/hr_HR/LC_TIME
+#usr/lib/locale/hrx_BR.utf8
+#usr/lib/locale/hrx_BR.utf8/LC_ADDRESS
+#usr/lib/locale/hrx_BR.utf8/LC_COLLATE
+#usr/lib/locale/hrx_BR.utf8/LC_CTYPE
+#usr/lib/locale/hrx_BR.utf8/LC_IDENTIFICATION
+#usr/lib/locale/hrx_BR.utf8/LC_MEASUREMENT
+#usr/lib/locale/hrx_BR.utf8/LC_MESSAGES
+#usr/lib/locale/hrx_BR.utf8/LC_MESSAGES/SYS_LC_MESSAGES
+#usr/lib/locale/hrx_BR.utf8/LC_MONETARY
+#usr/lib/locale/hrx_BR.utf8/LC_NAME
+#usr/lib/locale/hrx_BR.utf8/LC_NUMERIC
+#usr/lib/locale/hrx_BR.utf8/LC_PAPER
+#usr/lib/locale/hrx_BR.utf8/LC_TELEPHONE
+#usr/lib/locale/hrx_BR.utf8/LC_TIME
 #usr/lib/locale/hsb_DE
 #usr/lib/locale/hsb_DE.utf8
 #usr/lib/locale/hsb_DE.utf8/LC_ADDRESS
@@ -8250,6 +8265,7 @@ usr/lib/locale
 #usr/share/i18n/locales/hif_FJ
 #usr/share/i18n/locales/hne_IN
 #usr/share/i18n/locales/hr_HR
+#usr/share/i18n/locales/hrx_BR
 #usr/share/i18n/locales/hsb_DE
 #usr/share/i18n/locales/ht_HT
 #usr/share/i18n/locales/hu_HU
@@ -8468,6 +8484,9 @@ usr/lib/locale
 #usr/share/info/libc.info-7
 #usr/share/info/libc.info-8
 #usr/share/info/libc.info-9
+#usr/share/locale/ar
+#usr/share/locale/ar/LC_MESSAGES
+#usr/share/locale/ar/LC_MESSAGES/libc.mo
 #usr/share/locale/be
 #usr/share/locale/be/LC_MESSAGES
 #usr/share/locale/be/LC_MESSAGES/libc.mo

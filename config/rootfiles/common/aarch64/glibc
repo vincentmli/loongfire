@@ -60,6 +60,7 @@ usr/bin/locale
 #usr/include/bits/argp-ldbl.h
 #usr/include/bits/atomic_wide_counter.h
 #usr/include/bits/byteswap.h
+#usr/include/bits/cloexec.h
 #usr/include/bits/cmathcalls.h
 #usr/include/bits/confname.h
 #usr/include/bits/cpu-set.h
@@ -77,6 +78,7 @@ usr/bin/locale
 #usr/include/bits/error-ldbl.h
 #usr/include/bits/error.h
 #usr/include/bits/eventfd.h
+#usr/include/bits/fcntl-linux-fortify.h
 #usr/include/bits/fcntl-linux.h
 #usr/include/bits/fcntl.h
 #usr/include/bits/fcntl2.h
@@ -92,6 +94,8 @@ usr/bin/locale
 #usr/include/bits/hwcap.h
 #usr/include/bits/in.h
 #usr/include/bits/indirect-return.h
+#usr/include/bits/inet-fortified-decl.h
+#usr/include/bits/inet-fortified.h
 #usr/include/bits/initspin.h
 #usr/include/bits/inotify.h
 #usr/include/bits/ioctl-types.h
@@ -109,6 +113,7 @@ usr/bin/locale
 #usr/include/bits/long-double.h
 #usr/include/bits/math-vector.h
 #usr/include/bits/mathcalls-helper-functions.h
+#usr/include/bits/mathcalls-macros.h
 #usr/include/bits/mathcalls-narrow.h
 #usr/include/bits/mathcalls.h
 #usr/include/bits/mathdef.h
@@ -122,9 +127,9 @@ usr/bin/locale
 #usr/include/bits/mqueue2.h
 #usr/include/bits/msq.h
 #usr/include/bits/netdb.h
+#usr/include/bits/openat2.h
 #usr/include/bits/param.h
 #usr/include/bits/poll.h
-#usr/include/bits/platform/features.h
 #usr/include/bits/poll2.h
 #usr/include/bits/posix1_lim.h
 #usr/include/bits/posix2_lim.h
@@ -207,6 +212,7 @@ usr/bin/locale
 #usr/include/bits/termios-c_iflag.h
 #usr/include/bits/termios-c_lflag.h
 #usr/include/bits/termios-c_oflag.h
+#usr/include/bits/termios-cbaud.h
 #usr/include/bits/termios-misc.h
 #usr/include/bits/termios-struct.h
 #usr/include/bits/termios-tcflow.h
@@ -234,6 +240,7 @@ usr/bin/locale
 #usr/include/bits/types/idtype_t.h
 #usr/include/bits/types/locale_t.h
 #usr/include/bits/types/mbstate_t.h
+#usr/include/bits/types/once_flag.h
 #usr/include/bits/types/res_state.h
 #usr/include/bits/types/sig_atomic_t.h
 #usr/include/bits/types/sigevent_t.h
@@ -512,7 +519,6 @@ usr/bin/locale
 #usr/include/sysexits.h
 #usr/include/syslog.h
 #usr/include/tar.h
-#usr/include/termio.h
 #usr/include/termios.h
 #usr/include/tgmath.h
 #usr/include/thread_db.h
@@ -812,7 +818,7 @@ usr/lib/gconv
 #usr/lib/libc_nonshared.a
 #usr/lib/libdl.a
 #usr/lib/libg.a
-#usr/lib/libm-2.40.a
+#usr/lib/libm-2.44.a
 #usr/lib/libm.a
 #usr/lib/libm.so
 #usr/lib/libmcheck.a
@@ -2956,6 +2962,20 @@ usr/lib/locale
 #usr/lib/locale/en_SC.utf8/LC_PAPER
 #usr/lib/locale/en_SC.utf8/LC_TELEPHONE
 #usr/lib/locale/en_SC.utf8/LC_TIME
+#usr/lib/locale/en_SE.utf8
+#usr/lib/locale/en_SE.utf8/LC_ADDRESS
+#usr/lib/locale/en_SE.utf8/LC_COLLATE
+#usr/lib/locale/en_SE.utf8/LC_CTYPE
+#usr/lib/locale/en_SE.utf8/LC_IDENTIFICATION
+#usr/lib/locale/en_SE.utf8/LC_MEASUREMENT
+#usr/lib/locale/en_SE.utf8/LC_MESSAGES
+#usr/lib/locale/en_SE.utf8/LC_MESSAGES/SYS_LC_MESSAGES
+#usr/lib/locale/en_SE.utf8/LC_MONETARY
+#usr/lib/locale/en_SE.utf8/LC_NAME
+#usr/lib/locale/en_SE.utf8/LC_NUMERIC
+#usr/lib/locale/en_SE.utf8/LC_PAPER
+#usr/lib/locale/en_SE.utf8/LC_TELEPHONE
+#usr/lib/locale/en_SE.utf8/LC_TIME
 #usr/lib/locale/en_SG
 #usr/lib/locale/en_SG.utf8
 #usr/lib/locale/en_SG.utf8/LC_ADDRESS
@@ -4454,6 +4474,20 @@ usr/lib/locale
 #usr/lib/locale/hr_HR/LC_PAPER
 #usr/lib/locale/hr_HR/LC_TELEPHONE
 #usr/lib/locale/hr_HR/LC_TIME
+#usr/lib/locale/hrx_BR.utf8
+#usr/lib/locale/hrx_BR.utf8/LC_ADDRESS
+#usr/lib/locale/hrx_BR.utf8/LC_COLLATE
+#usr/lib/locale/hrx_BR.utf8/LC_CTYPE
+#usr/lib/locale/hrx_BR.utf8/LC_IDENTIFICATION
+#usr/lib/locale/hrx_BR.utf8/LC_MEASUREMENT
+#usr/lib/locale/hrx_BR.utf8/LC_MESSAGES
+#usr/lib/locale/hrx_BR.utf8/LC_MESSAGES/SYS_LC_MESSAGES
+#usr/lib/locale/hrx_BR.utf8/LC_MONETARY
+#usr/lib/locale/hrx_BR.utf8/LC_NAME
+#usr/lib/locale/hrx_BR.utf8/LC_NUMERIC
+#usr/lib/locale/hrx_BR.utf8/LC_PAPER
+#usr/lib/locale/hrx_BR.utf8/LC_TELEPHONE
+#usr/lib/locale/hrx_BR.utf8/LC_TIME
 #usr/lib/locale/hsb_DE
 #usr/lib/locale/hsb_DE.utf8
 #usr/lib/locale/hsb_DE.utf8/LC_ADDRESS
@@ -8173,6 +8207,7 @@ usr/lib/locale
 #usr/share/i18n/locales/en_NZ
 #usr/share/i18n/locales/en_PH
 #usr/share/i18n/locales/en_SC
+#usr/share/i18n/locales/en_SE
 #usr/share/i18n/locales/en_SG
 #usr/share/i18n/locales/en_US
 #usr/share/i18n/locales/en_ZA
@@ -8240,6 +8275,7 @@ usr/lib/locale
 #usr/share/i18n/locales/hif_FJ
 #usr/share/i18n/locales/hne_IN
 #usr/share/i18n/locales/hr_HR
+#usr/share/i18n/locales/hrx_BR
 #usr/share/i18n/locales/hsb_DE
 #usr/share/i18n/locales/ht_HT
 #usr/share/i18n/locales/hu_HU
@@ -8450,6 +8486,7 @@ usr/lib/locale
 #usr/share/info/libc.info-18
 #usr/share/info/libc.info-19
 #usr/share/info/libc.info-2
+#usr/share/info/libc.info-20
 #usr/share/info/libc.info-3
 #usr/share/info/libc.info-4
 #usr/share/info/libc.info-5
@@ -8457,6 +8494,9 @@ usr/lib/locale
 #usr/share/info/libc.info-7
 #usr/share/info/libc.info-8
 #usr/share/info/libc.info-9
+#usr/share/locale/ar
+#usr/share/locale/ar/LC_MESSAGES
+#usr/share/locale/ar/LC_MESSAGES/libc.mo
 #usr/share/locale/be
 #usr/share/locale/be/LC_MESSAGES
 #usr/share/locale/be/LC_MESSAGES/libc.mo
