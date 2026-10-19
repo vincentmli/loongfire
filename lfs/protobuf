@@ -73,6 +73,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	cd $(DIR_APP) && cmake . \
 				-D CMAKE_INSTALL_PREFIX=/usr \
 				-D CMAKE_BUILD_TYPE=Release \
+				D CMAKE_CXX_STANDARD:STRING=17 \
 				-D protobuf_BUILD_TESTS=OFF \
 				-D protobuf_BUILD_SHARED_LIBS=ON \
 				-D protobuf_ABSL_PROVIDER=package
