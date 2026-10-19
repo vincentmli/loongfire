@@ -2562,12 +2562,12 @@ NINJAJOBS="${DEFAULT_PARALLELISM}"
 
 # Configure XZ
 XZ_OPT=(
-	"-T0" "-8"
+	"-T${DEFAULT_PARALLELISM}" "-8"
 )
 
 # Configure Zstandard
 ZSTD_OPT=(
-	"-T0" "-19" "--long"
+	"-T${DEFAULT_PARALLELISM}" "-19" "--long"
 )
 
 # Set directories
