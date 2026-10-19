@@ -85,7 +85,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 		pahole.c
 
 	cd $(DIR_APP) && mkdir build 
-	cd $(DIR_APP)/build && cmake -D__LIB=lib -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_C_FLAGS="-O2" -DCMAKE_CXX_FLAGS="-O2" ..
+	cd $(DIR_APP)/build && cmake -D__LIB=lib -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_C_FLAGS="-O2" -DCMAKE_CXX_FLAGS="-O2" -DCMAKE_C_FLAGS="-Wno-error=unused-but-set-variable" ..
 	cd $(DIR_APP)/build && make && make install
 	@rm -rf $(DIR_APP)
 	@$(POSTBUILD)
