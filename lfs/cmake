@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -24,13 +24,16 @@
 
 include Config
 
-VER        = 4.1.1
+VER        = 4.4.3
 
 THISAPP    = cmake-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
 DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
+
+# Some files carry the name of an architecture on all architectures
+ROOTFILE_KEEP_LITERAL = 1
 
 MAX_PARALLELISM = $(shell echo $$(( $(SYSTEM_MEMORY) / 512)))
 
@@ -42,7 +45,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 8e0806d2d2342c646ca3379dd9481dd27705d84d9720dc572beadd9e8eac48dd27398df6bdade34eb5294416aa62bb075eaa622c28679a82bacafc66f1b165c2
+$(DL_FILE)_BLAKE2 = d30fc821adf3a8ba1dd2b64a62a4245ab0a4f97fc2295db8abfae3cffec566a7eee621fd722c5041df44b0bd767051c78b2f0898dec92c65ed3cf66ad9a59506
 
 install : $(TARGET)
 
@@ -73,7 +76,6 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 	cd $(DIR_APP) && sed -i '/"lib64"/s/64//' Modules/GNUInstallDirs.cmake
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/cmake-4.1.1_Avoid_using_undocumented_type_for_CURLOPT_PROXYTYPE_values.patch
 	cd $(DIR_APP) && ./bootstrap \
 			--prefix=/usr \
 			--mandir=/share/man \
