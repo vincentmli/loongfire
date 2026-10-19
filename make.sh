@@ -280,10 +280,9 @@ cleanrd() {
                 umount "${BUILD_DIR}/usr/src/doc"
                 umount "${BUILD_DIR}/usr/src/html"
                 umount "${BUILD_DIR}/usr/src/images"
-                umount "${BUILD_DIR}/usr/src/langs"
                 umount "${BUILD_DIR}/usr/src/log"
                 umount "${BUILD_DIR}/usr/src/lfs"
-                umount "${BUILD_DIR}/usr/src/log"
+                umount "${BUILD_DIR}/usr/src/po"
                 umount "${BUILD_DIR}/usr/src/src"
                 umount "${BUILD_DIR}/usr/src"
                 print_status DONE
@@ -434,9 +433,9 @@ prepareenv() {
         mkdir -p "${BUILD_DIR}/usr/src/doc"
         mkdir -p "${BUILD_DIR}/usr/src/html"
         mkdir -p "${BUILD_DIR}/usr/src/images"
-        mkdir -p "${BUILD_DIR}/usr/src/langs"
         mkdir -p "${BUILD_DIR}/usr/src/lfs"
         mkdir -p "${BUILD_DIR}/usr/src/log"
+        mkdir -p "${BUILD_DIR}/usr/src/po"
         mkdir -p "${BUILD_DIR}/usr/src/src"
 
 	# Make all sources and proc available under lfs build
