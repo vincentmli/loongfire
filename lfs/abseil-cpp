@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 20260107.1
+VER        = 20260817.0
 
 THISAPP    = abseil-cpp-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -40,7 +40,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 1c0814eefb6181a82437128c9d3c08dec0540c2353b8a317204c49b1510b311173897de4a737da6f0cc034bf1b23717dea54f0338e3794f6a56f7292f53937bc
+$(DL_FILE)_BLAKE2 = 90a2dba1f88ef2ba16fe7f8ea19b5ae8895edb52b241baba987f246b9c5ef12b9012ee6c085aa89f4b86d1809b5ee74fc43aa846a9b075d4fb0b97ac2d3bbcd2
 
 install : $(TARGET)
 
@@ -72,7 +72,8 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 	cd $(DIR_APP) && cmake . \
 			-D CMAKE_INSTALL_PREFIX=/usr \
-			-D BUILD_TESTING=OFF
+			-D BUILD_TESTING=OFF \
+			-D CMAKE_CXX_STANDARD:STRING=17
 	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install
 	@rm -rf $(DIR_APP)
