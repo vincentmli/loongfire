@@ -26,6 +26,7 @@ etc/keepalived/samples
 #etc/keepalived/samples/keepalived.conf.vrrp.scripts
 #etc/keepalived/samples/keepalived.conf.vrrp.static_ipaddress
 #etc/keepalived/samples/keepalived.conf.vrrp.sync
+#etc/keepalived/samples/keepalived.service.d.auth_hmac.conf
 #etc/keepalived/samples/sample.misccheck.smbcheck.sh
 #etc/keepalived/samples/sample_notify_fifo.sh
 etc/rc.d/init.d/keepalived
