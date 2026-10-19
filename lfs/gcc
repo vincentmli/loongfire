@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 15.2.0
+VER        = 16.1.0
 
 GMP_VER    = 6.3.0
 MPFR_VER   = 4.2.2
@@ -37,6 +37,7 @@ DIR_APP    = $(DIR_SRC)/$(THISAPP)
 
 ifeq "$(PASS)" "1"
 CFLAGS    := $(patsubst -march=%,,$(CFLAGS))
+CFLAGS    := $(patsubst -mabi=%,,$(CFLAGS))
 CFLAGS    := $(patsubst -mfpu=%,,$(CFLAGS))
 CFLAGS    := $(patsubst -mtune=%,,$(CFLAGS))
 CFLAGS    := $(patsubst -mfloat-abi=%,,$(CFLAGS))
@@ -58,13 +59,10 @@ ifeq "$(ROOT)" ""
   EXTRA_CONFIG = \
 	--prefix=/usr \
 	--libexecdir=/usr/lib \
-	--enable-shared \
-	--enable-threads=posix \
-	--enable-__cxa_atexit \
-	--enable-clocale=gnu \
 	--enable-languages=c,c++ \
 	--disable-bootstrap \
-	--disable-nls
+	--disable-nls \
+	--with-system-zlib
   EXTRA_MAKE =
   EXTRA_INSTALL =
 else
@@ -76,10 +74,10 @@ ifeq "$(PASS)" "1"
 	--with-sysroot=$(ROOT) \
 	--with-local-prefix=$(TOOLS_DIR) \
 	--with-native-system-header-dir=$(TOOLS_DIR)/include \
-	--with-glibc-version=2.11 \
+	--with-glibc-version=2.43 \
+	--with-newlib \
 	--disable-nls \
 	--disable-shared \
-	--disable-multilib \
 	--disable-decimal-float \
 	--disable-threads \
 	--disable-libatomic \
@@ -88,12 +86,11 @@ ifeq "$(PASS)" "1"
 	--disable-libmpx \
 	--disable-libgomp \
 	--disable-libquadmath \
-	--disable-libstdc++-v3 \
+	--disable-libstdcxx \
 	--disable-libvtv \
 	--disable-libcilkrts \
 	--disable-libitm \
 	--disable-libsanitizer \
-	--with-newlib \
 	--without-headers \
 	--without-ppl \
 	--without-cloog \
@@ -114,11 +111,16 @@ ifeq "$(PASS)" "2"
 	--prefix=$(TOOLS_DIR) \
 	--with-local-prefix=$(TOOLS_DIR) \
 	--with-native-system-header-dir=$(TOOLS_DIR)/include \
+	--disable-nls \
 	--disable-bootstrap \
-	--enable-languages=c,c++ \
 	--disable-libstdcxx-pch \
-	--disable-multilib \
-	--disable-libgomp
+	--disable-libatomic \
+	--disable-libgomp \
+	--disable-libquadmath \
+	--disable-libsanitizer \
+	--disable-libssp \
+	--disable-libvtv \
+	--enable-languages=c,c++
   EXTRA_MAKE =
   EXTRA_INSTALL =
 else
@@ -126,15 +128,14 @@ else
   TARGET = $(DIR_INFO)/$(THISAPP)-libstdc++
   EXTRA_ENV = \
 	CC="$(CROSSTARGET)-gcc" \
+	CXX="$(CROSSTARGET)-gcc" \
 	AR="$(CROSSTARGET)-ar" \
 	RANLIB="$(CROSSTARGET)-ranlib"
   EXTRA_CONFIG = \
 	--host=$(CROSSTARGET) \
 	--prefix=$(TOOLS_DIR) \
-	--with-sysroot=$(ROOT) \
-	--disable-shared \
+	--disable-multilib \
 	--disable-nls \
-	--disable-libstdcxx-threads \
 	--disable-libstdcxx-pch \
 	--with-gxx-include-dir=$(TOOLS_DIR)/$(CROSSTARGET)/include/c++/$(VER)
   EXTRA_MAKE =
@@ -155,7 +156,10 @@ ifeq "$(BUILD_ARCH)" "riscv64"
 endif
 
 EXTRA_CONFIG += \
+	--enable-default-pie \
+	--enable-default-ssp \
 	--disable-multilib \
+	--disable-fixincludes \
 	--with-bugurl=https://bugzilla.ipfire.org \
 	--disable-libunwind-exceptions \
 	--enable-gnu-unique-object
@@ -177,7 +181,7 @@ gmp-$(GMP_VER).tar.xz = $(DL_FROM)/gmp-$(GMP_VER).tar.xz
 mpfr-$(MPFR_VER).tar.xz = $(DL_FROM)/mpfr-$(MPFR_VER).tar.xz
 mpc-$(MPC_VER).tar.gz = $(DL_FROM)/mpc-$(MPC_VER).tar.gz
 
-$(DL_FILE)_BLAKE2 = e270320978ca690e6e8f5ef06414dc13caf561f16403a3783c76fbf3dcee57e755a2d5bba922bf7fcae0bb6120443755d819b003791ae823d54589dd799804de
+$(DL_FILE)_BLAKE2 = ceb07866b6b17eb4c69a6b51241b275bc5ec506603a7c1a4c1e2585091a09fc647be945beeff76700bffd9018bda81b072d84f909fd7998baa0cfe3f0eb550b4
 gmp-$(GMP_VER).tar.xz_BLAKE2	= a865129e2b3f634ec5bad7f97ed89532e43f5662ac47a7d8ab7f0df8c9f8d0886bd984651422e2573c2163bca69c0547c248147ec90880accbd53db97dc0ddee
 mpfr-$(MPFR_VER).tar.xz_BLAKE2	= 6bbf5658e70fbb673a3b65246a6bac708d1571aa6943c6742efd92f468ac71e6f0fe351b757f7133440ea312d9a5fc3549acd89d54f4d975c58bdc204d7b21ec
 mpc-$(MPC_VER).tar.gz_BLAKE2	= 76434e6f8830af3571836d51576bfebbc9701e9bbb5c4686f134081cd96cd90ae02f7ff42bf9e3957c7a7ba92b6b2d9cdabe18f0269271147521cd7f6a2d551c
@@ -212,8 +216,6 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@rm -rf $(DIR_APP) $(DIR_SRC)/gcc-build && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 	@mkdir $(DIR_SRC)/gcc-build
 
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/gcc-15.2.0-9c9d3aef2f66625d9cb03ef4baee10ed6648e681.patch
-
 	# Fix compilation with kernel 7.1.1+ which removed linux/scc.h
 	# Remove the scc.h include and comment out struct references that depend on it
 	cd $(DIR_APP) && sed -i \
@@ -237,6 +239,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 		-e 's@\./fixinc\.sh@-c true@' \
 		-e 's/^T_CFLAGS =$$/& -fomit-frame-pointer/'
 
+ifeq "$(TOOLCHAIN)" "1"
 	# Build gmp and mpfr internally in toolchain.
 	cd $(DIR_APP) && tar xfa $(DIR_DL)/gmp-$(GMP_VER).tar.xz
 	cd $(DIR_APP) && mv -v gmp-$(GMP_VER) gmp
@@ -245,12 +248,11 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	cd $(DIR_APP) && tar xfa $(DIR_DL)/mpc-$(MPC_VER).tar.gz
 	cd $(DIR_APP) && mv -v mpc-$(MPC_VER) mpc
 
-ifeq "$(TOOLCHAIN)" "1"
-
-#loongarch64
 ifeq "$(BUILD_ARCH)" "loongarch64"
-	sed -i.orig '/ABI_GRLEN_SPEC/s@"/lib" ABI_GRLEN_SPEC@"$(TOOLS_DIR)/lib" ABI_GRLEN_SPEC@g' $(DIR_APP)/gcc/config/loongarch/gnu-user.h
+	sed -e '/ABI_GRLEN_SPEC/s@"/lib" ABI_GRLEN_SPEC@"$(TOOLS_DIR)/lib" ABI_GRLEN_SPEC@g' \
+		-i $(DIR_APP)/gcc/config/loongarch/gnu-user.h
 endif
+
 	for file in $$(find $(DIR_APP)/gcc/config -name linux64.h -o -name linux.h \
 			-o -name sysv4.h -o -name linux-eabi.h -o -name linux-elf.h -o -name aarch64-linux.h); do \
 		echo "Processing $${file}..."; \
@@ -295,6 +297,9 @@ ifeq "$(TOOLCHAIN)" "1"
 	ln -svf gcc $(TOOLS_DIR)/bin/cc
 	# remove gdb python files from libdir
 	rm -rf $(TOOLS_DIR)/lib/*-gdb.py
+
+	ln -svf --relative $(TOOLS_DIR)/lib/libgcc_s_asneeded.so \
+		$$($(TOOLS_DIR)/bin/$(BUILDTARGET)-gcc -print-libgcc-file-name | sed 's/libgcc/&_s_asneeded/')
  endif
 
  ifeq "$(PASS)" "L"
