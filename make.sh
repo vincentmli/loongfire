@@ -2562,7 +2562,7 @@ NINJAJOBS="${DEFAULT_PARALLELISM}"
 
 # Configure XZ
 XZ_OPT=(
-	"-T${DEFAULT_PARALLELISM}" "-8"
+	"-T0" "-8"
 )
 
 # Configure Zstandard
