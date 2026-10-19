@@ -72,6 +72,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/knot-resolver-6.5-keep-dst-ip.patch
 	cd $(DIR_APP) && meson setup \
+		--buildtype=release \
 		--prefix=/usr \
 		-Duser=knot-resolver \
 		-Dgroup=knot-resolver \
