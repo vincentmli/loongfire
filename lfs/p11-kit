@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 0.26.2
+VER        = 0.26.5
 
 THISAPP    = p11-kit-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
@@ -43,7 +43,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = a10eab0fe405ea1f99aaac823bdb48d09caa09decd6bfe134aa702430ed5c09af2416db503ea8954467179c30ab754cc2811b4d8e28ac02cf3847fa021e1a2e2
+$(DL_FILE)_BLAKE2 = 3588e4abeca13450c8228b4e104942b459c86fa5bf07fd391b895ff99694e37a20562462fd3e5290dce79a45a16cc821da4ed86d9d4446beb1305d4638421589
 
 install : $(TARGET)
 
