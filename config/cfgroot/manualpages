@@ -6,6 +6,8 @@ BASE_URL=https://www.ipfire.org/docs
 
 #	System menu
 index.cgi=configuration/system/startpage
+pppsetup.cgi=configuration/system/dial
+wireless.cgi=configuration/system/wlanclient
 mail.cgi=configuration/system/mail_service
 remote.cgi=configuration/system/ssh
 backup.cgi=configuration/system/backup
@@ -63,6 +65,7 @@ firewall.cgi=configuration/firewall
 fwhosts.cgi=configuration/firewall/fwgroups
 optionsfw.cgi=configuration/firewall/options
 ids.cgi=configuration/firewall/ips
+dnsbl.cgi=configuration/firewall/dns
 ipblocklist.cgi=configuration/firewall/ipblocklist
 location-block.cgi=configuration/firewall/geoip-block
 wireless.cgi=configuration/firewall/accesstoblue
