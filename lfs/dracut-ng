@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 108
+VER        = 112
 
 THISAPP    = dracut-ng-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -40,7 +40,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = fa5efd4039be8d2d30564a0768d2dec8c3d72b3721391d3a02bde8445cd7a5766d4b119594ebbca86dbd59bd71b64353febaaa7e2257f02d0075333dc29e9047
+$(DL_FILE)_BLAKE2 = b01b6d97d183e52be4358ab5c2c456a5000e05f5137cf55eeeeaf46d88c698fe44032a7c998d5cb2c58134fea339229f53274870ea288bd99a02c5414fa1389d
 
 install : $(TARGET)
 

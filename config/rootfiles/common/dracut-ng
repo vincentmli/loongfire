@@ -6,12 +6,12 @@ usr/bin/lsinitrd
 #usr/lib/dracut
 usr/lib/dracut/dracut-functions
 usr/lib/dracut/dracut-functions.sh
-usr/lib/dracut/dracut-init.sh
+#usr/lib/dracut/dracut-init.sh
 usr/lib/dracut/dracut-initramfs-restore
 usr/lib/dracut/dracut-install
 usr/lib/dracut/dracut-logger.sh
 usr/lib/dracut/dracut-util
-usr/lib/dracut/dracut-version.sh
+#usr/lib/dracut/dracut-version.sh
 usr/lib/dracut/dracut.conf.d
 usr/lib/dracut/dracut.conf.d/01-ipfire.conf
 #usr/lib/dracut/modules.d
