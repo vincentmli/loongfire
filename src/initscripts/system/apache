@@ -24,28 +24,38 @@
 
 PIDFILE="/var/run/httpd.pid"
 
+# Verify a generated file exists and is non-empty; log a boot message if not.
+check_generated() {
+	if [ ! -s "$1" ]; then
+		boot_mesg "ERROR: $1 is missing or empty!" ${FAILURE}
+	fi
+}
+
 generate_certificates() {
-	if [ ! -f "/etc/httpd/server-ecdsa.key" ]; then
+	if [ ! -s "/etc/httpd/server-ecdsa.key" ]; then
 		boot_mesg "Generating HTTPS ECDSA server key..."
 		openssl ecparam -genkey -name secp384r1 -noout \
 			-out /etc/httpd/server-ecdsa.key &>/dev/null
 		chmod 600 /etc/httpd/server-ecdsa.key
 		evaluate_retval
+		check_generated /etc/httpd/server-ecdsa.key
 	fi
 
-	if [ ! -f "/etc/httpd/server-ecdsa.csr" ]; then
+	if [ ! -s "/etc/httpd/server-ecdsa.csr" ]; then
 		sed "s/HOSTNAME/`hostname -f`/" < /etc/certparams | \
 			openssl req -new -key /etc/httpd/server-ecdsa.key \
 			-out /etc/httpd/server-ecdsa.csr &>/dev/null
+		check_generated /etc/httpd/server-ecdsa.csr
 	fi
 
-	if [ ! -f "/etc/httpd/server-ecdsa.crt" ]; then
+	if [ ! -s "/etc/httpd/server-ecdsa.crt" ]; then
 		boot_mesg "Signing ECDSA certificate..."
 		openssl x509 -req -days 999999 -sha256 \
 			-in /etc/httpd/server-ecdsa.csr \
 			-signkey /etc/httpd/server-ecdsa.key \
 			-out /etc/httpd/server-ecdsa.crt &>/dev/null
 		evaluate_retval
+		check_generated /etc/httpd/server-ecdsa.crt
 	fi
 }
 
