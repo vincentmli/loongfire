@@ -25,7 +25,7 @@
 
 include Config
 
-VER         = 7.1.1
+VER         = 7.2.13
 
 THISAPP    = linux-$(VER)
 DL_FILE    = linux-$(VER).tar.xz
@@ -76,7 +76,7 @@ objects = \
 
 $(DL_FILE) = $(URL_IPFIRE)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = b0131b7a69bcf808322f4c48493faec7169fd8e3dbdb0974e61814d27c4af93ccf889af89d44e29463e416393b1bd36a8f5c0916f122d109a0a0c62b27038af8
+$(DL_FILE)_BLAKE2 = 60678d37e9eb2b712c0afe09d04c17ab95b24a626a459ebbac994ff43dab00b37a8083a5f0fa91a3dfd08a71edf8502c26796ca6eb402dcd133aa9257dd5efa4
 
 install : $(TARGET)
 
@@ -160,7 +160,7 @@ ifeq "$(BUILD_ARCH)" "aarch64"
 	# Apply Arm kernel patches.
 	cd $(DIR_APP) && cat patch $(DIR_SRC)/src/patches/linux/aarch64/* | patch -Np1
 endif
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/linux-3.14.79-amba-fix.patch
+	#cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/linux/linux-3.14.79-amba-fix.patch
 
 	# Customise the release
 	cd $(DIR_APP) && echo "$(KVER_SUFFIX)" > localversion.10-$(SNAME)
