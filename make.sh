@@ -1534,7 +1534,6 @@ build_system() {
 	lfsmake2 dhcp
 	lfsmake2 dhcpcd
 	lfsmake2 boost
-	lfsmake2 linux-atm
 	lfsmake2 libqmi
 	lfsmake2 c-ares
 if [ "${BUILD_ARCH}" != "loongarch64" ] && [ "${BUILD_ARCH}" != "x86_64" ]; then
