@@ -26,7 +26,7 @@ include Config
 
 SUMMARY    = Free Lossless Audio Codec
 
-VER        = 1.4.3
+VER        = 1.5.0
 
 THISAPP    = flac-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
@@ -34,7 +34,7 @@ DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = flac
-PAK_VER    = 6
+PAK_VER    = 7
 
 DEPS       = libogg
 
@@ -48,7 +48,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = c4f441aeaa0493433347b8a110ca01865fd40d5b21150174372af2fee4fa5c3397a67add31138e92999eab9d9abe6c46a5ac29e13cbac60093fbff6d7a672ad3
+$(DL_FILE)_BLAKE2 = 6b1c9a36db5daf24e2c21fa8429aa8776df5fd2fb430de8ee6728628a1ffc44f49c2bdedba514a24dea5ea87553e32dd08af4830870d64d77b3f776e4fe69644
 
 install : $(TARGET)
 
@@ -81,10 +81,9 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
-	cd $(DIR_APP) && \
-		./configure \
-		--prefix=/usr \
-		--disable-thorough-tests
+	cd $(DIR_APP) && ./configure \
+				--prefix=/usr \
+				--disable-thorough-tests
 	cd $(DIR_APP) && make $(MAKETUNING)
 	cd $(DIR_APP) && make install
 	@rm -rf $(DIR_APP)
