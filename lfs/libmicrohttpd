@@ -26,7 +26,7 @@ include Config
 
 SUMMARY    = Small C library to easily run an HTTP server as part of an application
 
-VER        = 1.0.5
+VER        = 1.0.10
 
 THISAPP    = libmicrohttpd-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -34,7 +34,7 @@ DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = libmicrohttpd
-PAK_VER    = 3
+PAK_VER    = 4
 
 DEPS       =
 
@@ -48,7 +48,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = dd6ea96a4ab94925d041ef4c45066bf8fb5568c93a727e93295d69db5432ef498d72138f1c64fe157327aca8f97636c9140757c1c048e589d91fddc8ff83a119
+$(DL_FILE)_BLAKE2 = bf7885a0c48ca5e5a0543aa518ec004e47c60dd9f812a06914cf97b3f95fe0a972a9a24a84a402fd63e480bc096fc7cd67f8366ea6df7e6e438f18cc0448f2fc
 
 install : $(TARGET)
 
