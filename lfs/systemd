@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 261.1
+VER        = 261.3
 
 THISAPP    = systemd-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -50,7 +50,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = ab345d6ae27d361aa56d3b021263e2b2e3af76cdc37ee9015932557f1b904f2e5e5a6d5911b4a442057d12d5eedf8a702a30aa13f9b68294ccc14833f397a0ea
+$(DL_FILE)_BLAKE2 = d0809439fea1f8c8b00a597ea5a09ff0455009c07f13976ed7663978bb8cafbd22ce0f49386087fec3553b376251cc8c82ca05adb6188c6ec43e580b336dc7de
 
 install : $(TARGET)
 
