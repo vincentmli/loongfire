@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 4.0.6
+VER        = 4.0.7
 
 THISAPP    = procps-v$(VER)
 DL_FILE    = $(THISAPP).tar.bz2
@@ -40,7 +40,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = dbcbc76f544db055a5921cbe65d917ee7cdf5dae97ee9dc418d3969f68ebfa41e6adebb1369f5b07df5580504bf6881c27e2a8db0241a099b879e15337a8cb03
+$(DL_FILE)_BLAKE2 = efb1a245a8078a12b2de7a129ac66a3b0f5777b676b2bc7682488f995c57a48e24020f337d7beb2cb7161f0bf5e0c263f9ef7acb417ad1f7c90a27c8b9ab4ecd
 
 install : $(TARGET)
 
