@@ -1,0 +1,22 @@
+diff -Naur shadow-4.20.0.orig/lib/find_new_sub_gids.c shadow-4.20.0/lib/find_new_sub_gids.c
+--- shadow-4.20.0.orig/lib/find_new_sub_gids.c	2026-08-07 18:55:36.246967805 +0200
++++ shadow-4.20.0/lib/find_new_sub_gids.c	2026-08-07 22:41:35.771731696 +0200
+@@ -8,6 +8,7 @@
+ 
+ #ifdef ENABLE_SUBIDS
+ 
++#include <stdint.h>
+ #include <stdio.h>
+ #include <errno.h>
+ 
+diff -Naur shadow-4.20.0.orig/lib/find_new_sub_uids.c shadow-4.20.0/lib/find_new_sub_uids.c
+--- shadow-4.20.0.orig/lib/find_new_sub_uids.c	2026-08-07 18:56:37.619956630 +0200
++++ shadow-4.20.0/lib/find_new_sub_uids.c	2026-08-07 22:41:52.640184987 +0200
+@@ -8,6 +8,7 @@
+ 
+ #ifdef ENABLE_SUBIDS
+ 
++#include <stdint.h>
+ #include <stdio.h>
+ #include <errno.h>
+ 
