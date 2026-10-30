@@ -1,0 +1,119 @@
+diff --git a/configure.ac b/configure.ac
+index cdda324ce6..8f99703f3a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -6368,16 +6368,16 @@ NUT_ARG_WITH_CUSTOM_DEFAULT_HELP([user], [USERNAME], [(Unprivileged) user for pr
+ AS_CASE([${nut_with_user}],
+ 	[yes|no], [AC_MSG_ERROR(invalid option --with(out)-user - see docs/configure.txt)],
+ 	["${RUN_AS_USER}"], [
+-		 nut_user_given=no
+-		 AC_MSG_RESULT([default])
++		 AS_IF([test x"${nut_withGiven_user}" = xyes],
++			[AC_MSG_RESULT([specified])],	dnl Just happens to be same as default
++			[AC_MSG_RESULT([default])])
+ 		],
+ 		[RUN_AS_USER="${nut_with_user}"
+-		 nut_user_given=yes
+ 		 AC_MSG_RESULT([specified])
+ 		]
+ )
+ NUT_REPORT_SETTING([User to run as],
+-    RUN_AS_USER, "${RUN_AS_USER}", [User to switch to if started as root])
++	RUN_AS_USER, "${RUN_AS_USER}", [User to switch to if started as root])
+ 
+ dnl Note: Technically daemons "run as" the primary GID of the user they de-levate into;
+ dnl but in simpler setups (stipulated by common packaging) this one is the "run as" GID too
+@@ -6387,21 +6387,21 @@ NUT_ARG_WITH_CUSTOM_DEFAULT_HELP([group], [GROUPNAME], [(Unprivileged) group mem
+ AS_CASE([${nut_with_group}],
+ 	[yes|no], [AC_MSG_ERROR(invalid option --with(out)-group - see docs/configure.txt)],
+ 	["${RUN_AS_GROUP}"], [
+-		 nut_group_given=no
+-		 AC_MSG_RESULT([default])
++		 AS_IF([test x"${nut_withGiven_group}" = xyes],
++			[AC_MSG_RESULT([specified])],	dnl Just happens to be same as default
++			[AC_MSG_RESULT([default])])
+ 		],
+ 		[RUN_AS_GROUP="${nut_with_group}"
+-		 nut_group_given=yes
+ 		 AC_MSG_RESULT([specified])
+ 		]
+ )
+ NUT_REPORT_SETTING([Group of user to own state files],
+-    RUN_AS_GROUP, "${RUN_AS_GROUP}", [Group membership for state files of drivers normally started as root])
++	RUN_AS_GROUP, "${RUN_AS_GROUP}", [Group membership for state files of drivers normally started as root])
+ 
+ dnl check that --with-user is given if --with-group is given.
+-if test "${nut_user_given}" = "yes" -a "${nut_group_given}" = "no"; then
++if test "${nut_withGiven_user}" = "yes" -a "${nut_withGiven_group}" = "no"; then
+ 	AC_MSG_ERROR([If you specify --with-user, you also must specify --with-group])
+-elif test "${nut_user_given}" = "no" -a "${nut_group_given}" = "yes"; then
++elif test "${nut_withGiven_user}" = "no" -a "${nut_withGiven_group}" = "yes"; then
+ 	AC_MSG_ERROR([If you specify --with-group, you also must specify --with-user])
+ fi
+ 
+diff --git a/m4/nut_arg_with.m4 b/m4/nut_arg_with.m4
+index 10f2516c8f..5a1c6b0820 100644
+--- a/m4/nut_arg_with.m4
++++ b/m4/nut_arg_with.m4
+@@ -47,8 +47,12 @@ AC_DEFUN([NUT_ARG_WITH_CUSTOM_DEFAULT_HELP],
+             [m4_ifval([$5],
+                 [AS_HELP_STRING([--with-$1], [$3 (default: $5)])],
+                 [AS_HELP_STRING([--with-$1], [$3 (default: $4)])])]),
+-        [[nut_with_]m4_translit([$1], [-], [_])="${withval}"],
+-        [[nut_with_]m4_translit([$1], [-], [_])="$4"]
++        [[nut_with_]m4_translit([$1], [-], [_])="${withval}"
++         [nut_withGiven_]m4_translit([$1], [-], [_])="yes"
++        ],
++        [[nut_with_]m4_translit([$1], [-], [_])="$4"
++         [nut_withGiven_]m4_translit([$1], [-], [_])="no"
++        ]
+     )
+ ])
+ 
+@@ -85,8 +89,12 @@ AC_DEFUN([NUT_ARG_WITH_LIBOPTS],
+ [
+     AC_ARG_WITH([$1],
+         [AS_HELP_STRING([@<:@--with-$1=$2@:>@], [$3 (default: $4)])],
+-        [[nut_with_]m4_translit([$1], [-], [_])="${withval}"],
+-        [[nut_with_]m4_translit([$1], [-], [_])="$4"]
++        [[nut_with_]m4_translit([$1], [-], [_])="${withval}"
++         [nut_withGiven_]m4_translit([$1], [-], [_])="yes"
++        ],
++        [[nut_with_]m4_translit([$1], [-], [_])="$4"
++         [nut_withGiven_]m4_translit([$1], [-], [_])="no"
++        ]
+     )
+ ])
+ 
+@@ -96,9 +104,13 @@ AC_DEFUN([NUT_ARG_WITH_LIBOPTS_INVALID_YESNO],
+         [AS_HELP_STRING([@<:@--with-$1=$2@:>@], [$3 (default: $4)])],
+         [AS_CASE([${withval}],
+             [yes|no], [AC_MSG_ERROR([invalid option --with(out)-$1 - see docs/configure.txt])],
+-                [[nut_with_]m4_translit([$1], [-], [_])="${withval}"]
++                [[nut_with_]m4_translit([$1], [-], [_])="${withval}"
++                 [nut_withGiven_]m4_translit([$1], [-], [_])="yes"
++                ]
+         )],
+-        [[nut_with_]m4_translit([$1], [-], [_])="$4"]
++        [[nut_with_]m4_translit([$1], [-], [_])="$4"
++         [nut_withGiven_]m4_translit([$1], [-], [_])="no"
++        ]
+     )
+ ])
+ 
+@@ -197,8 +209,12 @@ AC_DEFUN([NUT_ARG_ENABLE_CUSTOM_DEFAULT_HELP],
+             [m4_ifval([$5],
+                 [AS_HELP_STRING([--enable-$1], [$3 (default: $5)])],
+                 [AS_HELP_STRING([--enable-$1], [$3 (default: $4)])])]),
+-        [[nut_enable_]m4_translit([$1], [-], [_])="${enableval}"],
+-        [[nut_enable_]m4_translit([$1], [-], [_])="$4"]
++        [[nut_enable_]m4_translit([$1], [-], [_])="${enableval}"
++         [nut_enableGiven_]m4_translit([$1], [-], [_])="yes"
++        ],
++        [[nut_enable_]m4_translit([$1], [-], [_])="$4"
++         [nut_enableGiven_]m4_translit([$1], [-], [_])="no"
++        ]
+     )
+ ])
+ 
+

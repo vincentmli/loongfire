@@ -36,6 +36,7 @@ usr/bin/liebert
 usr/bin/liebert-esp2
 usr/bin/liebert-gxe
 usr/bin/masterguard
+usr/bin/meanwell_ntu
 usr/bin/metasys
 usr/bin/mge-shut
 usr/bin/mge-utalk
@@ -43,6 +44,7 @@ usr/bin/microdowell
 usr/bin/microsol-apc
 usr/bin/nhs_ser
 usr/bin/nut-scanner
+usr/bin/nut-upower
 usr/bin/nutconf
 usr/bin/nutdrv_atcl_usb
 usr/bin/nutdrv_hashx
@@ -87,7 +89,7 @@ usr/bin/victronups
 #usr/lib/libnutclient.la
 #usr/lib/libnutclient.so
 usr/lib/libnutclient.so.2
-usr/lib/libnutclient.so.2.0.2
+usr/lib/libnutclient.so.2.1.0
 #usr/lib/libnutclientstub.la
 #usr/lib/libnutclientstub.so
 usr/lib/libnutclientstub.so.1
@@ -95,18 +97,17 @@ usr/lib/libnutclientstub.so.1.0.1
 #usr/lib/libnutscan.la
 #usr/lib/libnutscan.so
 usr/lib/libnutscan.so.4
-usr/lib/libnutscan.so.4.0.0
+usr/lib/libnutscan.so.4.1.0
 #usr/lib/libupsclient.la
 #usr/lib/libupsclient.so
 usr/lib/libupsclient.so.7
-usr/lib/libupsclient.so.7.0.0
+usr/lib/libupsclient.so.7.1.0
 #usr/lib/pkgconfig/libnutclient.pc
 #usr/lib/pkgconfig/libnutclientstub.pc
 #usr/lib/pkgconfig/libnutscan.pc
 #usr/lib/pkgconfig/libupsclient.pc
 #usr/lib/python3.10/site-packages/PyNUT.py
 #usr/lib/python3.10/site-packages/test_nutclient.py
-#usr/libexec/enphase-monitor
 #usr/libexec/sockdebug
 usr/sbin/upsd
 usr/sbin/upsdrvctl
@@ -116,8 +117,5 @@ usr/share/cmdvartab
 #usr/share/doc/nut
 #usr/share/doc/nut/html-man
 usr/share/driver.list
-#usr/share/external_apis
-#usr/share/external_apis/enphase
-#usr/share/external_apis/enphase/README.adoc
 var/ipfire/backup/addons/includes/nut
 var/state/ups
