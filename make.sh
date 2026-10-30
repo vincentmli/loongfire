@@ -2114,6 +2114,7 @@ fi
 	lfsmake2 suricata-reporter
 	lfsmake2 lldpd
 	lfsmake2 perl-Net-LibIDN2
+	lfsmake2 python3-zabbix-utils
 
 	lfsmake2 linux
 	lfsmake2 loxilb
