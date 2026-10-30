@@ -26,7 +26,7 @@ include Config
 
 SUMMARY    = Zabbix Agent
 
-VER        = 7.0.24
+VER        = 7.0.29
 
 THISAPP    = zabbix-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -34,7 +34,7 @@ DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = zabbix_agentd
-PAK_VER    = 23
+PAK_VER    = 24
 
 DEPS       = fping
 
@@ -48,7 +48,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = d508b84185493ce830ff2990569407c4e6ff03437c406e15258c1641e21c4c3b5195ca329903c44b73ec4fec022bd31c6bdd3883caa824e577e5044c0a5e840a
+$(DL_FILE)_BLAKE2 = d013d271842464658bdb05f5d60ee591e60cfd7a9406c30f91ed96da8ec3a24c8f145154541190bf09d2819cba8c57cc7e264eb5148d257177f81d40b307cbb4
 
 install : $(TARGET)
 
@@ -118,6 +118,10 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 		/var/ipfire/zabbix_agentd/userparameters/userparameter_wireguard.conf
 	install -v -m 644 $(DIR_SRC)/config/zabbix_agentd/userparameter_locationdb.conf \
 		/var/ipfire/zabbix_agentd/userparameters/userparameter_locationdb.conf
+	install -v -m 644 $(DIR_SRC)/config/zabbix_agentd/userparameter_kresd.conf \
+		/var/ipfire/zabbix_agentd/userparameters/userparameter_kresd.conf
+	install -v -m 644 $(DIR_SRC)/config/zabbix_agentd/userparameter_suricata.conf \
+		/var/ipfire/zabbix_agentd/userparameters/userparameter_suricata.conf
 
 	# Install IPFire-specific Zabbix Agent scripts
 	-mkdir -pv /var/ipfire/zabbix_agentd/scripts
