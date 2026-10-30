@@ -15,6 +15,7 @@ usr/bin/vtysh
 #usr/include/frr/lib/assert
 #usr/include/frr/lib/assert/assert.h
 #usr/include/frr/lib/atomlist.h
+#usr/include/frr/lib/atomptr.h
 #usr/include/frr/lib/base64.h
 #usr/include/frr/lib/bfd.h
 #usr/include/frr/lib/bitfield.h
@@ -184,6 +185,7 @@ usr/bin/vtysh
 #usr/include/frr/zebra/zebra_dplane.h
 #usr/include/frr/zebra/zebra_errors.h
 #usr/include/frr/zebra/zebra_evpn.h
+#usr/include/frr/zebra/zebra_evpn_base.h
 #usr/include/frr/zebra/zebra_evpn_mac.h
 #usr/include/frr/zebra/zebra_evpn_mh.h
 #usr/include/frr/zebra/zebra_evpn_neigh.h
@@ -303,6 +305,7 @@ usr/sbin/zebra
 #usr/share/yang/frr-route-types.yang
 #usr/share/yang/frr-routing.yang
 #usr/share/yang/frr-staticd.yang
+#usr/share/yang/frr-test-config.yang
 #usr/share/yang/frr-test-module.yang
 #usr/share/yang/frr-vrf.yang
 #usr/share/yang/frr-vrrpd.yang
