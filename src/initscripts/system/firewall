@@ -449,7 +449,9 @@ iptables_init() {
 	/usr/local/bin/captivectrl
 
 	# Grant Knot Resolver access
-	iptables -A LOCAL_OUTPUT -m owner --uid-owner knot-resolver -j ACCEPT
+	iptables -A LOCAL_OUTPUT -m owner --uid-owner knot-resolver -p udp --dport  53 -j ACCEPT
+	iptables -A LOCAL_OUTPUT -m owner --uid-owner knot-resolver -p tcp --dport  53 -j ACCEPT
+	iptables -A LOCAL_OUTPUT -m owner --uid-owner knot-resolver -p tcp --dport 853 -j ACCEPT
 
 	# If a Tor relay is enabled apply firewall rules
 	if [ "${TOR_RELAY_ENABLED}" = "on" -a -n "${TOR_RELAY_PORT}" ]; then
