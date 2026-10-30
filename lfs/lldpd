@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 1.0.21
+VER        = 1.0.22
 
 THISAPP    = lldpd-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -47,7 +47,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 4420fa88b934a368741e3d2cf26fe8dc9b84eb45a604f31b6b9588e992eda3e5be0767187bebc9137d90b632fe17af647f3134dc05e3251b73b113338cb2a44c
+$(DL_FILE)_BLAKE2 = 04e6259ef3a9d0afc419f95f8ced146ef3e63b5f23958da123c8285837463cb1e826f5a9256d73dd48c658c7a7cd7930bc6de0c9328bd522de0989c04c831a04
 
 install : $(TARGET)
 
