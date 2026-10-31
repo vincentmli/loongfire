@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2025 IPFire Team  <info@ipfire.org>                           #
+# Copyright (C) 2025-2026 IPFire Team  <info@ipfire.org>                      #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -87,6 +87,9 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 		/var/ipfire/suricata/reporter.conf \
 		/etc/suricata/reporter.conf
 	chown nobody:nobody /var/ipfire/suricata/reporter.conf
+
+	# Install suricata-report-cron file.
+	install -m 0644 $(DIR_SRC)/config/suricata/suricata-report-cron /usr/bin/suricata-report-cron
 
 	@rm -rf $(DIR_APP)
 	@$(POSTBUILD)
