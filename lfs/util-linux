@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 2.42
+VER        = 2.42.4
 #          https://www.kernel.org/pub/linux/utils/util-linux/
 
 THISAPP    = util-linux-$(VER)
@@ -43,7 +43,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 531b79bbec272cf1007c55ff4042b5e1b14bcc0dc098e54e4b76ea2e70c785fc763f96686ad8cea5ea9c0f7190794f4d828b7742e3aa18a0c3ef506d34e9d465
+$(DL_FILE)_BLAKE2 = 24bbba43224f83eb2d72db21153ab1567b9f520107ee7bf962975893cd9c3ad3280c522a1574ed4d27ed257e89bf2c7197369e179187331a44ec916ce587e6a3
 
 install : $(TARGET)
 
