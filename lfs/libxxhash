@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 0.8.3
+VER        = 0.8.4
 SUMMARY    = Extremely fast non-cryptographic hash algorithm, working at RAM speed limit
 
 THISAPP    = xxHash-$(VER)
@@ -32,7 +32,7 @@ DL_FILE    = $(THISAPP).tar.gz
 DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 PROG       = libxxhash
-PAK_VER    = 3
+PAK_VER    = 4
 
 DEPS       =
 
@@ -54,7 +54,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 75923c7c5df3490062791fa02ccddfb7281b3646e2b3e4b4a0c0d611c339e07c8d9cb656777fd0fcec9cda484f7b33edf080116bb011f70d6b8299cda63afa4e
+$(DL_FILE)_BLAKE2 = 73d6a98a8ca43897808b6bacc1fa44201933170028a8321f4794e71226748cfb472f1b1a4dbceb70306838c11856c41107949660242b776e9f5bc3222e5ad7bc
 
 install : $(TARGET)
 
