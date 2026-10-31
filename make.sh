@@ -1895,7 +1895,6 @@ fi
 	lfsmake2 perl-Encode-Locale
 	lfsmake2 ebtables
 	lfsmake2 faad2
-	lfsmake2 alac
 	lfsmake2 ffmpeg
 	lfsmake2 vdr
 	lfsmake2 vdr_streamdev
