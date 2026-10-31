@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 1.7.2
+VER        = 1.7.3
 
 THISAPP    = Linux-PAM-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
@@ -45,7 +45,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = d7ebfac4393af3f889fef973946f1e6d60f118f2e048448708c5fdf0ef7fa7780945cda3b0abf6e0e2e15bbc2dd23be52389efabd00647381b3bc971f1aadcd8
+$(DL_FILE)_BLAKE2 = 2476e5b08f8e4c3e013f8ee22d858da79e9074160d396b504400c1f7ee490df9b432b226d18ae58e6f5c77a0a31709d363b76c800cd86953237f7e534a317358
 
 install : $(TARGET)
 

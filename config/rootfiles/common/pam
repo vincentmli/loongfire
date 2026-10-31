@@ -82,8 +82,6 @@ usr/lib/libpamc.so.0.82.1
 #usr/share/locale/am
 #usr/share/locale/am/LC_MESSAGES
 #usr/share/locale/am/LC_MESSAGES/Linux-PAM.mo
-#usr/share/locale/ar
-#usr/share/locale/ar/LC_MESSAGES
 #usr/share/locale/ar/LC_MESSAGES/Linux-PAM.mo
 #usr/share/locale/as
 #usr/share/locale/as/LC_MESSAGES
@@ -143,6 +141,9 @@ usr/lib/libpamc.so.0.82.1
 #usr/share/locale/it/LC_MESSAGES/Linux-PAM.mo
 #usr/share/locale/ja/LC_MESSAGES/Linux-PAM.mo
 #usr/share/locale/ka/LC_MESSAGES/Linux-PAM.mo
+#usr/share/locale/kab
+#usr/share/locale/kab/LC_MESSAGES
+#usr/share/locale/kab/LC_MESSAGES/Linux-PAM.mo
 #usr/share/locale/kk/LC_MESSAGES/Linux-PAM.mo
 #usr/share/locale/km
 #usr/share/locale/km/LC_MESSAGES
