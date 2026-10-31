@@ -1,5 +1,5 @@
 diff --git a/daemon/io.c b/daemon/io.c
-index 320809bb9..d52127781 100644
+index 320809bb9..4d2941cf2 100644
 --- a/daemon/io.c
 +++ b/daemon/io.c
 @@ -239,6 +239,24 @@ int io_bind(const struct sockaddr *addr, int type, const endpoint_flags_t *flags
@@ -27,7 +27,7 @@ index 320809bb9..d52127781 100644
  		/* Linux 3.15 has IP_PMTUDISC_OMIT which makes sockets
  		 * ignore PMTU information and send packets with DF=0.
  		 * This mitigates DNS fragmentation attacks by preventing
-@@ -276,16 +294,171 @@ static void set_so(int fd, int so_option, int value, const char *descr)
+@@ -276,7 +294,144 @@ static void set_so(int fd, int so_option, int value, const char *descr)
  	}
  }
  
@@ -121,6 +121,7 @@ index 320809bb9..d52127781 100644
 +			.comm_addr = &src.ip,
 +			.src_addr  = &src.ip,
 +			.dst_addr  = (dst.ip6.sin6_family || dst.ip4.sin_family) ? &dst.ip : NULL,
++			.comm_dst_addr = (dst.ip6.sin6_family || dst.ip4.sin_family) ? &dst.ip : NULL,
 +		};
 +
 +		session2_unwrap(session, protolayer_payload_buffer((char *)pkt, n, true),
@@ -143,12 +144,9 @@ index 320809bb9..d52127781 100644
 +	set_so(fd, SO_RCVBUF, the_network->listen_udp_buflens.rcv, "UDP receive buffer size");
 +
 +	// Allocate the data
-+	data = malloc(sizeof(*data));
++	data = calloc(1, sizeof(*data));
 +	if (!data)
 +		return kr_error(errno);
-+
-+	// Set protocol
-+	data->proto = KRES_PROTO_UDP;
 +
 +	r = uv_poll_init(loop, handle, fd);
 +	if (r) {
@@ -173,37 +171,9 @@ index 320809bb9..d52127781 100644
 +
 +int io_listen_doq(uv_loop_t *loop, uv_udp_t *handle, int fd)
  {
-+	io_handle_data_t *data = NULL;
-+	int ret;
-+
  	if (!handle) {
  		return kr_error(EINVAL);
- 	}
--	int ret = uv_udp_init(loop, handle);
--	if (ret) return ret;
-+
-+	// Allocate the data
-+	data = malloc(sizeof(*data));
-+	if (!data) {
-+		ret = kr_error(errno);
-+		goto ERROR;
-+	}
-+
-+	// Set protocol
-+	data->proto = KRES_PROTO_DOQ;
-+
-+	ret = uv_udp_init(loop, handle);
-+	if (ret)
-+		goto ERROR;
- 
- 	ret = uv_udp_open(handle, fd);
--	if (ret) return ret;
-+	if (ret)
-+		goto ERROR;
- 
- 	set_so(fd, SO_SNDBUF, the_network->listen_udp_buflens.snd, "UDP send buffer size");
- 	set_so(fd, SO_RCVBUF, the_network->listen_udp_buflens.rcv, "UDP receive buffer size");
-@@ -293,8 +466,7 @@ int io_listen_udp(uv_loop_t *loop, uv_udp_t *handle, int fd, bool doq)
+@@ -293,8 +448,7 @@ int io_listen_udp(uv_loop_t *loop, uv_udp_t *handle, int fd, bool doq)
  	uv_handle_t *h = (uv_handle_t *)handle;
  	check_bufsize(h);
  	/* Handle is already created, just create context. */
@@ -213,39 +183,16 @@ index 320809bb9..d52127781 100644
  			NULL, 0, false);
  	kr_require(s);
  
-@@ -305,9 +477,17 @@ int io_listen_udp(uv_loop_t *loop, uv_udp_t *handle, int fd, bool doq)
- 		abort(); /* It might be nontrivial not to leak something here. */
- 	}
- 
-+	// Refer the data
-+	handle->data = data;
-+
- 	return io_start_read(h);
--}
- 
-+ERROR:
-+	if (data)
-+		free(data);
-+
-+	return ret;
-+}
- 
- static void tcp_recv(uv_stream_t *handle, ssize_t nread, const uv_buf_t *buf)
- {
-@@ -809,7 +989,11 @@ static void xdp_rx(uv_poll_t* handle, int status, int events)
+@@ -809,7 +963,7 @@ static void xdp_rx(uv_poll_t* handle, int status, int events)
  		return;
  	}
  
 -	xdp_handle_data_t *xhd = handle->data;
 +	io_handle_data_t *xhd = handle->data;
-+
-+	// Check protocol
-+	assert(xhd->proto == KRES_PROTO_XDP);
-+
  	kr_require(xhd && xhd->session && xhd->socket);
  	uint32_t rcvd;
  	knot_xdp_msg_t msgs[XDP_RX_BATCH_SIZE];
-@@ -886,9 +1070,12 @@ int io_listen_xdp(uv_loop_t *loop, struct endpoint *ep, const char *ifname)
+@@ -886,7 +1040,7 @@ int io_listen_xdp(uv_loop_t *loop, struct endpoint *ep, const char *ifname)
  	}
  	if (ret_limit) return ret_limit;
  
@@ -253,13 +200,8 @@ index 320809bb9..d52127781 100644
 +	io_handle_data_t *xhd = malloc(sizeof(*xhd));
  	if (!xhd) return kr_error(ENOMEM);
  
-+	// Set protocol
-+	xhd->proto = KRES_PROTO_XDP;
-+
  	xhd->socket = NULL; // needed for some reason
- 	queue_init(xhd->tx_waker_queue);
- 
-@@ -965,20 +1152,40 @@ static void io_deinit(uv_handle_t *handle)
+@@ -965,21 +1119,37 @@ static void io_deinit(uv_handle_t *handle)
  	if (!handle || !handle->data) {
  		return;
  	}
@@ -286,35 +228,41 @@ index 320809bb9..d52127781 100644
 +
 +	io_handle_data_t *data = handle->data;
 +
-+	switch (data->proto) {
-+		case KRES_PROTO_UDP:
-+			// Free the session
-+			session2_dec_refs(data->session);
++	// UDP
++	if (!data->socket) {
++		// Free the session
++		session2_dec_refs(data->session);
 +
-+			// Free the data object
-+			free(handle->data);
-+			handle->data = NULL;
-+			break;
++		// Free the data object
++		free(handle->data);
++		handle->data = NULL;
++		return;
+ 	}
 +
 +#if ENABLE_XDP
-+		case KRES_PROTO_XDP:
-+			uv_idle_stop(&data->tx_waker);
-+			uv_close((uv_handle_t *)&data->tx_waker, NULL);
-+			session2_dec_refs(data->session);
-+			knot_xdp_deinit(data->socket);
-+			queue_deinit(data->tx_waker_queue);
-+			free(data);
-+			break;
++	uv_idle_stop(&data->tx_waker);
++	uv_close((uv_handle_t *)&data->tx_waker, NULL);
++	session2_dec_refs(data->session);
++	knot_xdp_deinit(data->socket);
++	queue_deinit(data->tx_waker_queue);
++	free(data);
++#else
++	kr_assert(false);
 +#endif /* ENABLE_XDP */
-+
-+		default:
-+			kr_assert(false);
-+			break;
- 	}
  }
  
+ void io_free(uv_handle_t *handle)
+@@ -1005,6 +1175,8 @@ int io_stop_read(uv_handle_t *handle)
+ {
+ 	if (handle->type == UV_UDP) {
+ 		return uv_udp_recv_stop((uv_udp_t *)handle);
++	} else if (handle->type == UV_POLL) {
++		return uv_poll_stop((uv_poll_t *)handle);
+ 	} else {
+ 		return uv_read_stop((uv_stream_t *)handle);
+ 	}
 diff --git a/daemon/io.h b/daemon/io.h
-index c9489a5d8..b389cd628 100644
+index c9489a5d8..ca98aae5b 100644
 --- a/daemon/io.h
 +++ b/daemon/io.h
 @@ -20,7 +20,9 @@ struct io_stream_data;
@@ -334,32 +282,31 @@ index c9489a5d8..b389cd628 100644
  
 -/** When uv_handle_t::type == UV_POLL, ::data points to this malloc-ed helper.
 - * (Other cases store a direct struct session pointer in ::data.) */
-+typedef enum protocol {
-+	KRES_PROTO_UNDEF = 0,
-+	KRES_PROTO_UDP,
-+	KRES_PROTO_DOQ,
-+#ifdef ENABLE_XDP
-+	KRES_PROTO_XDP,
-+#endif
-+} io_protocol_t;
-+
  typedef struct {
 -	struct knot_xdp_socket *socket;
-+	// Protocol
-+	io_protocol_t proto;
-+
 +	// Session
  	struct session2 *session;
 +
-+	// XDP
++	// XDP (socket is NULL for anything else)
 +	struct knot_xdp_socket *socket;
  	uv_idle_t tx_waker;
  	queue_t(void *) tx_waker_queue;
 -} xdp_handle_data_t;
--
 +} io_handle_data_t;
++
++/** Get the session of a handle, regardless of its type (may return NULL). */
++static inline struct session2 *io_handle_session(const uv_handle_t *handle)
++{
++	if (!handle || !handle->data)
++		return NULL;
++
++	if (handle->type == UV_POLL)
++		return ((const io_handle_data_t *)handle->data)->session;
+ 
++	return handle->data;
++}
 diff --git a/daemon/network.c b/daemon/network.c
-index 5341601f7..81d2cfe8c 100644
+index 5341601f7..392d20f2d 100644
 --- a/daemon/network.c
 +++ b/daemon/network.c
 @@ -235,19 +235,21 @@ static void endpoint_close(struct endpoint *ep, bool force)
@@ -367,7 +314,7 @@ index 5341601f7..81d2cfe8c 100644
  	free_const(ep->flags.kind); /* needed if (is_control) */
  	kr_require(ep->handle);
 +
-+	io_handle_data_t *data = ep->handle->data;
++	struct session2 *s = io_handle_session(ep->handle);
 +
  	if (force) { /* Force close if event loop isn't running. */
  		if (ep->fd >= 0) {
@@ -376,16 +323,14 @@ index 5341601f7..81d2cfe8c 100644
  		if (ep->handle) {
  			ep->handle->loop = NULL;
 -			struct session2 *s = ep->handle->data;
--			if (s)
--				session2_close(s);
-+			if (data && data->session)
-+				session2_close(data->session);
+ 			if (s)
+ 				session2_close(s);
  		}
  	} else { /* Asynchronous close */
 -		struct session2 *s = ep->handle->data;
 -		session2_close(s);
-+		if (data && data->session)
-+			session2_close(data->session);
++		if (s)
++			session2_close(s);
  	}
  }
  
@@ -419,23 +364,32 @@ index 5341601f7..81d2cfe8c 100644
  
  	if (ep->flags.sock_type == SOCK_STREAM) {
 diff --git a/daemon/session2.c b/daemon/session2.c
-index 3efc36541..0b6dac7e6 100644
+index 3efc36541..b9c260f0d 100644
 --- a/daemon/session2.c
 +++ b/daemon/session2.c
-@@ -1476,7 +1476,11 @@ static void session2_transport_stream_pushv_finished(uv_write_t *req, int status
+@@ -694,6 +694,12 @@ static int session2_submit(
+ 			memcpy(&addrst->dst_addr, comm->dst_addr, len);
+ 			ctx->comm_storage.dst_addr = &addrst->dst_addr.ip;
+ 		}
++		if (comm->comm_dst_addr) {
++			int len = kr_sockaddr_len(comm->comm_dst_addr);
++			kr_require(len > 0 && len <= sizeof(union kr_sockaddr));
++			memcpy(&addrst->comm_dst_addr, comm->comm_dst_addr, len);
++			ctx->comm_storage.comm_dst_addr = &addrst->comm_dst_addr.ip;
++		}
+ 		ctx->comm = &ctx->comm_storage;
+ 		ctx->comm->target = comm->target;
+ 	} else {
+@@ -1476,7 +1482,7 @@ static void session2_transport_stream_pushv_finished(uv_write_t *req, int status
  #if ENABLE_XDP
  static void xdp_tx_waker(uv_idle_t *handle)
  {
 -	xdp_handle_data_t *xhd = handle->data;
 +	io_handle_data_t *xhd = handle->data;
-+
-+	// Check that we are being called for the correct protocol
-+	assert(xhr->proto == KRES_PROTO_XDP);
-+
  	int ret = knot_xdp_send_finish(xhd->socket);
  	if (ret != KNOT_EAGAIN && ret != KNOT_EOK)
  		kr_log_error(XDP, "check: ret = %d, %s\n", ret, knot_strerror(ret));
-@@ -1534,6 +1538,9 @@ static int session2_transport_pushv(struct session2 *s,
+@@ -1534,6 +1540,9 @@ static int session2_transport_pushv(struct session2 *s,
                                      const struct comm_info *comm,
                                      protolayer_finished_cb cb, void *baton)
  {
@@ -445,7 +399,7 @@ index 3efc36541..0b6dac7e6 100644
  	struct iovec iovecmem;
  	if (kr_fails_assert(s))
  		return kr_error(EINVAL);
-@@ -1558,7 +1565,6 @@ static int session2_transport_pushv(struct session2 *s,
+@@ -1558,7 +1567,6 @@ static int session2_transport_pushv(struct session2 *s,
  
  		if (handle->type == UV_UDP) {
  			if (ENABLE_SENDMMSG && !s->outgoing && s->proto != KR_PROTO_DOQ) {
@@ -453,18 +407,18 @@ index 3efc36541..0b6dac7e6 100644
  				int ret = uv_fileno(handle, &fd);
  				if (kr_fails_assert(!ret)) {
  					err_ret = kr_error(EIO);
-@@ -1574,8 +1580,8 @@ static int session2_transport_pushv(struct session2 *s,
+@@ -1574,8 +1582,8 @@ static int session2_transport_pushv(struct session2 *s,
  				session2_transport_pushv_ensure_long_lived(
  						&iov, &iovcnt, iov_short_lived,
  						&iovecmem, ctx);
 -				udp_queue_push(fd, comm->comm_addr, iov->iov_base, iov->iov_len,
 -						session2_transport_udp_queue_pushv_finished,
-+				udp_queue_push(fd, comm->comm_addr, comm->dst_addr, iov->iov_base,
++				udp_queue_push(fd, comm->comm_addr, comm->comm_dst_addr, iov->iov_base,
 +						iov->iov_len, session2_transport_udp_queue_pushv_finished,
  						ctx);
  				return kr_ok();
  			} else {
-@@ -1633,53 +1639,79 @@ static int session2_transport_pushv(struct session2 *s,
+@@ -1633,9 +1641,32 @@ static int session2_transport_pushv(struct session2 *s,
  
  			session2_transport_pushv_finished(ret, ctx);
  			return ret;
@@ -472,139 +426,90 @@ index 3efc36541..0b6dac7e6 100644
 +
  		} else if (handle->type == UV_POLL) {
 -			xdp_handle_data_t *xhd = handle->data;
--			if (kr_fails_assert(xhd && xhd->socket)) {
--				err_ret = kr_error(EIO);
--				goto exit_err;
--			}
 +			io_handle_data_t* data = handle->data;
 +
-+			switch (data->proto) {
-+				// UDP
-+				case KRES_PROTO_UDP:
-+					// Fetch the file descriptor
-+					r = uv_fileno(handle, &fd);
-+					if (r < 0) {
-+						err_ret = kr_error(EIO);
-+						goto exit_err;
-+					}
- 
--			/* TODO: support multiple iovecs properly? */
--			if (kr_fails_assert(iovcnt == 1)) {
--				err_ret = kr_error(EINVAL);
--				goto exit_err;
--			}
-+					session2_transport_pushv_ensure_long_lived(
-+							&iov, &iovcnt, iov_short_lived,
-+							&iovecmem, ctx);
-+					udp_queue_push(fd, comm->comm_addr, comm->dst_addr,
-+							iov->iov_base, iov->iov_len,
-+							session2_transport_udp_queue_pushv_finished,
-+							ctx);
-+					return kr_ok();
++			// UDP
++			if (!data->socket) {
++				// Fetch the file descriptor
++				r = uv_fileno(handle, &fd);
++				if (r < 0) {
++					err_ret = kr_error(EIO);
++					goto exit_err;
++				}
++
++				session2_transport_pushv_ensure_long_lived(
++						&iov, &iovcnt, iov_short_lived,
++						&iovecmem, ctx);
++				udp_queue_push(fd, comm->comm_addr, comm->comm_dst_addr,
++						iov->iov_base, iov->iov_len,
++						session2_transport_udp_queue_pushv_finished,
++						ctx);
++				return kr_ok();
++			}
 +
 +#if ENABLE_XDP
-+				// XDP
-+				case KRES_PROTO_XDP:
-+					io_handle_data_t *xhd = handle->data;
-+					if (kr_fails_assert(xhd && xhd->socket)) {
-+						err_ret = kr_error(EIO);
-+						goto exit_err;
-+					}
-+
-+					/* TODO: support multiple iovecs properly? */
-+					if (kr_fails_assert(iovcnt == 1)) {
-+						err_ret = kr_error(EINVAL);
-+						goto exit_err;
-+					}
++			// XDP
++			io_handle_data_t *xhd = handle->data;
+ 			if (kr_fails_assert(xhd && xhd->socket)) {
+ 				err_ret = kr_error(EIO);
+ 				goto exit_err;
+@@ -1675,11 +1706,11 @@ static int session2_transport_pushv(struct session2 *s,
+ 			kr_log_debug(XDP, "pushed a packet, ret = %d\n", ret);
  
--			session2_transport_pushv_ensure_long_lived(
--					&iov, &iovcnt, iov_short_lived,
--					&iovecmem, ctx);
-+					session2_transport_pushv_ensure_long_lived(
-+							&iov, &iovcnt, iov_short_lived,
-+							&iovecmem, ctx);
- 
--			knot_xdp_msg_t msg;
-+					knot_xdp_msg_t msg;
- 
--			/* We don't have a nice way of preserving the _msg_t from frame allocation,
--			 * so we manually redo all other parts of knot_xdp_send_alloc() */
--			memset(&msg, 0, sizeof(msg));
--			bool ipv6 = comm->comm_addr->sa_family == AF_INET6;
--			msg.flags = ipv6 ? KNOT_XDP_MSG_IPV6 : 0;
--			memcpy(msg.eth_from, comm->eth_from, sizeof(comm->eth_from));
--			memcpy(msg.eth_to,   comm->eth_to,   sizeof(comm->eth_to));
-+					/* We don't have a nice way of preserving the _msg_t from frame allocation,
-+					 * so we manually redo all other parts of knot_xdp_send_alloc() */
-+					memset(&msg, 0, sizeof(msg));
-+					bool ipv6 = comm->comm_addr->sa_family == AF_INET6;
-+					msg.flags = ipv6 ? KNOT_XDP_MSG_IPV6 : 0;
-+					memcpy(msg.eth_from, comm->eth_from, sizeof(comm->eth_from));
-+					memcpy(msg.eth_to,   comm->eth_to,   sizeof(comm->eth_to));
- 
--			const struct sockaddr *ip_from = comm->dst_addr;
--			const struct sockaddr *ip_to   = comm->comm_addr;
--			memcpy(&msg.ip_from, ip_from, kr_sockaddr_len(ip_from));
--			memcpy(&msg.ip_to,   ip_to,   kr_sockaddr_len(ip_to));
--			msg.payload = *iov;
-+					const struct sockaddr *ip_from = comm->dst_addr;
-+					const struct sockaddr *ip_to   = comm->comm_addr;
-+					memcpy(&msg.ip_from, ip_from, kr_sockaddr_len(ip_from));
-+					memcpy(&msg.ip_to,   ip_to,   kr_sockaddr_len(ip_to));
-+					msg.payload = *iov;
- 
--			uint32_t sent;
--			int ret = knot_xdp_send(xhd->socket, &msg, 1, &sent);
-+					uint32_t sent;
-+					int ret = knot_xdp_send(xhd->socket, &msg, 1, &sent);
- 
--			queue_push(xhd->tx_waker_queue, ctx);
--			uv_idle_start(&xhd->tx_waker, xdp_tx_waker);
--			kr_log_debug(XDP, "pushed a packet, ret = %d\n", ret);
-+					queue_push(xhd->tx_waker_queue, ctx);
-+					uv_idle_start(&xhd->tx_waker, xdp_tx_waker);
-+					kr_log_debug(XDP, "pushed a packet, ret = %d\n", ret);
- 
--			return kr_ok();
-+					return kr_ok();
- #endif
+ 			return kr_ok();
+-#endif
 -		} else {
--			kr_assert(false && "Unsupported handle");
--			err_ret = kr_error(EINVAL);
--			goto exit_err;
-+
-+				default:
-+					kr_assert(false && "Unsupported handle");
-+					err_ret = kr_error(EINVAL);
-+					goto exit_err;
-+			}
++#else
+ 			kr_assert(false && "Unsupported handle");
+ 			err_ret = kr_error(EINVAL);
+ 			goto exit_err;
++#endif
  		}
  
  	case SESSION2_TRANSPORT_PARENT:;
+@@ -1745,7 +1776,7 @@ static inline int session2_transport_push(struct session2 *s,
+ 
+ static void on_session2_handle_close(uv_handle_t *handle)
+ {
+-	struct session2 *session = handle->data;
++	struct session2 *session = io_handle_session(handle);
+ 	kr_assert(session->transport.type == SESSION2_TRANSPORT_IO &&
+ 			session->transport.io.handle == handle);
+ 	io_free(handle);
+diff --git a/daemon/session2.h b/daemon/session2.h
+index 2a5fa9670..bd8737610 100644
+--- a/daemon/session2.h
++++ b/daemon/session2.h
+@@ -99,6 +99,11 @@ struct comm_info {
+ 	 * `NULL` if the communication did not come from network. */
+ 	const struct sockaddr *dst_addr;
+ 
++	/** The actual local address the data arrived at, if known. Unlike
++	 * `dst_addr`, it is never replaced by a proxied one, so it is the
++	 * address to send replies from. May be `NULL`. */
++	const struct sockaddr *comm_dst_addr;
++
+ 	/** Data parsed from a PROXY header. May be `NULL` if the communication
+ 	 * did not come through a proxy, or if the PROXYv2 protocol was not
+ 	 * used. */
+@@ -120,6 +125,7 @@ struct comm_addr_storage {
+ 	union kr_sockaddr src_addr;
+ 	union kr_sockaddr comm_addr;
+ 	union kr_sockaddr dst_addr;
++	union kr_sockaddr comm_dst_addr;
+ };
+ 
+ 
 diff --git a/daemon/udp_queue.c b/daemon/udp_queue.c
-index 50638c098..80f16297d 100644
+index 50638c098..cb7c755c8 100644
 --- a/daemon/udp_queue.c
 +++ b/daemon/udp_queue.c
-@@ -42,6 +42,10 @@ typedef struct {
- 		udp_queue_cb cb;
- 		void *cb_baton;
- 		struct iovec msg_iov[1]; /**< storage for .msgvec[i].msg_iov */
-+		union {
-+			char buf[CMSG_SPACE(sizeof(struct in6_pktinfo))];
-+			struct cmsghdr align;
-+		} ctrl;
- 	} items[UDP_QUEUE_LEN];
- } udp_queue_t;
+@@ -14,16 +14,87 @@ struct qr_task;
+ #include <sys/socket.h>
  
-@@ -111,8 +115,61 @@ int udp_queue_init_global(uv_loop_t *loop)
- 	return ret;
- }
  
--void udp_queue_push(int fd, const struct sockaddr *sa, char *buf, size_t buf_len,
--                    udp_queue_cb cb, void *baton)
-+static void udp_queue_set_destination_address(struct mmsghdr* header,
++static void udp_queue_set_destination_address(struct msghdr *msg,
 +		void *cbuf, size_t cbuf_len, const struct sockaddr *addr) {
-+	struct msghdr *msg = &header->msg_hdr;
 +	struct cmsghdr *c = NULL;
 +
 +	// No source address: send no control data at all
@@ -619,7 +524,7 @@ index 50638c098..80f16297d 100644
 +
 +	switch (addr->sa_family) {
 +		// IPv6
-+		case AF_INET6:
++		case AF_INET6:;
 +			const struct sockaddr_in6 *sa6 = (const struct sockaddr_in6 *)addr;
 +			struct in6_pktinfo pktinfo6 = {
 +				.ipi6_addr    = sa6->sin6_addr,
@@ -637,7 +542,7 @@ index 50638c098..80f16297d 100644
 +			break;
 +
 +		// IPv4
-+		case AF_INET:
++		case AF_INET:;
 +			const struct sockaddr_in *sa4 = (const struct sockaddr_in *)addr;
 +			struct in_pktinfo pktinfo4 = {
 +				.ipi_spec_dst = sa4->sin_addr,
@@ -655,17 +560,70 @@ index 50638c098..80f16297d 100644
 +	}
 +}
 +
+ #if !ENABLE_SENDMMSG
+ int udp_queue_init_global(uv_loop_t *loop)
+ {
+ 	return 0;
+ }
+-/* Appease the linker in case this unused call isn't optimized out. */
+-void udp_queue_push(int fd, const struct sockaddr *sa, char *buf, size_t buf_len,
+-                    udp_queue_cb cb, void *baton)
++/* Without sendmmsg() we don't queue but send immediately. */
++void udp_queue_push(int fd, const struct sockaddr *sa, const struct sockaddr *da,
++		char *buf, size_t buf_len, udp_queue_cb cb, void *baton)
+ {
+-	abort();
++	union {
++		char buf[CMSG_SPACE(sizeof(struct in6_pktinfo))];
++		struct cmsghdr align;
++	} ctrl;
++	struct iovec iov = {
++		.iov_base = buf,
++		.iov_len  = buf_len,
++	};
++	struct msghdr msg = {
++		.msg_name    = (void *)sa,
++		.msg_namelen = kr_sockaddr_len(sa),
++		.msg_iov     = &iov,
++		.msg_iovlen  = 1,
++	};
++
++	udp_queue_set_destination_address(&msg, ctrl.buf, sizeof(ctrl.buf), da);
++
++	int err = sendmsg(fd, &msg, 0) < 0 ? errno : 0;
++	if (cb)
++		cb(err, baton);
+ }
+ void udp_queue_send_all(void)
+ {
+@@ -42,6 +113,10 @@ typedef struct {
+ 		udp_queue_cb cb;
+ 		void *cb_baton;
+ 		struct iovec msg_iov[1]; /**< storage for .msgvec[i].msg_iov */
++		union {
++			char buf[CMSG_SPACE(sizeof(struct in6_pktinfo))];
++			struct cmsghdr align;
++		} ctrl;
+ 	} items[UDP_QUEUE_LEN];
+ } udp_queue_t;
+ 
+@@ -111,8 +186,8 @@ int udp_queue_init_global(uv_loop_t *loop)
+ 	return ret;
+ }
+ 
+-void udp_queue_push(int fd, const struct sockaddr *sa, char *buf, size_t buf_len,
+-                    udp_queue_cb cb, void *baton)
 +void udp_queue_push(int fd, const struct sockaddr *sa, const struct sockaddr *da,
 +		char *buf, size_t buf_len, udp_queue_cb cb, void *baton)
  {
  	if (fd < 0) {
  		kr_log_error(SYSTEM, "ERROR: called udp_queue_push(fd = %d, ...)\n", fd);
-@@ -132,6 +189,10 @@ void udp_queue_push(int fd, const struct sockaddr *sa, char *buf, size_t buf_len
+@@ -132,6 +207,10 @@ void udp_queue_push(int fd, const struct sockaddr *sa, char *buf, size_t buf_len
  		state.udp_queues[fd] = udp_queue_create();
  	udp_queue_t *const q = state.udp_queues[fd];
  
 +	// Set the destination address
-+	udp_queue_set_destination_address(&q->msgvec[q->len],
++	udp_queue_set_destination_address(&q->msgvec[q->len].msg_hdr,
 +		q->items[q->len].ctrl.buf, sizeof(q->items[q->len].ctrl.buf), da);
 +
  	/* Append to the queue */
@@ -687,10 +645,20 @@ index cb01f90a2..9d3cb7da2 100644
  /** Send all queued packets immediatelly. */
  void udp_queue_send_all(void);
 diff --git a/daemon/worker.c b/daemon/worker.c
-index 834a3ae5b..acec5c653 100644
+index 834a3ae5b..02118aaef 100644
 --- a/daemon/worker.c
 +++ b/daemon/worker.c
-@@ -232,7 +232,7 @@ static uint8_t *alloc_wire_cb(struct kr_request *req, uint16_t *maxlen)
+@@ -66,6 +66,9 @@ struct request_ctx
+ 		/** Local address.  For AF_XDP we couldn't use session's,
+ 		 * as the address might be different every time. */
+ 		union kr_sockaddr dst_addr;
++		/** Local address the request really arrived at, if known (else AF_UNSPEC);
++		 * if not from a proxy, same as dst_addr. */
++		union kr_sockaddr comm_dst_addr;
+ 
+ 		/** Router's MAC address for XDP. */
+ 		ethaddr_t eth_from;
+@@ -232,7 +235,7 @@ static uint8_t *alloc_wire_cb(struct kr_request *req, uint16_t *maxlen)
  	uv_handle_t *handle = session2_get_handle(ctx->source.session);
  	if (kr_fails_assert(handle->type == UV_POLL))
  		return NULL;
@@ -699,7 +667,7 @@ index 834a3ae5b..acec5c653 100644
  	knot_xdp_msg_t out;
  	bool ipv6 = ctx->source.comm_addr.ip.sa_family == AF_INET6;
  	int ret = knot_xdp_send_alloc(xhd->socket, ipv6 ? KNOT_XDP_MSG_IPV6 : 0, &out);
-@@ -260,7 +260,7 @@ static void free_wire(const struct request_ctx *ctx)
+@@ -260,7 +263,7 @@ static void free_wire(const struct request_ctx *ctx)
  	uv_handle_t *handle = session2_get_handle(ctx->source.session);
  	if (!handle || kr_fails_assert(handle->type == UV_POLL))
  		return;
@@ -708,3 +676,23 @@ index 834a3ae5b..acec5c653 100644
  	/* Freeing is done by sending an empty packet (the API won't really send it). */
  	knot_xdp_msg_t out;
  	out.payload.iov_base = ans->wire;
+@@ -368,6 +371,10 @@ static struct request_ctx *request_create(struct session2 *session,
+ 			dst_addr = session2_get_sockname(session);
+ 		memcpy(&ctx->source.dst_addr.ip, dst_addr, kr_sockaddr_len(dst_addr));
+ 		req->qsource.dst_addr = &ctx->source.dst_addr.ip;
++
++		if (comm->comm_dst_addr)
++			memcpy(&ctx->source.comm_dst_addr.ip, comm->comm_dst_addr,
++				kr_sockaddr_len(comm->comm_dst_addr));
+ 	}
+ 
+ 	req->selection_context.is_tls_capable = is_tls_capable;
+@@ -1010,6 +1017,8 @@ static int qr_task_finalize(struct qr_task *task, int state)
+ 		.comm_addr = &ctx->source.comm_addr.ip,
+ 		.xdp = ctx->source.xdp
+ 	};
++	if (ctx->source.comm_dst_addr.ip.sa_family != AF_UNSPEC)
++		out_comm.comm_dst_addr = &ctx->source.comm_dst_addr.ip;
+ 	if (ctx->req.qsource.flags.quic) {
+ 		out_comm.target = ctx->source.session->comm_storage.target;
+ 	}
