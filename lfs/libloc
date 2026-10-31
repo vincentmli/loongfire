@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -81,6 +81,7 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 
 	# https://lists.ipfire.org/pipermail/development/2022-November/014763.html
 	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/libloc-0.9.18-Revert-Install-Perl-files-to-Perl-vendor-directory.patch
+	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/libloc-0.9.19-Return_3_when_database_is_latest_version.patch
 	cd $(DIR_APP) && ./autogen.sh
 	cd $(DIR_APP) && ./configure \
 			--prefix=/usr \

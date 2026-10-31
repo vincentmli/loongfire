@@ -1,0 +1,11 @@
+--- libloc-0.9.19/src/scripts/location.in.orig	2026-06-02 16:41:25.000000000 +0200
++++ libloc-0.9.19/src/scripts/location.in	2026-09-10 16:00:33.706282553 +0200
+@@ -468,7 +468,7 @@
+ 		# Check the version of the local database
+ 		if db and t and db.created_at >= t:
+ 			log.info("Already on the latest version")
+-			return
++			return 3
+ 
+ 		# Download the database into the correct directory
+ 		tmpdir = os.path.dirname(ns.database)
