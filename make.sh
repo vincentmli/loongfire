@@ -1845,6 +1845,7 @@ fi
 	lfsmake2 libogg
 	lfsmake2 libvorbis
 	lfsmake2 flac
+	lfsmake2 libmpg123
 	lfsmake2 lame
 	lfsmake2 soxr
 	lfsmake2 libshout
