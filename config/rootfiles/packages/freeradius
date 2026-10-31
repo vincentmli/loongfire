@@ -250,6 +250,7 @@ etc/raddb
 #etc/raddb/mods-enabled/detail
 #etc/raddb/mods-enabled/detail.log
 #etc/raddb/mods-enabled/digest
+#etc/raddb/mods-enabled/dpsk
 #etc/raddb/mods-enabled/dynamic_clients
 #etc/raddb/mods-enabled/eap
 #etc/raddb/mods-enabled/echo
@@ -331,9 +332,12 @@ usr/bin/map_unit
 usr/bin/rad_counter
 usr/bin/radattr
 usr/bin/radclient
+usr/bin/radconf2json
 usr/bin/radcrypt
+usr/bin/raddict2json
 usr/bin/radeapclient
 usr/bin/radlast
+usr/bin/radmod2json
 usr/bin/radsecret
 usr/bin/radsniff
 usr/bin/radsqlrelay
@@ -346,10 +350,13 @@ usr/bin/smbencrypt
 #usr/include/freeradius
 #usr/include/freeradius/attributes.h
 #usr/include/freeradius/autoconf.h
+#usr/include/freeradius/automask.h
 #usr/include/freeradius/base64.h
 #usr/include/freeradius/build.h
+#usr/include/freeradius/clients.h
 #usr/include/freeradius/conf.h
 #usr/include/freeradius/conffile.h
+#usr/include/freeradius/connection.h
 #usr/include/freeradius/detail.h
 #usr/include/freeradius/event.h
 #usr/include/freeradius/features.h
@@ -357,6 +364,8 @@ usr/bin/smbencrypt
 #usr/include/freeradius/hash.h
 #usr/include/freeradius/heap.h
 #usr/include/freeradius/libradius.h
+#usr/include/freeradius/listen.h
+#usr/include/freeradius/log.h
 #usr/include/freeradius/map.h
 #usr/include/freeradius/md4.h
 #usr/include/freeradius/md5.h
@@ -364,6 +373,7 @@ usr/bin/smbencrypt
 #usr/include/freeradius/modcall.h
 #usr/include/freeradius/modules.h
 #usr/include/freeradius/packet.h
+#usr/include/freeradius/process.h
 #usr/include/freeradius/rad_assert.h
 #usr/include/freeradius/radius.h
 #usr/include/freeradius/radiusd.h
@@ -411,9 +421,11 @@ usr/bin/smbencrypt
 #usr/include/freeradius/tcp.h
 #usr/include/freeradius/threads.h
 #usr/include/freeradius/tls.h
+#usr/include/freeradius/tmpl.h
 #usr/include/freeradius/token.h
 #usr/include/freeradius/udpfromto.h
 #usr/include/freeradius/vqp.h
+#usr/include/freeradius/xlat.h
 #usr/lib/freeradius
 #usr/lib/freeradius/libfreeradius-dhcp.a
 #usr/lib/freeradius/libfreeradius-dhcp.la
@@ -597,9 +609,6 @@ usr/lib/freeradius/rlm_sqlippool.so
 #usr/lib/freeradius/rlm_totp.a
 #usr/lib/freeradius/rlm_totp.la
 usr/lib/freeradius/rlm_totp.so
-#usr/lib/freeradius/rlm_unbound.a
-#usr/lib/freeradius/rlm_unbound.la
-usr/lib/freeradius/rlm_unbound.so
 #usr/lib/freeradius/rlm_unix.a
 #usr/lib/freeradius/rlm_unix.la
 usr/lib/freeradius/rlm_unix.so
@@ -686,6 +695,7 @@ usr/sbin/radmin
 #usr/share/doc/freeradius/antora/modules/developers/pages/coverage.adoc
 #usr/share/doc/freeradius/antora/modules/developers/pages/index.adoc
 #usr/share/doc/freeradius/antora/modules/developers/pages/profile.adoc
+#usr/share/doc/freeradius/antora/modules/developers/pages/protocol-error.adoc
 #usr/share/doc/freeradius/antora/modules/developers/pages/release-method.adoc
 #usr/share/doc/freeradius/antora/modules/howto
 #usr/share/doc/freeradius/antora/modules/howto/nav.adoc
@@ -899,7 +909,6 @@ usr/sbin/radmin
 #usr/share/doc/freeradius/rfc/draft-kamath-pppext-eap-mschapv2-00.txt
 #usr/share/doc/freeradius/rfc/draft-sterman-aaa-sip-00.txt
 #usr/share/doc/freeradius/rfc/genref.pl
-#usr/share/doc/freeradius/rfc/leap.txt
 #usr/share/doc/freeradius/rfc/per-rfc.pl
 #usr/share/doc/freeradius/rfc/rewrite.pl
 #usr/share/doc/freeradius/rfc/rfc1157.txt
@@ -1198,6 +1207,7 @@ usr/share/freeradius
 #usr/share/freeradius/dictionary.riverbed
 #usr/share/freeradius/dictionary.riverstone
 #usr/share/freeradius/dictionary.roaringpenguin
+#usr/share/freeradius/dictionary.rtbrick
 #usr/share/freeradius/dictionary.ruckus
 #usr/share/freeradius/dictionary.ruggedcom
 #usr/share/freeradius/dictionary.sangoma
