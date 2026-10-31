@@ -14,7 +14,11 @@ usr/lib/libdrop_ambient.so.0.0.0
 #usr/share/aclocal/cap-ng.m4
 #usr/share/bash-completion
 #usr/share/bash-completion/completions
+#usr/share/bash-completion/completions/cap-audit
+#usr/share/bash-completion/completions/filecap
 #usr/share/bash-completion/completions/libcap-ng.bash_completion
+#usr/share/bash-completion/completions/netcap
+#usr/share/bash-completion/completions/pscap
 #usr/share/man/man3/capng_apply.3
 #usr/share/man/man3/capng_apply_caps_fd.3
 #usr/share/man/man3/capng_capability_to_name.3
