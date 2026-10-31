@@ -727,6 +727,9 @@ execute() {
 
 			# Enable QEMU strace
 			#[QEMU_STRACE]="1"
+
+			# Tell QEMU to reserve more virtual memory
+			[QEMU_RESERVED_VA]=0x200000000
 		)
 
 		case "${BUILD_ARCH}" in
