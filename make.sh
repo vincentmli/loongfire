@@ -49,9 +49,9 @@ KVER="${KVER/-rc/.0-rc}${KVER_SUFFIX}"
 # All supported architectures
 ARCHES=(
 	aarch64
+	loongarch64
 	riscv64
 	x86_64
-	loongarch64
 )
 
 HOST_ARCH="${HOSTTYPE}"
@@ -2397,7 +2397,7 @@ done
 
 # Check the architecture
 case "${BUILD_ARCH}" in
-	aarch64|x86_64|riscv64|loongarch64)
+	aarch64|loongarch64|x86_64|riscv64)
 		;;
 
 	*)
@@ -2411,15 +2411,16 @@ case "${BUILD_ARCH}" in
 		BUILD_PLATFORM="arm"
 		;;
 
+	loongarch64)
+		BUILD_PLATFORM="loongarch"
+		;;
+
 	riscv64)
 		BUILD_PLATFORM="riscv"
 		;;
 
 	x86_64)
 		BUILD_PLATFORM="x86"
-		;;
-	loongarch64)
-		BUILD_PLATFORM="loongarch"
 		;;
 esac
 
