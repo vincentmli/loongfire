@@ -2471,6 +2471,13 @@ case "${BUILD_ARCH}" in
 		)
 		;;
 
+        loongarch64)
+                CFLAGS+=(
+                        "-march=loongarch64"
+                        "-mabi=lp64d"
+                )
+                ;;
+
         riscv64)
 		CFLAGS+=(
 			# Build for RVA22/23
