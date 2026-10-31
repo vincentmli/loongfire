@@ -964,14 +964,13 @@ qemu_is_required() {
 		build_arch="${BUILD_ARCH}"
 	fi
 
-	case "${HOST_ARCH},${build_arch}" in
-		x86_64,arm*|x86_64,aarch64|x86_64,riscv64|i?86,arm*|i?86,aarch64|i?86,x86_64)
-			return 0
-			;;
-		*)
-			return 1
-			;;
-	esac
+	# Don't require QEMU if we are building natively
+	if [ "${HOST_ARCH}" = "${build_arch}" ]; then
+		return 1
+	fi
+
+	# Require QEMU
+	return 0
 }
 
 qemu_install_helper() {
