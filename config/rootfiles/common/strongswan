@@ -34,7 +34,6 @@ etc/strongswan.d/charon/eap-ttls.conf
 etc/strongswan.d/charon/farp.conf
 etc/strongswan.d/charon/fips-prf.conf
 etc/strongswan.d/charon/gcm.conf
-etc/strongswan.d/charon/gcrypt.conf
 etc/strongswan.d/charon/hmac.conf
 etc/strongswan.d/charon/kdf.conf
 etc/strongswan.d/charon/kernel-netlink.conf
@@ -124,7 +123,6 @@ usr/lib/ipsec/plugins/libstrongswan-eap-ttls.so
 usr/lib/ipsec/plugins/libstrongswan-farp.so
 usr/lib/ipsec/plugins/libstrongswan-fips-prf.so
 usr/lib/ipsec/plugins/libstrongswan-gcm.so
-usr/lib/ipsec/plugins/libstrongswan-gcrypt.so
 usr/lib/ipsec/plugins/libstrongswan-hmac.so
 usr/lib/ipsec/plugins/libstrongswan-kdf.so
 usr/lib/ipsec/plugins/libstrongswan-kernel-netlink.so
@@ -208,7 +206,6 @@ usr/sbin/swanctl
 #usr/share/strongswan/templates/config/plugins/farp.conf
 #usr/share/strongswan/templates/config/plugins/fips-prf.conf
 #usr/share/strongswan/templates/config/plugins/gcm.conf
-#usr/share/strongswan/templates/config/plugins/gcrypt.conf
 #usr/share/strongswan/templates/config/plugins/hmac.conf
 #usr/share/strongswan/templates/config/plugins/kdf.conf
 #usr/share/strongswan/templates/config/plugins/kernel-netlink.conf
