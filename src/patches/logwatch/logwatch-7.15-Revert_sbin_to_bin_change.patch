@@ -1,0 +1,13 @@
+--- logwatch-7.15/install_logwatch.sh.orig	2026-09-21 12:24:58.939788088 +0200
++++ logwatch-7.15/install_logwatch.sh	2026-09-21 12:27:56.745789515 +0200
+@@ -326,8 +326,8 @@
+ fi
+ 
+ #Symlink
+-ln -f -s $BASEDIR/scripts/logwatch.pl /usr/bin/logwatch
+-printf "Created symlink for /usr/bin/logwatch \n"
++ln -f -s $BASEDIR/scripts/logwatch.pl /usr/sbin/logwatch
++printf "Created symlink for /usr/sbin/logwatch \n"
+ 
+ #Cron or Systemd timer
+ if [ $systemd -eq 1 ]; then

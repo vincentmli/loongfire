@@ -82,6 +82,7 @@ usr/share/logwatch/default.conf/services/amavis.conf
 #usr/share/logwatch/default.conf/services/autorpm.conf
 #usr/share/logwatch/default.conf/services/barracuda.conf
 #usr/share/logwatch/default.conf/services/bfd.conf
+#usr/share/logwatch/default.conf/services/chronyd.conf
 #usr/share/logwatch/default.conf/services/cisco.conf
 #usr/share/logwatch/default.conf/services/citadel.conf
 usr/share/logwatch/default.conf/services/clam-update.conf
@@ -92,7 +93,9 @@ usr/share/logwatch/default.conf/services/cron.conf
 #usr/share/logwatch/default.conf/services/denyhosts.conf
 usr/share/logwatch/default.conf/services/dhcpd.conf
 #usr/share/logwatch/default.conf/services/dirsrv.conf
+#usr/share/logwatch/default.conf/services/dnf-automatic.conf
 #usr/share/logwatch/default.conf/services/dnf-rpm.conf
+#usr/share/logwatch/default.conf/services/dnf5.conf
 #usr/share/logwatch/default.conf/services/dnssec.conf
 #usr/share/logwatch/default.conf/services/dovecot.conf
 #usr/share/logwatch/default.conf/services/dpkg.conf
@@ -123,6 +126,7 @@ usr/share/logwatch/default.conf/services/kernel.conf
 #usr/share/logwatch/default.conf/services/lvm.conf
 #usr/share/logwatch/default.conf/services/mailscanner.conf
 usr/share/logwatch/default.conf/services/mdadm.conf
+#usr/share/logwatch/default.conf/services/mdadm.conf.orig
 #usr/share/logwatch/default.conf/services/mod_security2.conf
 usr/share/logwatch/default.conf/services/modprobe.conf
 #usr/share/logwatch/default.conf/services/mountd.conf
@@ -231,6 +235,7 @@ usr/share/logwatch/scripts/services/amavis
 #usr/share/logwatch/scripts/services/autorpm
 #usr/share/logwatch/scripts/services/barracuda
 #usr/share/logwatch/scripts/services/bfd
+#usr/share/logwatch/scripts/services/chronyd
 #usr/share/logwatch/scripts/services/cisco
 #usr/share/logwatch/scripts/services/citadel
 usr/share/logwatch/scripts/services/clam-update
@@ -242,7 +247,9 @@ usr/share/logwatch/scripts/services/cron
 usr/share/logwatch/scripts/services/dhcpd
 usr/share/logwatch/scripts/services/dialup
 #usr/share/logwatch/scripts/services/dirsrv
+#usr/share/logwatch/scripts/services/dnf-automatic
 #usr/share/logwatch/scripts/services/dnf-rpm
+#usr/share/logwatch/scripts/services/dnf5
 #usr/share/logwatch/scripts/services/dnssec
 #usr/share/logwatch/scripts/services/dovecot
 #usr/share/logwatch/scripts/services/dpkg
