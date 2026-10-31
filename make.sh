@@ -736,6 +736,12 @@ execute() {
 				)
 				;;
 
+                        loongarch64)
+                                environ+=(
+                                        [QEMU_CPU]="${QEMU_CPU:-la464}"
+                                )
+                                ;;
+
 			riscv64)
 				environ+=(
 					[QEMU_CPU]="${QEMU_CPU:-sifive-u54}"
