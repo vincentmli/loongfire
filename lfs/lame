@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2020  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2026  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -26,7 +26,7 @@ include Config
 
 SUMMARY    = The LAME MP3 encoder
 
-VER        = 3.100
+VER        = 4.0
 
 THISAPP    = lame-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -34,9 +34,9 @@ DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 PROG       = lame
-PAK_VER    = 2
+PAK_VER    = 3
 
-DEPS       =
+DEPS       = libmpg3
 
 SERVICES   =
 
@@ -48,7 +48,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = fbcf6c6f0d8e4ad2e9333b507719793cc8785231b5d6b3596795c9bf43362737901e3dccd80170d448be3f63df2834e134706236cddbe11fea4cbbda58bec475
+$(DL_FILE)_BLAKE2 = 9e05275c28bc6d086011362f211edc2e2cd831429ca4d2daa1bc0ae7084ebd9bec3c3db93e1cab638570a9f624468372b9ff39f3dc9e7d0b105dbba7f248b2df
 
 install : $(TARGET)
 
@@ -81,8 +81,12 @@ $(subst %,%_BLAKE2,$(objects)) :
 $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar zxf $(DIR_DL)/$(DL_FILE)
+	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/lame-4.0-upstream_fixes.patch
 	$(UPDATE_AUTOMAKE)
-	cd $(DIR_APP) && ./configure --prefix=/usr --enable-mp3rtp
+	cd $(DIR_APP) && ./configure \
+				--prefix=/usr \
+				--enable-mp3rtp \
+				--disable-static
 	cd $(DIR_APP) && make $(MAKETUNING) $(EXTRA_MAKE)
 	cd $(DIR_APP) && make install
 	@rm -rf $(DIR_APP)
