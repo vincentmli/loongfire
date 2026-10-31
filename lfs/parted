@@ -26,7 +26,7 @@ include Config
 
 SUMMARY    = GNU partitioner
 
-VER        = 3.7
+VER        = 3.8
 
 THISAPP    = parted-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
@@ -45,7 +45,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 967a2c5e6f8d93bd8eff2fe9092413582437c7d33fb151ca5230c8acd0c32e94c90edcb83abed888da560f7fbfcc77ee31cda54ddc3c1af24b1a1c522ab83bca
+$(DL_FILE)_BLAKE2 = a6c07dba8f83cc0a1effed0912d8a6ee65e27d7595c3eb0362cd317a22cacf9fa0b23459bd52659ce6bc9435d3f5e700819d55ffcf1b534ca3d6bd5e0ee4fa74
 
 install : $(TARGET)
 
