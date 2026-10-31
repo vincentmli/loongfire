@@ -1,8 +1,8 @@
 bin/lowntfs-3g
 bin/ntfs-3g
 #lib/libntfs-3g.so
-lib/libntfs-3g.so.89
-lib/libntfs-3g.so.89.0.0
+lib/libntfs-3g.so.91
+lib/libntfs-3g.so.91.0.0
 sbin/mkfs.ntfs
 sbin/mount.lowntfs-3g
 sbin/mount.ntfs-3g
@@ -84,10 +84,5 @@ usr/sbin/ntfsundelete
 #usr/share/man/man8/ntfslabel.8
 #usr/share/man/man8/ntfsls.8
 #usr/share/man/man8/ntfsprogs.8
-#usr/share/man/man8/ntfsrecover.8
 #usr/share/man/man8/ntfsresize.8
-#usr/share/man/man8/ntfssecaudit.8
-#usr/share/man/man8/ntfstruncate.8
 #usr/share/man/man8/ntfsundelete.8
-#usr/share/man/man8/ntfsusermap.8
-#usr/share/man/man8/ntfswipe.8
