@@ -156,6 +156,9 @@ endif
 	mount --bind /dev  $(MNThdd)/dev
 	mount --bind /sys  $(MNThdd)/sys
 
+	# Update the linker cache
+	chroot $(MNThdd) ldconfig
+
 	# Run the filesystem cleanup script
 	chroot $(MNThdd) /usr/local/bin/filesystem-cleanup > $(DIR_TMP)/cleanup.log
 

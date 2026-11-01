@@ -153,6 +153,9 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	# Create mount points
 	$(call CREATE_MOUNTPOINTS,$(DIR_TMP)/root)
 
+	# Update the linker cache
+	chroot $(DIR_TMP)/root ldconfig
+
 	# Run the filesystem cleanup script
 	chroot $(DIR_TMP)/root /usr/local/bin/filesystem-cleanup > $(DIR_TMP)/cleanup.log
 
