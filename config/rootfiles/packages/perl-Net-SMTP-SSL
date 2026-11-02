@@ -1,6 +1,6 @@
 #usr/lib/perl5/site_perl/5.42.2/Net/SMTP
 usr/lib/perl5/site_perl/5.42.2/Net/SMTP/SSL.pm
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Net/SMTP
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Net/SMTP/SSL
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Net/SMTP/SSL/.packlist
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Net/SMTP
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Net/SMTP/SSL
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Net/SMTP/SSL/.packlist
 #usr/share/man/man3/Net::SMTP::SSL.3

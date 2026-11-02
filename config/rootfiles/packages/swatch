@@ -7,8 +7,8 @@ usr/lib/perl5/site_perl/5.42.2/Swatchdog/Throttle.pm
 #usr/lib/perl5/site_perl/5.42.2/auto/Swatchdog
 #usr/lib/perl5/site_perl/5.42.2/auto/Swatchdog/Actions
 #usr/lib/perl5/site_perl/5.42.2/auto/Swatchdog/Actions/autosplit.ix
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/swatchdog
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/swatchdog/.packlist
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/swatchdog
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/swatchdog/.packlist
 #usr/share/man/man1/swatchdog.1
 #usr/share/man/man3/Swatchdog::Actions.3
 #usr/share/man/man3/Swatchdog::Threshold.3

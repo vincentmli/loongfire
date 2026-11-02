@@ -28,9 +28,9 @@ usr/lib/perl5/site_perl/5.42.2/LWP/UserAgent.pm
 #usr/lib/perl5/site_perl/5.42.2/libwww
 #usr/lib/perl5/site_perl/5.42.2/libwww/lwpcook.pod
 #usr/lib/perl5/site_perl/5.42.2/libwww/lwptut.pod
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/libwww
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/libwww/perl
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/libwww/perl/.packlist
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/libwww
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/libwww/perl
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/libwww/perl/.packlist
 #usr/share/man/man3/LWP.3
 #usr/share/man/man3/LWP::Authen::Ntlm.3
 #usr/share/man/man3/LWP::ConnCache.3

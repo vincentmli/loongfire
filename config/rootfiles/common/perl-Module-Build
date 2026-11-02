@@ -25,9 +25,9 @@
 #usr/lib/perl5/site_perl/5.42.2/Module/Build/Platform/darwin.pm
 #usr/lib/perl5/site_perl/5.42.2/Module/Build/Platform/os2.pm
 #usr/lib/perl5/site_perl/5.42.2/Module/Build/PodParser.pm
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Module
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Module/Build
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Module/Build/.packlist
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Module
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Module/Build
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Module/Build/.packlist
 #usr/share/man/man1/config_data.1
 #usr/share/man/man3/Module::Build.3
 #usr/share/man/man3/Module::Build::API.3

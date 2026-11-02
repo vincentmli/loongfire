@@ -2,7 +2,7 @@
 #usr/lib/perl5/site_perl/5.42.2/Module/ScanDeps
 #usr/lib/perl5/site_perl/5.42.2/Module/ScanDeps.pm
 #usr/lib/perl5/site_perl/5.42.2/Module/ScanDeps/Cache.pm
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Module/ScanDeps
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Module/ScanDeps/.packlist
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Module/ScanDeps
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Module/ScanDeps/.packlist
 #usr/share/man/man1/scandeps.pl.1
 #usr/share/man/man3/Module::ScanDeps.3

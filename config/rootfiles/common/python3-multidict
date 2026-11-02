@@ -8,6 +8,6 @@ usr/lib/python3.10/site-packages/multidict
 #usr/lib/python3.10/site-packages/multidict/__init__.py
 #usr/lib/python3.10/site-packages/multidict/_abc.py
 #usr/lib/python3.10/site-packages/multidict/_compat.py
-#usr/lib/python3.10/site-packages/multidict/_multidict.cpython-310-xxxMACHINExxx-linux-gnu.so
+#usr/lib/python3.10/site-packages/multidict/_multidict.cpython-310-@ARCH@-linux-gnu.so
 #usr/lib/python3.10/site-packages/multidict/_multidict_py.py
 #usr/lib/python3.10/site-packages/multidict/py.typed

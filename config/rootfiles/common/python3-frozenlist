@@ -8,6 +8,6 @@ usr/lib/python3.10/site-packages/frozenlist
 #usr/lib/python3.10/site-packages/frozenlist-1.8.0.dist-info/top_level.txt
 #usr/lib/python3.10/site-packages/frozenlist/__init__.py
 #usr/lib/python3.10/site-packages/frozenlist/__init__.pyi
-#usr/lib/python3.10/site-packages/frozenlist/_frozenlist.cpython-310-xxxMACHINExxx-linux-gnu.so
+#usr/lib/python3.10/site-packages/frozenlist/_frozenlist.cpython-310-@ARCH@-linux-gnu.so
 #usr/lib/python3.10/site-packages/frozenlist/_frozenlist.pyx
 #usr/lib/python3.10/site-packages/frozenlist/py.typed

@@ -39,8 +39,8 @@ usr/lib/perl5/site_perl/5.42.2/Date/Parse.pm
 #usr/lib/perl5/site_perl/5.42.2/Time
 usr/lib/perl5/site_perl/5.42.2/Time/Zone.pm
 usr/lib/perl5/site_perl/5.42.2/TimeDate.pm
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Date/Parse
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Date/Parse/.packlist
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Date/Parse
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Date/Parse/.packlist
 #usr/share/man/man3/Date::Format.3
 #usr/share/man/man3/Date::Language.3
 #usr/share/man/man3/Date::Language::Bulgarian.3

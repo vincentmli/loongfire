@@ -8,8 +8,8 @@ usr/lib/perl5/site_perl/5.42.2/Parse/Yapp/Lalr.pm
 usr/lib/perl5/site_perl/5.42.2/Parse/Yapp/Options.pm
 usr/lib/perl5/site_perl/5.42.2/Parse/Yapp/Output.pm
 usr/lib/perl5/site_perl/5.42.2/Parse/Yapp/Parse.pm
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Parse
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Parse/Yapp
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Parse/Yapp/.packlist
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Parse
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Parse/Yapp
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Parse/Yapp/.packlist
 #usr/share/man/man1/yapp.1
 #usr/share/man/man3/Parse::Yapp.3

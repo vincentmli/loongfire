@@ -16,9 +16,9 @@ usr/lib/python3.10/site-packages/aiohttp
 #usr/lib/python3.10/site-packages/aiohttp/_cparser.pxd
 #usr/lib/python3.10/site-packages/aiohttp/_find_header.pxd
 #usr/lib/python3.10/site-packages/aiohttp/_headers.pxi
-#usr/lib/python3.10/site-packages/aiohttp/_http_parser.cpython-310-xxxMACHINExxx-linux-gnu.so
+#usr/lib/python3.10/site-packages/aiohttp/_http_parser.cpython-310-@ARCH@-linux-gnu.so
 #usr/lib/python3.10/site-packages/aiohttp/_http_parser.pyx
-#usr/lib/python3.10/site-packages/aiohttp/_http_writer.cpython-310-xxxMACHINExxx-linux-gnu.so
+#usr/lib/python3.10/site-packages/aiohttp/_http_writer.cpython-310-@ARCH@-linux-gnu.so
 #usr/lib/python3.10/site-packages/aiohttp/_http_writer.pyx
 #usr/lib/python3.10/site-packages/aiohttp/_websocket
 #usr/lib/python3.10/site-packages/aiohttp/_websocket/.hash
@@ -27,12 +27,12 @@ usr/lib/python3.10/site-packages/aiohttp
 #usr/lib/python3.10/site-packages/aiohttp/_websocket/.hash/reader_c.pxd.hash
 #usr/lib/python3.10/site-packages/aiohttp/_websocket/__init__.py
 #usr/lib/python3.10/site-packages/aiohttp/_websocket/helpers.py
-#usr/lib/python3.10/site-packages/aiohttp/_websocket/mask.cpython-310-xxxMACHINExxx-linux-gnu.so
+#usr/lib/python3.10/site-packages/aiohttp/_websocket/mask.cpython-310-@ARCH@-linux-gnu.so
 #usr/lib/python3.10/site-packages/aiohttp/_websocket/mask.pxd
 #usr/lib/python3.10/site-packages/aiohttp/_websocket/mask.pyx
 #usr/lib/python3.10/site-packages/aiohttp/_websocket/models.py
 #usr/lib/python3.10/site-packages/aiohttp/_websocket/reader.py
-#usr/lib/python3.10/site-packages/aiohttp/_websocket/reader_c.cpython-310-xxxMACHINExxx-linux-gnu.so
+#usr/lib/python3.10/site-packages/aiohttp/_websocket/reader_c.cpython-310-@ARCH@-linux-gnu.so
 #usr/lib/python3.10/site-packages/aiohttp/_websocket/reader_c.pxd
 #usr/lib/python3.10/site-packages/aiohttp/_websocket/reader_c.py
 #usr/lib/python3.10/site-packages/aiohttp/_websocket/reader_py.py

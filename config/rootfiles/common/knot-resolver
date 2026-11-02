@@ -150,7 +150,7 @@ usr/lib/python3.10/site-packages/knot_resolver-6.4.2-py3.10.egg-info/top_level.t
 #usr/lib/python3.10/site-packages/knot_resolver/controller/supervisord/plugin
 #usr/lib/python3.10/site-packages/knot_resolver/controller/supervisord/plugin/fast_rpcinterface.py
 #usr/lib/python3.10/site-packages/knot_resolver/controller/supervisord/plugin/manager_integration.py
-#usr/lib/python3.10/site-packages/knot_resolver/controller/supervisord/plugin/notify.cpython-310-xxxMACHINExxx-linux-gnu.so
+#usr/lib/python3.10/site-packages/knot_resolver/controller/supervisord/plugin/notify.cpython-310-@ARCH@-linux-gnu.so
 #usr/lib/python3.10/site-packages/knot_resolver/controller/supervisord/plugin/notifymodule.c
 #usr/lib/python3.10/site-packages/knot_resolver/controller/supervisord/plugin/patch_logger.py
 #usr/lib/python3.10/site-packages/knot_resolver/controller/supervisord/plugin/sd_notify.py

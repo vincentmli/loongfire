@@ -42,8 +42,8 @@
 #usr/lib/perl5/site_perl/5.42.2/inc/Module/Install
 #usr/lib/perl5/site_perl/5.42.2/inc/Module/Install.pm
 #usr/lib/perl5/site_perl/5.42.2/inc/Module/Install/DSL.pm
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Module/Install
-#usr/lib/perl5/site_perl/5.42.2/xxxMACHINExxx-linux-thread-multi/auto/Module/Install/.packlist
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Module/Install
+#usr/lib/perl5/site_perl/5.42.2/@ARCH@-linux-thread-multi/auto/Module/Install/.packlist
 #usr/share/man/man3/Module::AutoInstall.3
 #usr/share/man/man3/Module::Install.3
 #usr/share/man/man3/Module::Install::API.3
