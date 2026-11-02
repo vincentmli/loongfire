@@ -76,10 +76,21 @@ read_rootfiles() {
 }
 
 substitute_paths() {
-	sed \
-		-e "s/BUILDTARGET/${BUILDTARGET}/g" \
-		-e "s/KVER/${KVER}/g" \
-		-e "s/xxxMACHINExxx/${BUILD_ARCH}/g"
+	local args=()
+
+	# Replace all placeholders (NAME=VALUE)
+	local placeholder
+	for placeholder in ${ROOTFILE_PLACEHOLDERS}; do
+		args+=( -e "s/${placeholder%%=*}/${placeholder#*=}/g" )
+	done
+
+	# Pass everything through if there is nothing to replace
+	if [ "${#args[@]}" -eq 0 ]; then
+		cat
+		return
+	fi
+
+	sed "${args[@]}"
 }
 
 main() {

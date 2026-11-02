@@ -1,0 +1,173 @@
+#!/bin/bash
+###############################################################################
+#                                                                             #
+# IPFire.org - A linux based firewall                                         #
+# Copyright (C) 2026  IPFire Team  <info@ipfire.org>                          #
+#                                                                             #
+# This program is free software: you can redistribute it and/or modify        #
+# it under the terms of the GNU General Public License as published by        #
+# the Free Software Foundation, either version 3 of the License, or           #
+# (at your option) any later version.                                         #
+#                                                                             #
+# This program is distributed in the hope that it will be useful,             #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of              #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               #
+# GNU General Public License for more details.                                #
+#                                                                             #
+# You should have received a copy of the GNU General Public License           #
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.       #
+#                                                                             #
+###############################################################################
+
+# Compares the list of files that a package has installed with its rootfile
+# and writes the result to standard output:
+#
+#   #path   The file is commented out in the rootfile
+#   path    The file is listed in the rootfile
+#   +path   The file is new
+#   -path   The file is listed in the rootfile, but has not been installed
+#
+# The output is written in the notation of the rootfile, which means that any
+# placeholders (ROOTFILE_PLACEHOLDERS) are being put back in, so that the
+# result can be copied over without replacing any architectures, kernel
+# versions, etc. by hand.
+#
+# Files that are already known keep whatever notation the rootfile uses.
+# New files will have all placeholders inserted, unless ROOTFILE_KEEP_LITERAL
+# has been set.
+
+NAMES=()
+VALUES=()
+AMBIGUOUS=()
+
+# Reads the placeholders as NAME=VALUE, in the order in which they are
+# supposed to be put back in (i.e. the longest values first)
+read_placeholders() {
+	local placeholder
+
+	for placeholder in ${ROOTFILE_PLACEHOLDERS}; do
+		# Skip anything that has no value
+		[ -n "${placeholder#*=}" ] || continue
+
+		# Is there another placeholder with the same value?
+		local value
+		local ambiguous=""
+		for value in "${VALUES[@]}"; do
+			if [ "${value}" = "${placeholder#*=}" ]; then
+				ambiguous=1
+				break
+			fi
+		done
+
+		NAMES+=( "${placeholder%%=*}" )
+		VALUES+=( "${placeholder#*=}" )
+		AMBIGUOUS+=( "${ambiguous}" )
+	done
+}
+
+# Replaces all placeholders by their values and stores the result in REPLY
+expand() {
+	REPLY="${1}"
+
+	local i
+	for i in "${!NAMES[@]}"; do
+		REPLY="${REPLY//"${NAMES[${i}]}"/"${VALUES[${i}]}"}"
+	done
+}
+
+# Replaces all values by their placeholders and stores the result in REPLY
+collapse() {
+	local path="${1}"
+	local collapsed="${path}"
+
+	local i
+	for i in "${!VALUES[@]}"; do
+		# If multiple placeholders have the same value, the first one wins
+		[ -n "${AMBIGUOUS[${i}]}" ] && continue
+
+		collapsed="${collapsed//"${VALUES[${i}]}"/"${NAMES[${i}]}"}"
+	done
+
+	# Don't use the result if it would not bring us back to where we started
+	expand "${collapsed}"
+	if [ "${REPLY}" = "${path}" ]; then
+		REPLY="${collapsed}"
+	else
+		REPLY="${path}"
+	fi
+}
+
+main() {
+	local rootfile="${1}"
+	local filelist="${2}"
+
+	if [ ! -r "${rootfile}" ] || [ ! -r "${filelist}" ]; then
+		echo "Usage: ${0} ROOTFILE FILELIST" >&2
+		return 2
+	fi
+
+	read_placeholders
+
+	# Maps the actual path to the line in the rootfile
+	local -A known=()
+
+	# Paths that are listed in the rootfile, in order
+	local listed=()
+
+	# Paths that have been installed
+	local -A installed=()
+
+	local line
+	local path
+
+	# Read the rootfile
+	while IFS= read -r line; do
+		[ -n "${line}" ] || continue
+
+		expand "${line#\#}"
+		path="${REPLY}"
+
+		case "${line}" in
+			# If a file is listed twice, the commented line wins
+			\#*)
+				known["${path}"]="${line}"
+				;;
+			*)
+				if [ -z "${known["${path}"]+x}" ]; then
+					known["${path}"]="${line}"
+				fi
+				listed+=( "${path}" )
+				;;
+		esac
+	done < "${rootfile}"
+
+	# Walk through all files that have been installed
+	while IFS= read -r path; do
+		[ -n "${path}" ] || continue
+
+		installed["${path}"]=1
+
+		# We know this file
+		if [ -n "${known["${path}"]+x}" ]; then
+			echo "${known["${path}"]}"
+
+		# This is a new file
+		elif [ -n "${ROOTFILE_KEEP_LITERAL}" ]; then
+			echo "+${path}"
+		else
+			collapse "${path}"
+			echo "+${REPLY}"
+		fi
+	done < "${filelist}"
+
+	# Find any files that have gone away
+	for path in "${listed[@]}"; do
+		if [ -z "${installed["${path}"]+x}" ]; then
+			echo "-${known["${path}"]}"
+		fi
+	done
+
+	return 0
+}
+
+main "$@" || exit $?

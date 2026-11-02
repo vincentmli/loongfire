@@ -111,7 +111,7 @@ DIR_TMP_PAK = $(DIR_TMP)/package-$(PROG)
 # Add the compiler location and version and specs to the ccache hash
 CCACHE_COMPILERCHECK += $(shell gcc -dumpspecs 2>/dev/null | md5sum | cut -d ' ' -f1)
 
-# We support EFI on x86_64 riscv64 and aarch64
+# We support EFI on x86_64 riscv64 aarch64 and loongarch64
 ifeq "$(BUILD_ARCH)" "x86_64"
 	EFI = 1
 	EFI_ARCH = x64
@@ -140,8 +140,8 @@ CMAKE = cmake
 
 # In the toolchain, we might be cross-compiling and need cmake to know
 ifeq "$(TOOLCHAIN)" "1"
-        CMAKE += \
-                -D CMAKE_TOOLCHAIN_FILE=$(TOOLS_DIR)/share/cmake/toolchain.cmake
+	CMAKE += \
+		-D CMAKE_TOOLCHAIN_FILE=$(TOOLS_DIR)/share/cmake/toolchain.cmake
 endif
 
 # Go
@@ -169,6 +169,27 @@ else
 endif
 
 RUST_PLATFORM = $(RUST_ARCH)-unknown-linux-gnu
+
+# Placeholders that can be used in rootfiles as NAME=VALUE
+#
+# Any new files in the logs will have these put back in, in this order. If one
+# value is contained in another one, the longer one has to come first.
+#
+# @ARCH_DASHED@ is the architecture with all underscores replaced by dashes
+# (i.e. x86-64) which is what Samba uses for its private Python libraries. It
+# is the same as @ARCH@ on all other architectures and can therefore only be
+# put back in on x86_64.
+ROOTFILE_PLACEHOLDERS = \
+	@BUILDTARGET@=$(BUILDTARGET) \
+	@RUST_PLATFORM@=$(RUST_PLATFORM) \
+	@KERNEL_RELEASE@=$(KVER) \
+	@ARCH@=$(BUILD_ARCH) \
+	@ARCH_DASHED@=$(subst _,-,$(BUILD_ARCH))
+
+# Packages that install files which carry the name of an architecture on all
+# architectures can set this, so that new files won't have any placeholders
+# put back in.
+ROOTFILE_KEEP_LITERAL =
 
 CARGO_PATH     = $(DIR_APP)/.cargo
 CARGO_REGISTRY = /usr/share/cargo/registry
@@ -210,14 +231,8 @@ CARGO = \
 	--offline
 
 CARGO_OPTIONS = \
+	$(MAKETUNING) \
 	-Z avoid-dev-deps
-
-# Cargo dealocks on riscv64 when building on multiple cores at the same time
-ifeq "$(BUILD_ARCH)" "riscv64"
-	CARGO_OPTIONS += -j1
-else
-	CARGO_OPTIONS += $(MAKETUNING)
-endif
 
 define CARGO_PREPARE
 	mkdir -p $(CARGO_PATH) && \
@@ -297,8 +312,8 @@ define POSTBUILD
 	# - on a partial rebuild without a new file inside TARGET_diff, just touch TARGET
 	# $(TARGET)_diff : result of the diff
 	# ROOTFILE : reference of include/exclude files
-	# $(TARGET)_rootfile : ROOTFILE with KVER replacement
-	# $(TARGET) : log result with {commented|include|added} files
+	# $(TARGET) : log result with {commented|include|added|removed} files
+	#   written in the notation of the rootfile (i.e. with placeholders)
 	@if [ -s "$(TARGET)_diff" ]; then \
 		LFS_SCRIPT=$(firstword $(MAKEFILE_LIST))${ROOTFILE_APPEND} ; \
 		echo $(LFS_SCRIPT); \
@@ -308,18 +323,9 @@ define POSTBUILD
 			ROOTFILE=$(TARGET)_missing_rootfile ; \
 			echo "error $$LFS_SCRIPT not found in config/rootfiles"; \
 		fi; \
-		sed -e "s/BUILDTARGET/$(BUILDTARGET)/g" -e "s/KVER/$(KVER)/g" -e "s/xxxMACHINExxx/$(BUILD_ARCH)/g" $$ROOTFILE > $(TARGET)_rootfile; \
-		while read -r line; do \
-			if grep -qG "^#$$line$$" $(TARGET)_rootfile; then echo "#$$line" >> $(TARGET); \
-			elif grep -qG "^$$line$$" $(TARGET)_rootfile ; then echo "$$line" >> $(TARGET); \
-			else echo "+$$line" >> $(TARGET); \
-			fi; \
-		done < $(TARGET)_diff; \
-		grep -v "^#" $(TARGET)_rootfile | while read -r line; do \
-			if ! grep -qG "^$$line$$" $(TARGET)_diff ; then echo "-$$line" >> $(TARGET); \
-			fi; \
-		done; \
-		rm -f $(TARGET)_rootfile; \
+		ROOTFILE_PLACEHOLDERS="$(ROOTFILE_PLACEHOLDERS)" \
+		ROOTFILE_KEEP_LITERAL="$(ROOTFILE_KEEP_LITERAL)" \
+			$(DIR_SRC)/src/compare-rootfile $$ROOTFILE $(TARGET)_diff >> $(TARGET); \
 	else \
 		touch $(TARGET); \
 	fi
@@ -361,9 +367,7 @@ META_FILENAME    = meta-$(PROG)
 
 # Takes one rootfile or a directory and will return a list of all included files
 COLLECT_FILES = \
-	BUILD_ARCH="$(BUILD_ARCH)" \
-	BUILDTARGET="$(BUILDTARGET)" \
-	KVER="$(KVER)" \
+	ROOTFILE_PLACEHOLDERS="$(ROOTFILE_PLACEHOLDERS)" \
 		$(DIR_SRC)/src/scripts/archive.files $(BUILD_ARCH) $(1) $(2) | tee $(3)
 
 # Takes a filelist from standard input and streams a tarball with all files
