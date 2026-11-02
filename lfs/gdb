@@ -24,13 +24,16 @@
 
 include Config
 
-VER        = 17.2
+VER        = 18.1
 
 THISAPP    = gdb-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
 DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
+
+# Some files carry the name of an architecture on all architectures
+ROOTFILE_KEEP_LITERAL = 1
 
 ###############################################################################
 # Top-level Rules
@@ -40,7 +43,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = 3c6c893e1d26d534918fb07b64f2e5b368825a64f888171f07443c5ebed456e7c26ed223d78bf304ee5f145c6f3c08c790c993c7b955d168e2fd8e656c6e1e9a
+$(DL_FILE)_BLAKE2 = 9cf68cd96ecd1b2f51235f80f30d4024eadea7e11fe8af1cde0103176c622b770d79fde2205739fad8fe314ffecddd450626976e1897b04899027d0d88f30e1d
 
 install : $(TARGET)
 
@@ -71,14 +74,13 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 	cd $(DIR_APP) && mkdir -pv build
-	cd $(DIR_APP)/build && \
-		../configure \
-			--prefix=/usr \
-			--sysconfdir=/etc \
-			--disable-nls \
-			--enable-tui \
-			--with-system-readline \
-			--with-python=/usr/bin/python3
+	cd $(DIR_APP)/build && ../configure \
+					--prefix=/usr \
+					--sysconfdir=/etc \
+					--disable-nls \
+					--enable-tui \
+					--with-system-readline \
+					--with-python=/usr/bin/python3
 	cd $(DIR_APP)/build && make $(MAKETUNING)
 	cd $(DIR_APP)/build && make install
 	@rm -rf $(DIR_APP)

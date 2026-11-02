@@ -1900,7 +1900,7 @@ fi
 	lfsmake2 libseccomp
 	lfsmake2 libslirp
 	lfsmake2 dtc
-	#lfsmake2 qemu
+	lfsmake2 qemu
 	lfsmake2 nagios_nrpe
 	lfsmake2 nagios-plugins
 	lfsmake2 observium-agent
@@ -2243,25 +2243,12 @@ check_rootfiles_for_arch() {
 		"--exclude" "update.sh"
 	)
 
-	# A list of files that are not scanned
-	# because they probably cause some false positives.
-	local excluded_files=(
-		abseil-cpp
-		cmake
-		gdb
-		liburcu
-		luajit
-		ovmf
-		qemu
-		rust-crc32fast
-		rust-memchr
-		rust-libc
-		rust-libc-0.2.108
-		rust-linux-raw-sys
-		rust-ppv-lite86
-		rust-rustix
-		xfsprogs
-	)
+        # A list of files that are not scanned because they carry the name of
+        # an architecture on all architectures (ROOTFILE_KEEP_LITERAL)
+        local excluded_files=(
+                $(grep --files-with-matches "^ROOTFILE_KEEP_LITERAL\s*=\s*1" \
+                        "${BASEDIR}/lfs"/* | xargs --no-run-if-empty -n 1 basename)
+        )
 
 	# Exclude any architecture-specific directories
 	local a

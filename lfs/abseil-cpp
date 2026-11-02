@@ -32,6 +32,9 @@ DL_FROM    = $(URL_IPFIRE)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 
+# Some files carry the name of an architecture on all architectures
+ROOTFILE_KEEP_LITERAL = 1
+
 ###############################################################################
 # Top-level Rules
 ###############################################################################
