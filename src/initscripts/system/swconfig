@@ -22,6 +22,15 @@
 . /etc/sysconfig/rc
 . ${rc_functions}
 
+# There is nothing to do on any other architectures
+case "$(uname -m)" in
+        aarch64)
+                ;;
+        *)
+                exit 0
+                ;;
+esac
+
 if [ -e /etc/init.d/swconfig.user ]; then
 	/etc/init.d/swconfig.user $*
 	exit ${?}

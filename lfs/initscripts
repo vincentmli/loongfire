@@ -210,12 +210,9 @@ $(TARGET) :
 		ln -sf any /etc/rc.d/init.d/networking/$$i; \
 	done
 
-	# intel intel no swconfig
-ifeq "$(BUILD_PLATFORM)" "arm"
+	# swconfig is being shipped on all architectures, but won't do anything
+	# where it is not needed
 	ln -sf ../init.d/swconfig    /etc/rc.d/rcsysinit.d/S73swconfig
-else
-	rm -vf /etc/rc.d/init.d/swconfig
-endif
 	ln -sf ../init.d/acpid       /etc/rc.d/rc3.d/S12acpid
 	ln -sf ../init.d/acpid       /etc/rc.d/rc0.d/K87acpid
 	ln -sf ../init.d/acpid       /etc/rc.d/rc6.d/K87acpid
