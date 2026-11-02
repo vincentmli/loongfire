@@ -24,7 +24,7 @@
 
 include Config
 
-VER        = 2.14
+VER        = 2.16
 
 THISAPP    = grub-$(VER)
 DL_FILE    = $(THISAPP).tar.xz
@@ -61,7 +61,7 @@ objects = $(DL_FILE) \
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 unifont-7.0.03.pcf.gz = $(DL_FROM)/unifont-7.0.03.pcf.gz
 
-$(DL_FILE)_BLAKE2 = 724bb430d8824bec39e6a025cf354a780b79260684c7c4e3d28beb08c8bee10d082a089fcb799f8f5eb6e83abcf8675fb7c5f5ddf443c5c0e61d6f180ee341af
+$(DL_FILE)_BLAKE2 = 74437966a70854ec29f3d80715ac3436f4340e6f69ccd084b8762dd36f80a30e707333d2102639372ce421b79179a1fa043cbb6a2d25e568d035b916b228fca1
 unifont-7.0.03.pcf.gz_BLAKE2 = fb96c1786fcc8c77796c90ce30a2b7d544013bd62cedbf7b027e1894fe75cdbd2044717796cb0e3150db1457fcb58076491d9c0b855621b652fb9a52c0793469
 
 install : $(TARGET)
@@ -94,9 +94,11 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@rm -rf $(DIR_APP) $(DIR_APP_EFI) && cd $(DIR_SRC) && tar axf $(DIR_DL)/$(DL_FILE)
 	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/grub/grub-2.06-remove_os_prober_disabled_warning.patch
 	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/grub/grub-2.02_disable_vga_fallback.patch
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/grub/grub-2.12-Use-medany-instead-of-large-model-for-RISCV.patch
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/grub/grub-2.14-Revert-configure:_Check_linker_for_--image-base_support.patch
-	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/grub/grub-2.14-Revert-configure:_Print_a_more_helpful_error_if_autoconf-archive_is_not_installed.patch
+	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/grub/grub-2.16-Use-medany-instead-of-large-model-for-RISCV.patch
+
+	# Use the UUID for root file systems on software RAID like GRUB 2.14 did
+	# as the name of the array is not the same in the installer and at boot
+	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/grub/grub-2.16-Use-UUID-for-mdraid-root-filesystems.patch
 	cd $(DIR_APP) && [ ! -e grub-core/extra_deps.lst ] && echo 'depends bli part_gpt' > grub-core/extra_deps.lst
 	cd $(DIR_APP) && autoreconf -vfi
 

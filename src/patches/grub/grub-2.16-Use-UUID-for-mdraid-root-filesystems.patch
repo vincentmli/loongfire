@@ -1,0 +1,11 @@
+--- grub-2.16.orig/util/grub.d/10_linux.in	2026-09-21 17:33:49.000000000 +0000
++++ grub-2.16/util/grub.d/10_linux.in	2026-10-26 17:39:04.871821016 +0000
+@@ -56,7 +56,7 @@
+ 	&& [ "x${GRUB_DISABLE_LINUX_PARTUUID}" = "xtrue" ] ) \
+     || ( ! findfs UUID="${GRUB_DEVICE_UUID}" > /dev/null 2>&1 \
+ 	&& ! findfs PARTUUID="${GRUB_DEVICE_PARTUUID}" > /dev/null 2>&1 ) \
+-    || ( test -e "${GRUB_DEVICE}" && ( uses_abstraction "${GRUB_DEVICE}" lvm || uses_abstraction "${GRUB_DEVICE}" diskfilter ) ); then
++    || ( test -e "${GRUB_DEVICE}" && uses_abstraction "${GRUB_DEVICE}" lvm ); then
+   LINUX_ROOT_DEVICE=${GRUB_DEVICE}
+ elif [ "x${GRUB_DEVICE_UUID}" = "x" ] \
+     || [ "x${GRUB_DISABLE_LINUX_UUID}" = "xtrue" ]; then
