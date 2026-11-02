@@ -1,2 +1,2 @@
-boot/uInit-KVER
-boot/initramfs-KVER.img
+boot/uInit-@KERNEL_RELEASE@
+boot/initramfs-@KERNEL_RELEASE@.img

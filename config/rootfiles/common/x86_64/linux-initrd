@@ -1,1 +1,1 @@
-boot/initramfs-KVER.img
+boot/initramfs-@KERNEL_RELEASE@.img
