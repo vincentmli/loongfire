@@ -66,8 +66,8 @@ install:
 	cd $(DIR_SRC) && install -v -m 744 config/rootfiles/core/$(CORE)/update.sh \
 		$(ARCHIVE_DIR)/update.sh
 
-	# Replace the kernel version
-	sed -e "s/xxxKVERxxx/$(KVER)/g" -i $(ARCHIVE_DIR)/update.sh
+	# Replace the kernel release
+	sed -e "s/@KERNEL_RELEASE@/$(KVER)/g" -i $(ARCHIVE_DIR)/update.sh
 
 	# Create the package
 	$(call CREATE_PACKAGE,$(ARCHIVE_DIR),$(PACKAGES_DIR)/$(PACKAGE_FILENAME))
