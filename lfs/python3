@@ -95,6 +95,8 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP) && cd $(DIR_SRC) && tar Jxf $(DIR_DL)/$(DL_FILE)
 
+	cd $(DIR_APP) && patch -Np1 < $(DIR_SRC)/src/patches/python-3.10-loongarch64.patch
+
 ifeq "$(ROOT)" ""
 	rm -rf $(DIR_APP)/Modules/_ctypes/{darwin,libffi,libffi_arm_wince,libffi_msvc,libffi_osx}
 else
