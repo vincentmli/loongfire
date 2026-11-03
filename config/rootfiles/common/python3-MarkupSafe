@@ -7,6 +7,6 @@ usr/lib/python3.10/site-packages/markupsafe
 usr/lib/python3.10/site-packages/markupsafe/__init__.py
 usr/lib/python3.10/site-packages/markupsafe/_native.py
 usr/lib/python3.10/site-packages/markupsafe/_speedups.c
-usr/lib/python3.10/site-packages/markupsafe/_speedups.cpython-310-xxxMACHINExxx-linux-gnu.so
+usr/lib/python3.10/site-packages/markupsafe/_speedups.cpython-310-@ARCH@-linux-gnu.so
 usr/lib/python3.10/site-packages/markupsafe/_speedups.pyi
 usr/lib/python3.10/site-packages/markupsafe/py.typed
