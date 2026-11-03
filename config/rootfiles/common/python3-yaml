@@ -7,7 +7,7 @@ usr/lib/python3.10/site-packages/_yaml
 usr/lib/python3.10/site-packages/_yaml/__init__.py
 usr/lib/python3.10/site-packages/yaml
 usr/lib/python3.10/site-packages/yaml/__init__.py
-usr/lib/python3.10/site-packages/yaml/_yaml.cpython-310.so
+usr/lib/python3.10/site-packages/yaml/_yaml.cpython-310-@ARCH@-linux-gnu.so
 usr/lib/python3.10/site-packages/yaml/composer.py
 usr/lib/python3.10/site-packages/yaml/constructor.py
 usr/lib/python3.10/site-packages/yaml/cyaml.py
