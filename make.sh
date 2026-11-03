@@ -2175,9 +2175,7 @@ build_packages() {
 	local pkg
 
 	# Collect all packages
-	for path in \
-			"${BASEDIR}/config/rootfiles/packages/"* \
-			"${BASEDIR}/config/rootfiles/packages/${BUILD_ARCH}"/*; do
+	for path in "${BASEDIR}/config/rootfiles/packages/"*; do
 		# Skip directories
 		if [ -d "${path}" ]; then
 			continue
