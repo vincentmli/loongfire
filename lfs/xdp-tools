@@ -25,7 +25,7 @@
 
 include Config
 
-VER        = 1.5.7.7
+VER        = 1.5.5.8
 
 THISAPP    = xdp-tools-$(VER)
 DL_FILE    = $(THISAPP).tar.gz
@@ -41,7 +41,7 @@ objects = $(DL_FILE)
 
 $(DL_FILE) = $(DL_FROM)/$(DL_FILE)
 
-$(DL_FILE)_BLAKE2 = e22b6181a3b14a1c901bd39c5949f3cb255cdaaad2b03a1e9a6841a664a8b4bee08e352eda206057056c2787255c0a6844f9938947aa1aa4c6d52f7131f1bc16
+$(DL_FILE)_BLAKE2 = 83d4bb741fb7a4b3485b7c289e9445f2374465ffb98ef31de282a74725ae7766df527591fcbb43412fcd9027896af01bf5fe4929e9b517369b622d565f88fd7c
 
 install : $(TARGET)
 
