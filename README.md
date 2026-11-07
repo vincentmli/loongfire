@@ -1,3 +1,7 @@
+> **ℹ️ Note on architecture support:**
+>
+> LoongFire's primary focus is the **LoongArch** architecture port. However, this project continues the lineage of **IPFire 2.x**, and **all features (eBPF/XDP, firewall, IPS, load balancing, etc.) remain fully functional on x86_64.** If you're an existing IPFire-based x86_64 user, you can continue using this repository for the latest development.
+
 # LoongFire - The Open Source Firewall on LoongArch CPU (龙芯开源防火墙）
 
 # What is LoongFire?
