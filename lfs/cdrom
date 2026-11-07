@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 # IPFire.org - A linux based firewall                                         #
-# Copyright (C) 2007-2021  IPFire Team  <info@ipfire.org>                     #
+# Copyright (C) 2007-2025  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -120,6 +120,39 @@ GRUB_EFI_MODULES = \
 
 ISO_FILE = $(IMAGES_DIR)/$(SNAME)-$(VERSION)-core$(CORE)-$(BUILD_ARCH).iso
 
+ifeq "$(EFI_ARCH)" "LOONGARCH64"
+	EFI_BOOT_FILE = BOOT$(EFI_ARCH).EFI
+else
+	EFI_BOOT_FILE = boot$(EFI_ARCH).efi
+endif
+
+# Dracut modules that the installer does not need
+INSTALLER_OMIT_MODULES = \
+	cifs \
+	dm \
+	hwdb \
+	kernel-network-modules \
+	lunmask \
+	lvm \
+	modsign \
+	net-lib \
+	network \
+	network-legacy \
+	nfs \
+	nvdimm \
+	qemu \
+	qemu-net \
+	resume \
+	usrmount \
+	virtiofs
+
+# Drivers whose firmware is too large to carry in the installer
+INSTALLER_OMIT_DRIVERS = \
+	liquidio \
+	liquidio-core \
+	liquidio_vf \
+	nfp
+
 ###############################################################################
 # Top-level Rules
 ###############################################################################
@@ -176,7 +209,15 @@ $(TARGET) : $(patsubst %,$(DIR_DL)/%,$(objects))
 	mkdir -p $(DIR_TMP)/cdrom/boot/isolinux
 
 	cp /boot/vmlinuz-$(KVER) $(DIR_TMP)/cdrom/boot/isolinux/vmlinuz
-	dracut --install "/usr/sbin/chroot" --force -a "installer" --strip $(DIR_TMP)/cdrom/boot/isolinux/instroot $(KVER)
+	# Build the installer
+	#  - compress it harder than any regular initramfs since we only build it once
+	#  - don't add any microcode because it is not needed to run the installer
+	#  - omit any modules the installer doesn't use (it brings its own networking)
+	#  - omit network drivers for SmartNICs with very large firmware
+	dracut --force -a "installer" --strip --compress "zstd -19 -q -T0" \
+		--no-early-microcode -o "$(INSTALLER_OMIT_MODULES)" \
+		--omit-drivers "$(INSTALLER_OMIT_DRIVERS)" \
+		$(DIR_TMP)/cdrom/boot/isolinux/instroot $(KVER)
 
 ifeq "$(HAS_ISOLINUX)" "1"
 	dd if=/dev/zero  bs=1k count=2            > $(DIR_TMP)/cdrom/boot/isolinux/boot.catalog
@@ -207,7 +248,7 @@ ifeq "$(EFI)" "1"
 	mkdir -pv $(DIR_TMP)/cdrom/EFI/BOOT
 	grub-mkimage \
 		--format=$(GRUB_ARCH)-efi \
-		--output=$(DIR_TMP)/cdrom/EFI/BOOT/BOOT$(EFI_ARCH).EFI \
+		--output=$(DIR_TMP)/cdrom/EFI/BOOT/$(EFI_BOOT_FILE) \
 		--config=$(DIR_TMP)/grub-efi.cfg \
 		--compression=xz \
 		--prefix=/EFI/BOOT \
@@ -228,8 +269,8 @@ ifeq "$(EFI)" "1"
 
 	# Copy the bootloader into the image
 	mkdir -p $(DIR_TMP)/efiboot.img/EFI/BOOT
-	cp -a $(DIR_TMP)/cdrom/EFI/BOOT/BOOT$(EFI_ARCH).EFI \
-		$(DIR_TMP)/efiboot.img/EFI/BOOT/BOOT$(EFI_ARCH).EFI
+	cp -a $(DIR_TMP)/cdrom/EFI/BOOT/$(EFI_BOOT_FILE) \
+		$(DIR_TMP)/efiboot.img/EFI/$(EFI_BOOT_FILE)
 
 	# Cleanup
 	umount $(DIR_TMP)/efiboot.img
