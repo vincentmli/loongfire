@@ -1467,6 +1467,7 @@ build_system() {
 	lfsmake2 sqlite
 	lfsmake2 python3
 	lfsmake2 python3-wheel
+	lfsmake2 python3-toml
 	lfsmake2 python3-setuptools
 	lfsmake2 python3-pyproject2setuppy
 	lfsmake2 python3-packaging
@@ -1899,7 +1900,7 @@ fi
 	lfsmake2 libseccomp
 	lfsmake2 libslirp
 	lfsmake2 dtc
-	lfsmake2 python3-toml
+	lfsmake2 python3-tomli
 	lfsmake2 qemu
 	lfsmake2 nagios_nrpe
 	lfsmake2 nagios-plugins
@@ -1958,7 +1959,6 @@ fi
 	lfsmake2 wireless-regdb
 	lfsmake2 ddns
 	lfsmake2 python3-pycparser
-	lfsmake2 python3-tomli
 	lfsmake2 python3-typing-extensions
 	lfsmake2 python3-semantic-version
 	lfsmake2 python3-setuptools-scm
