@@ -270,7 +270,7 @@ ifeq "$(EFI)" "1"
 	# Copy the bootloader into the image
 	mkdir -p $(DIR_TMP)/efiboot.img/EFI/BOOT
 	cp -a $(DIR_TMP)/cdrom/EFI/BOOT/$(EFI_BOOT_FILE) \
-		$(DIR_TMP)/efiboot.img/EFI/$(EFI_BOOT_FILE)
+		$(DIR_TMP)/efiboot.img/EFI/BOOT/$(EFI_BOOT_FILE)
 
 	# Cleanup
 	umount $(DIR_TMP)/efiboot.img
